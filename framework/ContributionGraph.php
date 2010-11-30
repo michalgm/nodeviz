@@ -63,25 +63,28 @@ class ContributionGraph extends Graph {
 		$precheck = "";
 		$minOrgAmount = $graph['properties']['minOrgAmount'];
 	
-		$query ="select entityid from entities where (cash >= $minOrgAmount or cash = 0)";
-		$this->addquery('companies', $query, $graph);
+		$query ="select entityid as id from entities where (cash >= $minOrgAmount or cash = 0)";
+		$this->addquery('companies', $query);
 
 		$result = dbLookupArray($query);
-		$graph['nodes']['companies'] = $result;
-		return $graph;
+		return $result;
 	}
 	
 	function labels_fetchNodes() {
-		$graph = &$this->data;
-		$graph['nodes']['labels']['oilLabel']= array();
-		$graph['nodes']['labels']['coalLabel']= array();
-		return $graph;
+		return array(
+			'oilLabel' => array(
+				'id' => 'oilLabel',
+			),
+			'coalLabel' => array(
+				'id' => 'coalLabel'
+			)
+		);
 	}
 	
 	function labels_nodeProperties() {
 		$graph = &$this->data;
 		$propView = $graph['properties']['prop'];
-		$graph['nodes']['labels'] = array();
+		$nodes = array();
 		if ($propView ==23){
 			//get sector totals
 			$totals = fetchRow("select format(sum(if(entities.type='oil',amount,0)),0) oil,
@@ -89,122 +92,115 @@ format(sum(if(entities.type='coal',amount,0)),0) coal,
 format(sum(amount)-(sum(if(entities.type='oil',amount,0))+if(entities.type='coal',amount,0)),0) other 
 from relationships join entities on from_id = entityid  and view = 'prop_23' and to_id = 257 ");
 		
-			$graph['nodes']['labels']['oilLabel']['id'] = 'oilLabel';
-			$graph['nodes']['labels']['oilLabel']['shape'] = 'box';
-			$graph['nodes']['labels']['oilLabel']['size'] = 20;
-			$graph['nodes']['labels']['oilLabel']['fontsize'] ="180";
-			$graph['nodes']['labels']['oilLabel']['label'] = "Oil &amp; Gas Companies: $".$totals[0];
-			$graph['nodes']['labels']['oilLabel']['fontcolor'] ="#6d8f9d";
-			$graph['nodes']['labels']['oilLabel']['color'] ="#ffffff";
-			$graph['nodes']['labels']['oilLabel']['fontname'] ="Arial, Helvetica, sans-serif";
+			$nodes['oilLabel']['id'] = 'oilLabel';
+			$nodes['oilLabel']['shape'] = 'box';
+			$nodes['oilLabel']['size'] = 20;
+			$nodes['oilLabel']['fontsize'] ="180";
+			$nodes['oilLabel']['label'] = "Oil &amp; Gas Companies: $".$totals[0];
+			$nodes['oilLabel']['fontcolor'] ="#6d8f9d";
+			$nodes['oilLabel']['color'] ="#ffffff";
+			$nodes['oilLabel']['fontname'] ="Arial, Helvetica, sans-serif";
 			
+			$nodes['coalLabel']['id'] = 'coalLabel';
+			$nodes['coalLabel']['shape'] = 'box';
+			$nodes['coalLabel']['size'] = 20;
+			$nodes['coalLabel']['fontsize'] ="100";
+			$nodes['coalLabel']['label'] = "Coal Companies: $".$totals[1];
+			$nodes['coalLabel']['fontcolor'] ="#958d63";
+			$nodes['coalLabel']['color'] ="#ffffff";
+			$nodes['coalLabel']['fontname'] ="Arial, Helvetica, sans-serif";
 			
-			$graph['nodes']['labels']['coalLabel']['id'] = 'coalLabel';
-			$graph['nodes']['labels']['coalLabel']['shape'] = 'box';
-			$graph['nodes']['labels']['coalLabel']['size'] = 20;
-			$graph['nodes']['labels']['coalLabel']['fontsize'] ="100";
-			$graph['nodes']['labels']['coalLabel']['label'] = "Coal Companies: $".$totals[1];
-			$graph['nodes']['labels']['coalLabel']['fontcolor'] ="#958d63";
-			$graph['nodes']['labels']['coalLabel']['color'] ="#ffffff";
-			$graph['nodes']['labels']['coalLabel']['fontname'] ="Arial, Helvetica, sans-serif";
-			
-			$graph['nodes']['labels']['otherLabel']['id'] = 'otherLabel';
-			$graph['nodes']['labels']['otherLabel']['shape'] = 'box';
-			$graph['nodes']['labels']['otherLabel']['size'] = 20;
-			$graph['nodes']['labels']['otherLabel']['fontsize'] ="120";
-			$graph['nodes']['labels']['otherLabel']['label'] = "Other Companies: $".$totals[2];
-			$graph['nodes']['labels']['otherLabel']['fontcolor'] ="gray";
-			$graph['nodes']['labels']['otherLabel']['color'] ="#ffffff";
-			$graph['nodes']['labels']['otherLabel']['fontname'] ="Arial, Helvetica, sans-serif";
+			$nodes['otherLabel']['id'] = 'otherLabel';
+			$nodes['otherLabel']['shape'] = 'box';
+			$nodes['otherLabel']['size'] = 20;
+			$nodes['otherLabel']['fontsize'] ="120";
+			$nodes['otherLabel']['label'] = "Other Companies: $".$totals[2];
+			$nodes['otherLabel']['fontcolor'] ="gray";
+			$nodes['otherLabel']['color'] ="#ffffff";
+			$nodes['otherLabel']['fontname'] ="Arial, Helvetica, sans-serif";
 		} else if ($propView == 26){
 			$totals = fetchRow("select format(sum(if(entities.type='oil',amount,0)),0) oil,
 format(sum(if(entities.type='coal',amount,0)),0) coal,
 format(sum(amount)-(sum(if(entities.type='oil',amount,0))+if(entities.type='coal',amount,0)),0) other 
 from relationships join entities on from_id = entityid  and view = 'prop_25_26' and to_id in (376,377) ");
 
-			$graph['nodes']['labels']['oilLabel']['id'] = 'oilLabel';
-			$graph['nodes']['labels']['oilLabel']['shape'] = 'box';
-			//$graph['nodes']['labels']['oilLabel']['cash'] = 100000;
-			$graph['nodes']['labels']['oilLabel']['size'] = 20;
-			$graph['nodes']['labels']['oilLabel']['fontsize'] ="150";
-			$graph['nodes']['labels']['oilLabel']['label'] = "Oil &amp; Gas Companies: $".$totals[0];
-			$graph['nodes']['labels']['oilLabel']['fontcolor'] ="#6d8f9d";
-			$graph['nodes']['labels']['oilLabel']['color'] ="#ffffff";
-			$graph['nodes']['labels']['oilLabel']['fontname'] ="Arial, Helvetica, sans-serif";
+			$nodes['oilLabel']['id'] = 'oilLabel';
+			$nodes['oilLabel']['shape'] = 'box';
+			//$nodes['oilLabel']['cash'] = 100000;
+			$nodes['oilLabel']['size'] = 20;
+			$nodes['oilLabel']['fontsize'] ="150";
+			$nodes['oilLabel']['label'] = "Oil &amp; Gas Companies: $".$totals[0];
+			$nodes['oilLabel']['fontcolor'] ="#6d8f9d";
+			$nodes['oilLabel']['color'] ="#ffffff";
+			$nodes['oilLabel']['fontname'] ="Arial, Helvetica, sans-serif";
 			
-			$graph['nodes']['labels']['otherLabel']['id'] = 'otherLabel';
-			$graph['nodes']['labels']['otherLabel']['shape'] = 'box';
-			//$graph['nodes']['labels']['oilLabel']['cash'] = 100000;
-			$graph['nodes']['labels']['otherLabel']['size'] = 20;
-			$graph['nodes']['labels']['otherLabel']['fontsize'] ="180";
-			$graph['nodes']['labels']['otherLabel']['label'] = "Other Companies: $".$totals[2];
-			$graph['nodes']['labels']['otherLabel']['fontcolor'] ="gray";
-			$graph['nodes']['labels']['otherLabel']['color'] ="#ffffff";
-			$graph['nodes']['labels']['otherLabel']['fontname'] ="Arial, Helvetica, sans-serif";
+			$nodes['otherLabel']['id'] = 'otherLabel';
+			$nodes['otherLabel']['shape'] = 'box';
+			//$nodes['oilLabel']['cash'] = 100000;
+			$nodes['otherLabel']['size'] = 20;
+			$nodes['otherLabel']['fontsize'] ="180";
+			$nodes['otherLabel']['label'] = "Other Companies: $".$totals[2];
+			$nodes['otherLabel']['fontcolor'] ="gray";
+			$nodes['otherLabel']['color'] ="#ffffff";
+			$nodes['otherLabel']['fontname'] ="Arial, Helvetica, sans-serif";
 		}
-		return $graph;
+		return $nodes;
 	}
 	
 	function labels_fetchEdges(){
-	
 		$graph = &$this->data;
-		$graph['edges']['labels']= array();
 		//$graph['edges']['labels']['coalLabel'] = array();
 		$propView = $graph['properties']['prop'];
+
+		$edges = array();
 		
 		if ($propView ==23){
-			$graph['edges']['labels']['oilLabel']['id'] = 'oilLabel';
-			$graph['edges']['labels']['oilLabel']['fromId'] = 'oilLabel';
-			$graph['edges']['labels']['oilLabel']['toId'] = '262';
-			$graph['edges']['labels']['oilLabel']['cash'] = 30000;
-			$graph['edges']['labels']['oilLabel']['weight'] = 0;
-			$graph['edges']['labels']['oilLabel']['size'] = 0;
-			$graph['edges']['labels']['oilLabel']['weight'] = 0;
-			$graph['edges']['labels']['oilLabel']['style'] = "invis";
+			$edges['oilLabel']['id'] = 'oilLabel';
+			$edges['oilLabel']['fromId'] = 'oilLabel';
+			$edges['oilLabel']['toId'] = '262';
+			$edges['oilLabel']['cash'] = 30000;
+			$edges['oilLabel']['weight'] = 0;
+			$edges['oilLabel']['size'] = 0;
+			$edges['oilLabel']['weight'] = 0;
+			$edges['oilLabel']['style'] = "invis";
 			
-			$graph['edges']['labels']['coalLabel']['id'] = 'coalLabel';
-			$graph['edges']['labels']['coalLabel']['fromId'] = 'coalLabel';
-			$graph['edges']['labels']['coalLabel']['toId'] = '793';
-			$graph['edges']['labels']['coalLabel']['cash'] = 30000;
-			$graph['edges']['labels']['coalLabel']['weight'] = 0;
-			$graph['edges']['labels']['coalLabel']['size'] = 0;
-			$graph['edges']['labels']['coalLabel']['weight'] = 0;
-			$graph['edges']['labels']['coalLabel']['style'] = "invis";
+			$edges['coalLabel']['id'] = 'coalLabel';
+			$edges['coalLabel']['fromId'] = 'coalLabel';
+			$edges['coalLabel']['toId'] = '793';
+			$edges['coalLabel']['cash'] = 30000;
+			$edges['coalLabel']['weight'] = 0;
+			$edges['coalLabel']['size'] = 0;
+			$edges['coalLabel']['weight'] = 0;
+			$edges['coalLabel']['style'] = "invis";
 			
-			$graph['edges']['labels']['otherLabel']['id'] = 'otherLabel';
-			$graph['edges']['labels']['otherLabel']['fromId'] = 'otherLabel';
-			$graph['edges']['labels']['otherLabel']['toId'] = '357';
-			$graph['edges']['labels']['otherLabel']['cash'] = 30000;
-			$graph['edges']['labels']['otherLabel']['weight'] = 0;
-			$graph['edges']['labels']['otherLabel']['size'] = 0;
-			$graph['edges']['labels']['otherLabel']['weight'] = 0;
-			$graph['edges']['labels']['otherLabel']['style'] = "invis";
+			$edges['otherLabel']['id'] = 'otherLabel';
+			$edges['otherLabel']['fromId'] = 'otherLabel';
+			$edges['otherLabel']['toId'] = '357';
+			$edges['otherLabel']['cash'] = 30000;
+			$edges['otherLabel']['weight'] = 0;
+			$edges['otherLabel']['size'] = 0;
+			$edges['otherLabel']['weight'] = 0;
+			$edges['otherLabel']['style'] = "invis";
 		} else if ($propView == 26) {
-			$graph['edges']['labels']['oilLabel']['id'] = 'oilLabel';
-			$graph['edges']['labels']['oilLabel']['fromId'] = 'oilLabel';
-			$graph['edges']['labels']['oilLabel']['toId'] = '261';
-			$graph['edges']['labels']['oilLabel']['cash'] = 30000;
-			$graph['edges']['labels']['oilLabel']['weight'] = 0;
-			$graph['edges']['labels']['oilLabel']['size'] = 0;
-			$graph['edges']['labels']['oilLabel']['weight'] = 0;
-			$graph['edges']['labels']['oilLabel']['style'] = "invis";
+			$edges['oilLabel']['id'] = 'oilLabel';
+			$edges['oilLabel']['fromId'] = 'oilLabel';
+			$edges['oilLabel']['toId'] = '261';
+			$edges['oilLabel']['cash'] = 30000;
+			$edges['oilLabel']['weight'] = 0;
+			$edges['oilLabel']['size'] = 0;
+			$edges['oilLabel']['weight'] = 0;
+			$edges['oilLabel']['style'] = "invis";
 			
-			$graph['edges']['labels']['otherLabel']['id'] = 'otherLabel';
-			$graph['edges']['labels']['otherLabel']['fromId'] = 'otherLabel';
-			$graph['edges']['labels']['otherLabel']['toId'] = '792';
-			$graph['edges']['labels']['otherLabel']['cash'] = 30000;
-			$graph['edges']['labels']['otherLabel']['weight'] = 0;
-			$graph['edges']['labels']['otherLabel']['size'] = 0;
-			$graph['edges']['labels']['otherLabel']['weight'] = 0;
-			$graph['edges']['labels']['otherLabel']['style'] = "invis";
-			
-			
-
+			$edges['otherLabel']['id'] = 'otherLabel';
+			$edges['otherLabel']['fromId'] = 'otherLabel';
+			$edges['otherLabel']['toId'] = '792';
+			$edges['otherLabel']['cash'] = 30000;
+			$edges['otherLabel']['weight'] = 0;
+			$edges['otherLabel']['size'] = 0;
+			$edges['otherLabel']['weight'] = 0;
+			$edges['otherLabel']['style'] = "invis";
 		}
-		
-	
-		return $graph; 
-		
+		return $edges; 
 	}
 
 
@@ -219,7 +215,7 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 		global $company_images;
 		global $current_congress;
 		$racecode_filter = "";
-		$org_ids = arrayToInString($graph['nodes']['companies']);
+		$org_ids = arrayToInString($graph['nodetypesindex']['companies']);
 		$propView = $graph['properties']['prop'];
 		$cashType = "prop23_cash";
 		$sortType = "type desc";
@@ -230,8 +226,7 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 		$query ="select entityid as id,label as Name,$cashType as cash,format(sum($cashType),0) as nicecash,image_name as image,type as industry, state from entities where entityid in ($org_ids) group by entityid order by $sortType, $cashType desc;";
 		$this->addquery('companies_props', $query,$graph);
 		$nodes = dbLookupArray($query);
-		$graph['nodes']['companies'] = $nodes;
-		foreach($graph['nodes']['companies'] as &$node) {
+		foreach($nodes as &$node) {
 			$node['shape'] = 'circle';
 			$node['onClick'] = "selectNode('".$node['id']."');";
 			$nodeamount = '$'.$node['nicecash'];
@@ -268,7 +263,8 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 			$node['label'] = $node['Name'];
 			$node['fontname'] ="Arial, Helvetica, sans-serif";
 		}
-		$this->scaleSizes('companies', 'cash');
+		$nodes = $this->scaleSizes($nodes, 'companies', 'cash');
+		return $nodes;
 	}
 
 	//NEED TO HAVE COMMENTS GIVING THE NAMES OF THE PROPERTIES ADDED
@@ -277,7 +273,7 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 	function org2org_fetchEdges() {
 		dbwrite("SET group_concat_max_len := @@max_allowed_packet");
 		$graph = &$this->data;
-		$orgIds = arrayToInString($graph['nodes']['companies']);
+		$orgIds = arrayToInString($graph['nodetypesindex']['companies']);
 		$minContribAmount = $graph['properties']['minContribAmount'];
 		
 		//decide which edges to include based on which view
@@ -293,8 +289,7 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 		
 		$this->addquery('org2org', $query, $graph);
 		$result = dbLookupArray($query);
-		$graph['edges']['org2org'] = $result;	
-		return $graph;
+		return $result;
 	}
 	
 	function orgOwnOrg_fetchEdges() {
@@ -306,7 +301,7 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 		if($propView == "26"){
 			$view = "and (view in ('prop_25_26','both') or view is null)";
 		}
-		$orgIds = arrayToInString($graph['nodes']['companies']);
+		$orgIds = arrayToInString($graph['nodetypesindex']['companies']);
 		$minContribAmount = $graph['properties']['minContribAmount'];
 		
 		$query = "select concat('m_',from_id, '_', to_id ) as id, from_id fromId, to_id as toId,  group_concat(concat(\"'\", transaction_id, \"'\")) as ContribIDs from relationships where type = 'member' and from_id in ($orgIds) and to_id in ($orgIds) $view group by from_id, to_id";
@@ -314,13 +309,12 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 		
 		$this->addquery('orgOwnOrg', $query, $graph);
 		$result = dbLookupArray($query);
-		$graph['edges']['orgOwnOrg'] = $result;	
-		return $graph;
+		return $result;
 	}
 
 function org2org_edgeProperties() {
 		$graph = &$this->data;
-		$orgIds = arrayToInString($graph['nodes']['companies']);
+		$orgIds = arrayToInString($graph['nodetypesindex']['companies']);
 		$sitecode = "";
 		$congress = "";
 		$precheck = "";
@@ -338,46 +332,48 @@ function org2org_edgeProperties() {
 		$this->addquery('org2org_props', $query, $graph);
 		$edgeprops = dbLookupArray($query);
 		//$graph['edges']['com2can'] = $nodes;  //don't use this, would replace the edges
-		
-		foreach(array_keys($graph['edges']['org2org']) as $key) {
-			$edge = $graph['edges']['org2org'][$key];
+		$edges = array();	
+		foreach($graph['edgetypesindex']['org2org'] as $key) {
+			$edge = $graph['edges'][$key];
 			if(! array_key_exists($edge['id'], $edgeprops)) { 
-				unset($graph['edges']['org2org'][$key]); 
+				unset($graph['edges'][$key]); 
+				unset($graph['edgetypesindex']['org2org'][$key]); 
 				continue;
 			}
 			$edge['onClick'] = "selectEdge('".$edge['id']."');";
 			$edge['onClick'] = "selectEdge(eventObject)";
 			$edge['cash'] = $edgeprops[$edge['id']]['cash'];   //get the appropriate ammount properties
 			$edge['nicecash'] = $edgeprops[$edge['id']]['nicecash']; 
-			$edge['Name'] = htmlspecialchars($graph['nodes']['companies'][$edge['fromId']]['Name'], ENT_QUOTES);
-			$edge['OrganizationName'] = $graph['nodes']['companies'][$edge['toId']]['Name'];
+			$edge['Name'] = htmlspecialchars($graph['nodes'][$edge['fromId']]['Name'], ENT_QUOTES);
+			$edge['OrganizationName'] = $graph['nodes'][$edge['toId']]['Name'];
 			$edge['weight'] = $edge['cash'];
 			$edge['onMouseover'] = "this.style.cursor = 'pointer'; showTooltip('$".$edge['nicecash']."');";
 			$edge['type'] = 'org2org';
 			$edge['color'] = lookupIndustryColor($edgeprops[$edge['id']]['industry']);
 			$edge['class'] = 'level2';
-			$graph['edges']['org2org'][$key] = $edge;
+			$edges[$key] = $edge;
 		}
-		$this->scaleSizes('org2org', 'cash');
+		$edges = $this->scaleSizes($edges, 'org2org', 'cash');
+		return $edges;
 	}
 	
 	//MEMBERSHIP EDGES
 function orgOwnOrg_edgeProperties() {
 		$graph = &$this->data;
-		$orgIds = arrayToInString($graph['nodes']['companies']);
+		$orgIds = arrayToInString($graph['nodetypesindex']['companies']);
 		$sitecode = "";
 		$congress = "";
 		$precheck = "";
 		$breakdown = "";
-
 
 		$query = "select concat('m_',from_id, '_', to_id ) as id, 40 as weight, details nicecash from  relationships where type = 'member' and to_id in ($orgIds) and from_id in ($orgIds)";
 		$this->addquery('orgOwnOrg_props', $query, $graph);
 		$edgeprops = dbLookupArray($query);
 		//$graph['edges']['com2can'] = $nodes;  //don't use this, would replace the edges
 		
-		foreach(array_keys($graph['edges']['orgOwnOrg']) as $key) {
-			$edge = $graph['edges']['orgOwnOrg'][$key];
+		$edges = array();
+		foreach($graph['edgetypesindex']['orgOwnOrg'] as $key) {
+			$edge = $graph['edges'][$key];
 			if(! array_key_exists($edge['id'], $edgeprops)) { 
 				unset($graph['edges']['orgOwnOrg'][$key]); 
 				continue;
@@ -386,17 +382,17 @@ function orgOwnOrg_edgeProperties() {
 			$edge['onClick'] = "selectEdge(eventObject)";
 			$edge['weight'] = $edgeprops[$edge['id']]['weight'];   //get the appropriate ammount properties
 			$edge['nicecash'] = $edgeprops[$edge['id']]['nicecash']; 
-			$edge['Name'] = htmlspecialchars($graph['nodes']['companies'][$edge['fromId']]['Name'], ENT_QUOTES);
-			$edge['OrganizationName'] = $graph['nodes']['companies'][$edge['toId']]['Name'];
+			$edge['Name'] = htmlspecialchars($graph['nodes'][$edge['fromId']]['Name'], ENT_QUOTES);
+			$edge['OrganizationName'] = $graph['nodes'][$edge['toId']]['Name'];
 			//$edge['weight'] = $edge['cash'];
 			$edge['onMouseover'] = "this.style.cursor = 'pointer'; showTooltip('".$edge['nicecash']."');";
 			$edge['type'] = 'orgOwnOrg';
 			$edge['color'] = '#CCCCCC';
 			//$edge['style'] = 'dashed';
 			$edge['size'] = 10;
-			$graph['edges']['orgOwnOrg'][$key] = $edge;
-			
+			$edges[$key] = $edge;
 		}
+		return $edges;
 		//$this->scaleSizes('orgOwnOrg', 'weight');
 	}
 	

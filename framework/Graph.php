@@ -16,7 +16,9 @@ class Graph {
 			'nodes'=> array(),
 			'edges'=> array(),
 			'subgraphs' => array(),
-			'queries'=> array()
+			'queries'=> array(),
+			'nodetypesindex'=> array(),
+			'edgetypesindex'=> array(),
 		);
 
 		$this->data = $data;
@@ -72,31 +74,46 @@ class Graph {
 	function loadGraphData() {
 		global $debug;
 		if ($debug) { $start = microtime(1); }
+
 		foreach ($this->data['nodetypes'] as $nodetype) {
 			$function =  "$nodetype"."_fetchNodes";
 			if(method_exists($this, $function)) {
-				$this->$function();
+				$nodes = $this->$function();
+				$this->data['nodetypesindex'][$nodetype] = array_keys($nodes);
+				foreach ($nodes as $node) { 
+					$this->data['nodes'][$node['id']] = $node;
+					$this->data['nodes'][$node['id']]['type'] = $nodetype;
+				}
 			}
 		}
+
 		foreach (array_keys($this->data['edgetypes']) as $edgetype) {
 			$function =  "$edgetype"."_fetchEdges";
 			if(method_exists($this, $function)) {
-				$this->$function();
+				$edges = $this->$function();
+				$this->data['edgetypesindex'][$edgetype] = array_keys($edges);
+				foreach ($edges as $edge) { 
+					$this->data['edges'][$edge['id']] = $edge;
+					$this->data['edges'][$edge['id']]['type'] = $edgetype;
+				}
 			}
 		}
-		
+
 		if (! isset($this->data['properties']['retainIsolates'])) {
-			foreach ($this->data['nodetypes'] as $nodetype) {
-				foreach (array_keys($this->data['nodes'][$nodetype]) as $id) {
-					$test = 0;
-					foreach (array_keys($this->data['edgetypes']) as $edgetype) {
-						if (is_array($this->data['edges'][$edgetype])){
-							foreach (array_keys($this->data['edges'][$edgetype]) as $edgeid) {
-								if ($this->data['edges'][$edgetype][$edgeid]['toId'] == $id || $this->data['edges'][$edgetype][$edgeid]['fromId'] == $id) { $test = 1; }
-							}
-						}
+			foreach (array_keys($this->data['nodes']) as $id) {
+				$test = 0;
+				foreach (array_keys($this->data['edges']) as $edgeid) {
+					if (! isset($this->data['edges'][$edgeid]['toId'])) { print_r($this->data['edges'][$edgeid]); print $edgeid;}
+					if ($this->data['edges'][$edgeid]['toId'] == $id || $this->data['edges'][$edgeid]['fromId'] == $id) { $test = 1; }
+				}
+				if (! $test) { 
+					//This node is not associated with any edges, so we remove it from the nodes and nodetypesindex arrays
+					$nodetype = $this->data['nodes'][$id]['type'];
+					unset($this->data['nodes'][$id]); 
+					$index = array_search($id, $this->data['nodetypesindex'][$nodetype]);
+					if ($index) {
+						unset($this->data['nodetypesindex'][$nodetype][$index]); 
 					}
-					if (! $test) { unset($this->data['nodes'][$nodetype][$id]); }
 				}
 			}
 		}
@@ -104,16 +121,35 @@ class Graph {
 		foreach ($this->data['nodetypes'] as $nodetype) {
 			$function =  "$nodetype"."_nodeProperties";
 			if(method_exists($this, $function)) {
-				$this->$function();
+				$nodes = $this->$function();
+				foreach ($nodes as $node) {
+					unset($this->data['nodes'][$node['id']]); //need to unset to inherit new order
+					$this->data['nodes'][$node['id']] = $node;
+				}
 			}
 		}
 
 		foreach (array_keys($this->data['edgetypes']) as $edgetype) {
 			$function =  "$edgetype"."_edgeProperties";
 			if(method_exists($this, $function)) {
-				$this->$function();
+				$edges = $this->$function();
+				foreach ($edges as $edge) {
+					unset($this->data['edges'][$edge['id']]); //need to unset to inherit new order
+					$this->data['edges'][$edge['id']] = $edge;
+				}
 			}
 		}
+
+		//Populate the related nodes fields for each node by stepping through the edges
+		foreach ($this->data['edges'] as $edge) {
+			if ($this->data['nodes'][$edge['toId']]) {
+				$this->data['nodes'][$edge['toId']]['relatedNodes'][$edge['fromId']] = 'from';
+			}
+			if ($this->data['nodes'][$edge['fromId']]) {
+				$this->data['nodes'][$edge['fromId']]['relatedNodes'][$edge['toId']] = 'to';
+			}
+		}
+
 		//load subgraphs if subgraph method is defined
 		if (method_exists($this, 'getSubgraphs')) {
 			$this->getSubgraphs();
@@ -128,26 +164,26 @@ class Graph {
 	#-------------------------------------------------
 
 	//Sets 'size' property to scaled value: takes graph object, entity type, and key of entity to use for scaled values
-	function scaleSizes($type, $key){
+	function scaleSizes($array, $type, $key){
 		$graph = &$this->data;
 		$maxSize = $graph['properties']['maxSize'][$type];
 		$minSize = $graph['properties']['minSize'][$type];
 		$scale = pow($maxSize,2) - pow($minSize,2);  //the range we actually want
 		$vals = array();
 		
-		if (isset($graph['nodes'][$type])) {	
-			reset($graph['nodes'][$type]);
-			if (key($graph['nodes'][$type])) { 
-				$shape = $graph['nodes'][$type][key($graph['nodes'][$type])]['shape'];
+		if (isset($graph['nodetypesindex'][$type])) {	
+			reset($array);
+			if (key($array)) { 
+				$shape = $array[key($array)]['shape'];
 				//load all the cash into an array
-				foreach($graph['nodes'][$type] as $node) { $vals[] =  $node[$key]; }
+				foreach($array as $node) { $vals[] =  $node[$key]; }
 				$diff = max($vals) - min($vals);  //figure out the data range
 				$min = min($vals);
-				foreach(array_keys($graph['nodes'][$type]) as $id) {
+				foreach(array_keys($array) as $id) {
 					if ($diff == 0) {  // if all nodes are the same size, use max
-						$graph['nodes'][$type][$id]['size']	= $maxSize;
+						$array[$id]['size']	= $maxSize;
 					} else {
-						 $normed = ($graph['nodes'][$type][$id][$key] - $min) / $diff; //normalize it to the range 0-1
+						 $normed = ($array[$id][$key] - $min) / $diff; //normalize it to the range 0-1
 						 $area = ($normed * $scale) + pow($minSize,2);  //adjust to value we want
 						 //now calculate appropriate with from area depending on shape
 						if ($shape == 'circle') { 
@@ -156,82 +192,34 @@ class Graph {
 							$size = sqrt(abs($area));
 						}
 						//$factor = $amount/$diff;
-						$graph['nodes'][$type][$id]['size']	= $size ;
+						$array[$id]['size']	= $size ;
 					}
 				}
 			}
-		} else if ($graph['edges'][$type]) {
-			foreach($graph['edges'][$type] as $node) { $vals[] =  $node[$key]; }
+		} else if ($graph['edgetypesindex'][$type]) {
+			foreach($array as $node) { $vals[] =  $node[$key]; }
 			$diff = max($vals) - min($vals);
-			foreach(array_keys($graph['edges'][$type]) as $id) {
+			foreach(array_keys($array) as $id) {
 				if ($diff == 0) {
-					$graph['edges'][$type][$id]['size']	= $maxSize;
+					$array[$id]['size']	= $maxSize;
 				} else {
-					$amount = $graph['edges'][$type][$id][$key] - min($vals);
+					$amount = $array[$id][$key] - min($vals);
 					$factor = $amount/$diff;
-					$graph['edges'][$type][$id]['size'] = ($factor * ($maxSize - $minSize)) + $minSize;	
+					$array[$id]['size'] = ($factor * ($maxSize - $minSize)) + $minSize;	
 				}
 			}
 		}
-		return $graph;
-	}
-
-	function iloadGraphData($graph=NULL) {
-		if (!$graph) {
-			$graph = createGraph(); 
-		}
-
-		foreach ($graph['nodetypes'] as $nodetype) {
-			$function =  "$nodetype"."_fetchNodes";
-			$graph = $function($graph);
-		}
-
-		foreach (array_keys($graph['edgetypes']) as $edgetype) {
-			$function =  "$edgetype"."_fetchEdges";
-			$graph = $function($graph);
-		}
-		
-		if (! $graph['properties']['retainIsolates']) {
-			foreach ($graph['nodetypes'] as $nodetype) {
-				foreach (array_keys($graph['nodes'][$nodetype]) as $id) {
-					$test = 0;
-					foreach (array_keys($graph['edgetypes']) as $edgetype) {
-					   if (is_array($graph['edges'][$edgetype])){
-						foreach (array_keys($graph['edges'][$edgetype]) as $edgeid) {
-							if ($graph['edges'][$edgetype][$edgeid]['toId'] == $id || $graph['edges'][$edgetype][$edgeid]['fromId'] == $id) { $test = 1; }
-						}
-						}
-					}
-					if (! $test) { unset($graph['nodes'][$nodetype][$id]); }
-				}
-			}
-		}
-
-		foreach ($graph['nodetypes'] as $nodetype) {
-			$function =  "$nodetype"."_nodeProperties";
-			$graph = $function($graph);
-		}
-
-		foreach (array_keys($graph['edgetypes']) as $edgetype) {
-			$function =  "$edgetype"."_edgeProperties";
-			$graph = $function($graph);
-		}
-		
-		return $graph;
+		return $array;
 	}
 
 	//returns the node array corresponding to an id
 	function lookupNodeID($id) {
 		$graph = $this->data;
-		foreach($graph['nodetypes'] as $type) {
-			if (isset($graph['nodes'][$type][$id])) { 
-				return $graph['nodes'][$type][$id];
-			}
+		if (isset($graph['nodes'][$id])) { 
+			return $graph['nodes'][$id];
 		}
-		foreach(array_keys($graph['edgetypes']) as $type) {
-			if (isset($graph['edges'][$type][$id])) { 
-				return $graph['edges'][$type][$id];
-			}
+		if (isset($graph['edges'][$id])) { 
+			return $graph['edges'][$id];
 		}
 	}
 
@@ -259,7 +247,5 @@ class Graph {
 		global $debug;
 		if ($debug) { $this->data['queries'][$name] = $query; }	
 	}
-
-
 
 }

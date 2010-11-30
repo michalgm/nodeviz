@@ -79,7 +79,7 @@ function createDetailTable($graph, $type, $id) {
 	$secondary = $props['secondary'];
 	$odd = 'odd';
 	if (isset($graph->data['edges'])){   //check if graph is empty
-		$edgetypes = array_keys($graph->data['edges']);
+		$edgetypes = array_keys($graph->data['edgetypesindex']);
 		
 	} else {
 		$edgetypes = array();
@@ -89,12 +89,12 @@ function createDetailTable($graph, $type, $id) {
 		return $graph->data['edges']['org2org'][$a]['cash'] < $graph->data['edges']['org2org'][$b]['cash'];
 	}
 	foreach ($edgetypes as $edgetype){
-		$edge_ids = array_keys($graph->data['edges'][$edgetype]);
+		$edge_ids = $graph->data['edgetypesindex'][$edgetype];
 		//usort($edge_ids, 'edge_sort');
 		$edgecount += count($edge_ids);
 		foreach ($edge_ids as $edge_id) {
-			$edge = $graph->data['edges'][$edgetype][$edge_id];
-			$node = $graph->data['nodes'][$props['node2']][$edge[$props['secondary']]];
+			$edge = $graph->data['edges'][$edge_id];
+			$node = $graph->data['nodes'][$edge[$props['secondary']]];
 			if ($edge[$primary] == $id) {
 				$links = getLinks($node);
 				$extra = "<span class='industry $node[industry]'>(".ucwords($node['industry']).")</span>"; 
@@ -146,7 +146,8 @@ function createIndexTable($graph, $type) {
 	if ($type == 'company') { $style = 'company'; }
 
 	$data = "<ul>";
-	foreach ($graph->data['nodes'][$props['node1']] as $node) {
+	foreach ($graph->data['nodetypesindex'][$props['node1']] as $nodeid) {
+		$node = $graph->data['nodes'][$nodeid];
 		#$data .= "<tr id='t$node[id]'> <td><img src='".preg_replace("/..\/www\/c([ao][mn])_images\/\/c?([^\/]+)\.([^\/]+)$/", "c$1_images/s$2.$3", $node[image])."' style='vertical-align: middle; width:20px; height: 20px;' /> <a href='#' onclick=\"showDetails('$node[id]', '$type'); return false;\">$node[Name]</a></td>";
 		$extra = '';
 		if ($node['industry'] != ""){

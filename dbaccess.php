@@ -108,9 +108,12 @@ function arrayValuesToInString($array) {
 	return "'".join("','", array_values($array))."'";
 }
 
-function arrayToInString($array) {
+function arrayToInString($array, $assoc=0) {
 	$array2 = Array();
-	foreach (array_keys($array) as $key) {
+	if($assoc) { 
+		$array = array_keys($array);
+	}
+	foreach ($array as $key) {
 		$key = dbEscape($key);
 		$array2[] = $key;
 	}

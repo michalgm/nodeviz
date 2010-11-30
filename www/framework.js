@@ -653,40 +653,18 @@ function loadtitle(congressnum) {
 	if ($('candidateFilterIndex').value == 1) { 
 		prop = 26;
 	}
-	if(qparams['search'] || qparams['type'] == 'search') {
-		return;  //WTF?  if so, why is there still code after this?
-		if ($('searchtype').value == 'com') { 
-			direction = ' from ';
-		} else { 
-			direction = ' to ';
-		}
-		title = 'Contributions '+direction+$('selectedcandidatename').innerHTML;
-		if (congressnum == 'total') { 
-			title+= " since 1999"; 
-		} else if (congressnum == 'pre') { 
-			title+= ' before taking office'; 
-		} else { 
-			title+= ' during the '+congressnum+'th congress'; 
-		}
-	} else {
-		var race = $F($('form').racecode);
-		var raceopts = advanced_opts[$F($('form').sitecode)][$('congress_num').value][race];
-		contribamount = numberFormat(raceopts['minContribAmount'][$('contribFilterIndex').value]);	
-		candidateamount = numberFormat(raceopts['minCandidateAmount'][$('candidateFilterIndex').value]);	
-		companyamount = numberFormat(raceopts['minCompanyAmount'][$('companyFilterIndex').value]);	
-		if (qparams['type'] == 'presidential') {
-			title =  $('congress_num').options[$('congress_num').selectedIndex].innerHTML + ' Presidential Race';
-			subtitle = 'Showing contributions greater than '+contribamount+', candidates receiving more than '+candidateamount+', and companies giving more than '+companyamount+'.';
-		} else {
-			qparams['type'] = 'congress';
-		    current['congress_num'] = congressnum; //this is a hack to deal with the fact that we are passing with a global
-			chamber = 'Senate';
-			if (race == 'H') { chamber = 'House'; }
-			title = "Who is Funding California's Proposition "+prop+"?";
-			industry = sitecode == 'carbon' ? 'Dirty Energy' : sitecode;
-			subtitle = "Move your mouse over the diagram to reveal funding relationships. Click on circles and lines to show more details about organizations and people who contributed to Prop "+prop+".";		
-		}	
-	}
+	var race = $F($('form').racecode);
+	var raceopts = advanced_opts[$F($('form').sitecode)][$('congress_num').value][race];
+	contribamount = numberFormat(raceopts['minContribAmount'][$('contribFilterIndex').value]);	
+	candidateamount = numberFormat(raceopts['minCandidateAmount'][$('candidateFilterIndex').value]);	
+	companyamount = numberFormat(raceopts['minCompanyAmount'][$('companyFilterIndex').value]);	
+	qparams['type'] = 'congress';
+	current['congress_num'] = congressnum; //this is a hack to deal with the fact that we are passing with a global
+	chamber = 'Senate';
+	if (race == 'H') { chamber = 'House'; }
+	title = "Who is Funding California's Proposition "+prop+"?";
+	industry = sitecode == 'carbon' ? 'Dirty Energy' : sitecode;
+	subtitle = "Move your mouse over the diagram to reveal funding relationships. Click on circles and lines to show more details about organizations and people who contributed to Prop "+prop+".";		
 	$('graph-title').innerHTML = title;
 	$('graph-subtitle').innerHTML = subtitle;
 }
@@ -810,99 +788,6 @@ function killRequests() {
 	});
 }
 
-function initSVG() {
-	if (useSVG != 1 ) { return; } 
-	nodelookup = new Hash();
-	edgelookup = new Hash();
-	current['network'] = null;
-	$('svg').style.setProperty('position','absolute', '');
-	$('svg').style.setProperty('top','35px', '');
-	$('svgscreen').style.setProperty('cursor','move', 'important');
-	Event.observe($('svgscreen'),'click', hideNetwork);
-	Event.observe($('svg'), 'mousemove', mousemove);
-	$$('.node').each( function(n) {
-		if (! nodelookup[n.id]) { nodelookup[n.id] = new Array(); }
-		nodelookup[n.id]['id'] = n.id;
-		if (n.childNodes[1]) {
-			Event.observe(n,'mouseover', function(e) { eval(graphviz[n.id].onMouseover); });
-			Event.observe(n,'mouseout', function(e) { unhighlightSVGnode(n.id); });
-			Event.observe(n,'click', function(e) { eval(graphviz[n.id].onClick); });
-		}
-	});
-	$$('.edge').each( function(n) {
-		edgeid = n.id;
-		if (graphviz[edgeid]) { 
-			if (! edgelookup[edgeid]) { edgelookup[edgeid] = new Array(); }
-			edgelookup[edgeid]['id'] = edgeid;
-			nodes = new Array(graphviz[edgeid]['fromId'], graphviz[edgeid]['toId']);
-			edgelookup[edgeid]['nodes'] = nodes;
-			if (! nodelookup[nodes[0]]) { nodelookup[nodes[0]] = new Array(); nodelookup[nodes[0]]['id'] = 'fake'+nodes[0]}
-			if (! nodelookup[nodes[1]]) { nodelookup[nodes[1]] = new Array(); }
-			if (! nodelookup[nodes[0]]['edges']) { nodelookup[nodes[0]]['edges'] = {}; }
-			if (! nodelookup[nodes[1]]['edges']) { nodelookup[nodes[1]]['edges'] = {}; }
-			if (! nodelookup[nodes[0]]['lnodes']) { nodelookup[nodes[0]]['lnodes'] = {}; }
-			if (! nodelookup[nodes[1]]['lnodes']) { nodelookup[nodes[1]]['lnodes'] = {}; }
-			nodelookup[nodes[0]]['edges'][edgeid] = 1
-			nodelookup[nodes[1]]['edges'][edgeid] = 1;
-			nodelookup[nodes[0]]['lnodes'][nodes[1]] = 1;
-			nodelookup[nodes[1]]['lnodes'][nodes[0]]= 1;
-		}
-		Event.observe(n,'mouseover', function(eventObject) { eval(graphviz[n.id].onMouseover); });
-		Event.observe(n,'mouseout', hideTooltip, 1);
-		Event.observe(n,'click', function(eventObject) { eval(graphviz[n.id].onClick); });
-		//Event.observe(n,'click', graphviz[n.id].onClick);
-	});
-	//Tag and hide second level nodes and edges
-	$H(graphviz).keys().each(function(n) { 
-		/*
-		if (!graphviz[n]['fromId'] && graphviz[n]['cash'] < 10000) {
-			$(graphviz[n]['id']).setAttribute('class', 'node leveltwo');
-			$('f'+graphviz[n]['id']).setAttribute('class', 'node leveltwo');
-			$H(nodelookup[graphviz[n]['id']]['edges']).keys().each(function(e) {
-				if (graphviz[e]) { 
-					$(e).setAttribute('class', 'edge leveltwo');
-					$('f'+e).setAttribute('class', 'edge leveltwo');
-				}
-			});
-		}
-		*/
-	});
-	$('graph0').style.setProperty('opacity', '1', '');
-	$('svg').style.setProperty('visibility', 'visible', '');
-	var left = Math.round((parseInt($('graphs').getStyle('width')) - $('svg').childNodes[0].getAttribute('width').replace('px', ''))/2);
-	//$('svg').style.setProperty('left',left+'px' , '');
-	$('svg').style.setProperty('left','20px' , '');
-	$('svg').style.setProperty('display', 'block','');
-	root = $('svg').childNodes[0];
-	setupHandlers($('svg').childNodes[0]);
-	$('svg').childNodes[0].setAttribute('width', $('images').getWidth());
-	$('img0').childNodes[0].setAttribute('width', $('images').getWidth());
-	$('svg').childNodes[0].setAttribute('height', $('images').getHeight());
-	$('img0').childNodes[0].setAttribute('height', $('images').getHeight());
-
-	//$('graphs').style.height = $('svg').childNodes[0].getAttribute('height');
-	//$('svg').clonePosition($('img0'), {'setLeft': true});
-	defaultValue = current['zoom'];
-	var x = 0;
-	var values = new Array();
-	while (x <= zoomlevels) { 
-		values.unshift(x);
-		x++;
-	}
-	zoomSlider = new Control.Slider('zoomHandle', 'zoomSlider', {values: values, range: $R(zoomlevels,0), sliderValue: defaultValue,
-		onChange: function(value) { 
-			if(current['zoom'] != value) { 
-				zoom(value);
-			}
-		},
-		onSlide: function(value) {
-			if(current['zoom'] != value) { 
-				zoom(value);
-			}
-		}
-	});
-	resetsvg = $('graph0').getCTM();
-}
 
 function unhighlight(id) { 
 	if (useSVG) { 
@@ -910,53 +795,6 @@ function unhighlight(id) {
 	} else {
 		hideTooltip();
 	}
-}
-
-function highlightSVGnode(id) {
-	var node = $(id).childNodes[3];
-	node.setAttribute('class', 'nhighlight');
-	if (current['network']) { 
-		//$(id).parentNode.appendChild($(id));
-	}
-	showSVGElement(id);
-}
-
-function unhighlightSVGnode(id) {
-	if (! useSVG) { return; }
-	hideTooltip();
-	var node = $(id);
-	node.childNodes[3].removeAttribute('class');
-	if (current['network'] == id || (nodelookup[current['network']] && nodelookup[current['network']]['lnodes'][id] == 1)) {
-		return;
-	} else {
-		hideSVGElement(node);
-	}
-}
-function showNetwork(id) {
-	var node = $(id);
-	if (! node) { return; }
-	if (current['network'] == node.id) { 
-		hideNetwork();
-		highlightSVGnode(node.id);
-		return;
-	}
-	if (current['edge']) { 
-		hideEdge(1);
-	}
-	if (current['network']) { 
-		hideNetwork(1);
-	}
-	if ($('img0').getOpacity() == 1) {
-		new Effect.Opacity('img0', { from: 1, to: .3, duration: .5});
-	}
-	showSVGElement(node);
-	$H(nodelookup[node.id]['edges']).keys().each(function(e) {
-		showSVGElement(e);
-	});
-	$H(nodelookup[node.id]['lnodes']).keys().each(function(e) {
-		showSVGElement(e);
-	});
-	current['network'] = node.id	
 }
 
 function showEdge(edgename) {
@@ -1154,16 +992,6 @@ function zoom(d) {
 	}
 	stateTf = stateTf.multiply(k.inverse());
 
-}
-
-function showSVGElement(e) {
-	$(e).style.setProperty('opacity', '1', 'important');
-	$(e).style.setProperty('display', 'block', 'important');
-}
-
-function hideSVGElement(e) {
-	$(e).style.removeProperty('opacity');
-	$(e).style.removeProperty('display');
 }
 
 function toggleProp(prop) {

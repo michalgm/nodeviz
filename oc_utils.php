@@ -301,7 +301,7 @@ function canInfoHeader($id) {
 function comInfoHeader($id) {
 	global $graph;
 
-	$company = $graph->data['nodes']['companies'][$id];
+	$company = $graph->data['nodes'][$id];
 	$email = "";
 	$links = getLinks($company);
 	$blurb = getBlurb($company, $company['nicecash']);

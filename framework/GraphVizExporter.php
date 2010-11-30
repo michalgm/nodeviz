@@ -72,27 +72,25 @@ class GraphVizExporter {
 		}
 		$dot .= "];\n";
 
-		//for each node type  
-		foreach ($graph['nodetypes'] as $nodetype){
-			//for each node
-			foreach ($graph['nodes'][$nodetype] as $node){
-				//format the the string.  
-				$dot .= "\"".$node['id'].'" ['; //id of node
-				//write out properties
-				$dot .= 'width="'.$node['size'].'" ';
-				$dot .= 'href="a" ';
-				if (! isset($node['target'])) { $node['target'] = $node['id']; }
-				if (isset($node['label'])) { $dot .= 'label="'.$node['label'].'" '; }
-				//Write out all other node properties (color, shape, onClick)
-				foreach(array_keys($node) as $key) { 
-					if (! in_array($key, array('size', 'label'))) { //skip keys that we have to convert
-						$dot .= "$key=\"".$node[$key].'" ';
-					}
-				}	
-				$dot .= "];\n"; 
-			//FIXME MOVE LOGO CODE TO GRAPHBUILDER
+		//for each node
+		foreach ($graph['nodes'] as $node){
+			if(! isset($node['size'])) { print_r($node); }
+			//format the the string.  
+			$dot .= "\"".$node['id'].'" ['; //id of node
+			//write out properties
+			$dot .= 'width="'.$node['size'].'" ';
+			$dot .= 'href="a" ';
+			if (! isset($node['target'])) { $node['target'] = $node['id']; }
+			if (isset($node['label'])) { $dot .= 'label="'.$node['label'].'" '; }
+			//Write out all other node properties (color, shape, onClick)
+			foreach(array_keys($node) as $key) { 
+				if (! in_array($key, array('size', 'label'))) { //skip keys that we have to convert
+					$dot .= "$key=\"".$node[$key].'" ';
+				}
+			}	
+			$dot .= "];\n"; 
+		//FIXME MOVE LOGO CODE TO GRAPHBUILDER
 
-			}
 		}
 
 		//default properties for edges
@@ -105,32 +103,30 @@ class GraphVizExporter {
 		}
 		$dot .="];\n";
 
-		//for each edge type
-		foreach(array_keys($graph['edgetypes']) as $edgetype){
-			//for each edge
-			foreach($graph['edges'][$edgetype] as $edge ){
-				//format the string
-				$dot .= '"'.$edge['fromId'].'" -> "'.$edge['toId']."\" [".
-				'href="a" '.
-				'weight="'.GraphVizExporter::getWeightGV($edge['weight']).'" ';
-				if($edge['size']) {
-					$dot .= 'style="setlinewidth('.$edge['size'].')" ';
-					if (isset($edge['arrowhead']) && $edge['arrowhead'] != 'none' && $GV_PARAMS['edge']['arrowhead'] != 'none') { 
-						$dot .= 'arrowsize="'. ($edge['size']*5).'" ';
-					}
+		//for each edge
+		foreach($graph['edges'] as $edge ){
+			//format the string
+			$dot .= '"'.$edge['fromId'].'" -> "'.$edge['toId']."\" [".
+			'href="a" '.
+			'weight="'.GraphVizExporter::getWeightGV($edge['weight']).'" ';
+			if($edge['size']) {
+				$dot .= 'style="setlinewidth('.$edge['size'].')" ';
+				if (isset($edge['arrowhead']) && $edge['arrowhead'] != 'none' && $GV_PARAMS['edge']['arrowhead'] != 'none') { 
+					$dot .= 'arrowsize="'. ($edge['size']*5).'" ';
 				}
-				if (! isset($edge['target'])) { $edge['target'] = $edge['id']; }
-				//Write out all other node properties (color, shape, onClick)
-				foreach(array_keys($edge) as $key) { 
-					if (! in_array($key, array('href', 'weight', 'size'))) { //skip keys that we have to convert
-						$dot .= "$key=\"".$edge[$key].'" ';
-					}
-				}
-				$dot .= "];\n";
-		
-				//also add properties
 			}
+			if (! isset($edge['target'])) { $edge['target'] = $edge['id']; }
+			//Write out all other node properties (color, shape, onClick)
+			foreach(array_keys($edge) as $key) { 
+				if (! in_array($key, array('href', 'weight', 'size'))) { //skip keys that we have to convert
+					$dot .= "$key=\"".$edge[$key].'" ';
+				}
+			}
+			$dot .= "];\n";
+	
+			//also add properties
 		}
+		
 //hack test subgraph function
 		foreach (array_keys($graph['subgraphs']) as $sg_name){
 			$dot .= "subgraph $sg_name {\n";
@@ -217,6 +213,7 @@ class GraphVizExporter {
 		}
 		//convert array to string
 		$string = 'graphviz = '.json_encode($jsgraph).';'; 
+		$string .= 'graph = '.json_encode($graph).';';
 		return(array("<map id='G' name='G'>$imapstr</map>", $string));
 	}
 
@@ -321,6 +318,7 @@ class GraphVizExporter {
 		$svg = preg_replace("/\.\.\/www\//", "", $svg);
 
 		#pull out all the node x values
+		/*
 		preg_match_all("/<ellipse[^>]+ cx=\"([^\"]+)\"/", $svg, $matches);
 		$matches = $matches[1];
 		sort($matches);
@@ -332,7 +330,7 @@ class GraphVizExporter {
 			<text class='columnlabels' text-anchor='middle' x='".$x_values[2]."' y='$y' font-family='Arial, Helvetica, sans-serif' font-size='150.00' fill='#999999' >Both Direct and Indirect</text>
 		";
 		$svg = preg_replace("/(svgscreen'[^>]*>)/", "$1$labels", $svg);
-		#$x_values = array_keys(array_count_values($matches)); 
+		*/
 
 		#write out the new svg
 		$svgout = fopen("$datapath/$graphname.svg", 'w');
@@ -345,18 +343,14 @@ class GraphVizExporter {
 		$graphout = $graph->data;
 		unset($graphout['properties']['graphvizProperties']);
 		unset($graphout['queries']);
-		foreach (array_keys($graphout['nodes']) as $nodetype) {
-			foreach (array_keys($graphout['nodes'][$nodetype]) as $node) {
-				foreach(array('mouseout', 'size', 'max', 'min', 'color', 'fillcolor', 'weight') as $key) { 
-					unset($graphout['nodes'][$nodetype][$node][$key]); 
-				}
+		foreach (array_keys($graphout['nodes']) as $node) {
+			foreach(array('mouseout', 'size', 'max', 'min', 'color', 'fillcolor', 'weight') as $key) { 
+				unset($graphout['nodes'][$node][$key]); 
 			}
 		}
-		foreach (array_keys($graphout['edges']) as $edgetype) {
-			foreach (array_keys($graphout['edges'][$edgetype]) as $edge) {
-				foreach(array('mouseout', 'size', 'max', 'min', 'color', 'fillcolor', 'weight', 'width') as $key) { 
-					unset($graphout['edges'][$edgetype][$edge][$key]); 
-				}
+		foreach (array_keys($graphout['edges']) as $edge) {
+			foreach(array('mouseout', 'size', 'max', 'min', 'color', 'fillcolor', 'weight', 'width') as $key) { 
+				unset($graphout['edges'][$edge][$key]); 
 			}
 		}
 		$graphfile = fopen("$datapath/$graphname.graph", "w");

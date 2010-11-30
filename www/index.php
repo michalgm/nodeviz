@@ -34,12 +34,13 @@
 	<script type="text/javascript" src="js/slider.js" ></script>
 	<script type="text/javascript" src="js/controls.js" ></script>
 	<script type="text/javascript" src="svgpan.js" ></script>
+	<script type="text/javascript" src="svg.js" ></script>
 
 	<script type="text/javascript" src="js/tablekit/tablekit.js"></script>
 	<script type="text/javascript" src="tables.js"></script>
 	<!--<script type="text/javascript" src="js/rsh.js"></script>-->
 	<script type="text/javascript" src="optionDefaults.js"></script>
-	<script type="text/javascript" src="graph.js" ></script>
+	<script type="text/javascript" src="framework.js" ></script>
 	<script type="text/javascript">
 	//<![CDATA[
 	<?php echo "var setupfile='$setupfile';"; ?>
@@ -50,6 +51,7 @@
 </head>
 
 <body onload="<?php echo $graphinfo['onload']; ?>">
+	<div id="error"></div>
 	<div id="nosvgbrowser">
 		The web browser you are using does not support some of the technologies used by this site, and therefore some interactivity has been disabled.<br/> For the best experience, please consider using a modern, standards-compliant browser, such as <a href='http://www.mozilla.com/firefox/'>Firefox</a>, <a href='http://www.google.com/chrome'>Chrome</a>, or <a href='http://www.apple.com/safari/'>Safari</a>.
 	</div>
