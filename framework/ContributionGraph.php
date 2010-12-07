@@ -45,11 +45,9 @@ class ContributionGraph extends Graph {
 				'pad' => '1,5',
 				'fontname' => 'Helvetica',
 				'fontnames' => 'ps',
-				'fontsize' => 220
-
-			),
-			'node'=> array('label'=> ' ', 'imagescale'=>'true', 'style'=> 'setlinewidth(14), filled'),
-			'edge'=>array('len'=>30,  'color'=>'#958d63')
+				'fontsize' => 220,
+				'layoutEngine'=>'dot'
+			)
 		);
 	}
 
@@ -223,17 +221,17 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 			$cashType = "prop26_cash";
 			$sortType = "type";
 		}
-		$query ="select entityid as id,label as Name,$cashType as cash,format(sum($cashType),0) as nicecash,image_name as image,type as industry, state from entities where entityid in ($org_ids) group by entityid order by $sortType, $cashType desc;";
+		$query ="select concat(entityid) as id,label as Name,$cashType as cash,format(sum($cashType),0) as nicecash,image_name as image,type as industry, state from entities where entityid in ($org_ids) group by entityid order by $sortType, $cashType desc;";
 		$this->addquery('companies_props', $query,$graph);
 		$nodes = dbLookupArray($query);
 		foreach($nodes as &$node) {
 			$node['shape'] = 'circle';
-			$node['onClick'] = "selectNode('".$node['id']."');";
+			$node['onClick'] = "this.Framework.selectNode('".$node['id']."');";
 			$nodeamount = '$'.$node['nicecash'];
 			if ($node['cash'] == 0){
 				$nodeamount = "(amount not disclosed)";
 			}
-			$node['onMouseover'] = "highlightNode('".$node['id']."', '".safeLabel($node['Name']).'<br/>'.$nodeamount."');";
+			$node['onMouseover'] = "this.Framework.highlightNode('".$node['id']."', '".safeLabel($node['Name']).'<br/>'.$nodeamount."');";
 			$node['color'] = lookupIndustryColor($node['industry']);
 			$node['fillcolor'] = '#c0c0c0';
 			$node['tileimage'] = "$company_images"."c".$node['image'].".png";
@@ -256,9 +254,8 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 				//}
 				//$image = '';
 			//}
-			$node['image'] = $image;
+			$node['image'] = '../www/images/carbon_round.png';
 			
-			$node['type'] = 'Com';
 			$node['Name'] = htmlspecialchars($node['Name'], ENT_QUOTES);
 			$node['label'] = $node['Name'];
 			$node['fontname'] ="Arial, Helvetica, sans-serif";
@@ -340,14 +337,14 @@ function org2org_edgeProperties() {
 				unset($graph['edgetypesindex']['org2org'][$key]); 
 				continue;
 			}
-			$edge['onClick'] = "selectEdge('".$edge['id']."');";
-			$edge['onClick'] = "selectEdge(eventObject)";
+			$edge['onClick'] = "this.Framework.selectEdge('".$edge['id']."');";
+			$edge['onClick'] = "this.Framework.selectEdge(eventObject)";
 			$edge['cash'] = $edgeprops[$edge['id']]['cash'];   //get the appropriate ammount properties
 			$edge['nicecash'] = $edgeprops[$edge['id']]['nicecash']; 
 			$edge['Name'] = htmlspecialchars($graph['nodes'][$edge['fromId']]['Name'], ENT_QUOTES);
 			$edge['OrganizationName'] = $graph['nodes'][$edge['toId']]['Name'];
 			$edge['weight'] = $edge['cash'];
-			$edge['onMouseover'] = "this.style.cursor = 'pointer'; showTooltip('$".$edge['nicecash']."');";
+			$edge['onMouseover'] = "this.showTooltip('$".$edge['nicecash']."');";
 			$edge['type'] = 'org2org';
 			$edge['color'] = lookupIndustryColor($edgeprops[$edge['id']]['industry']);
 			$edge['class'] = 'level2';
@@ -379,13 +376,13 @@ function orgOwnOrg_edgeProperties() {
 				continue;
 			}
 			$edge['onClick'] = "selectEdge('".$edge['id']."');";
-			$edge['onClick'] = "selectEdge(eventObject)";
+			$edge['onClick'] = "this.Framework.selectEdge(eventObject)";
 			$edge['weight'] = $edgeprops[$edge['id']]['weight'];   //get the appropriate ammount properties
 			$edge['nicecash'] = $edgeprops[$edge['id']]['nicecash']; 
 			$edge['Name'] = htmlspecialchars($graph['nodes'][$edge['fromId']]['Name'], ENT_QUOTES);
 			$edge['OrganizationName'] = $graph['nodes'][$edge['toId']]['Name'];
 			//$edge['weight'] = $edge['cash'];
-			$edge['onMouseover'] = "this.style.cursor = 'pointer'; showTooltip('".$edge['nicecash']."');";
+			$edge['onMouseover'] = "this.showTooltip('".$edge['nicecash']."');";
 			$edge['type'] = 'orgOwnOrg';
 			$edge['color'] = '#CCCCCC';
 			//$edge['style'] = 'dashed';

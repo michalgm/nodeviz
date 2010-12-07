@@ -142,6 +142,18 @@ function checkRequestHeaders() {
 	}
 }
 
-//
+function setupHeaders() {
+	$known = array('msie', 'firefox', 'safari', 'webkit', 'opera', 'netscape', 'konqueror', 'gecko');
+	preg_match_all( '#(?<browser>' . join('|', $known) .  ')[/ ]+(?<version>[0-9]+(?:\.[0-9]+)?)#', strtolower( $_SERVER[ 'HTTP_USER_AGENT' ]), $browser );
+	$svgdoctype = "";
+	if (isset($browser['browser']) && isset($browser['browser'][0]) && $browser['browser'][0] == 'msie') { 
+		header("content-type:text/html");
+	} else {
+		header("content-type:application/xhtml+xml");
+		$svgdoctype = 'xmlns:svg="http://www.w3.org/2000/svg"';
+	}
+	$baseurl = "http://".preg_replace("/\/[^\/]*$/", "/", $_SERVER['HTTP_HOST']. $_SERVER['PHP_SELF']);
+	return $svgdoctype;
+}
 
 ?>

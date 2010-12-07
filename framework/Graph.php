@@ -125,6 +125,7 @@ class Graph {
 				foreach ($nodes as $node) {
 					unset($this->data['nodes'][$node['id']]); //need to unset to inherit new order
 					$this->data['nodes'][$node['id']] = $node;
+					$this->data['nodes'][$node['id']]['type'] = $nodetype;
 				}
 			}
 		}
@@ -136,17 +137,19 @@ class Graph {
 				foreach ($edges as $edge) {
 					unset($this->data['edges'][$edge['id']]); //need to unset to inherit new order
 					$this->data['edges'][$edge['id']] = $edge;
+					$this->data['edges'][$edge['id']]['type'] = $edgetype;
 				}
 			}
 		}
 
 		//Populate the related nodes fields for each node by stepping through the edges
 		foreach ($this->data['edges'] as $edge) {
+			if (! $edge['toId']) { print 'none!'; print_r($edge); } 
 			if ($this->data['nodes'][$edge['toId']]) {
-				$this->data['nodes'][$edge['toId']]['relatedNodes'][$edge['fromId']] = 'from';
+				$this->data['nodes'][$edge['toId']]['relatedNodes'][$edge['fromId']][] = $edge['id'];
 			}
 			if ($this->data['nodes'][$edge['fromId']]) {
-				$this->data['nodes'][$edge['fromId']]['relatedNodes'][$edge['toId']] = 'to';
+				$this->data['nodes'][$edge['fromId']]['relatedNodes'][$edge['toId']][] = $edge['id'];
 			}
 		}
 

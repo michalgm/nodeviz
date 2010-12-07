@@ -52,19 +52,6 @@ function mousemove(e) {
 	}
 }
 
-function onLoading(request) {
-	if ($('error').visible()) {
-		$('error').hide();
-	}
-}
-
-function timeOutExceeded(request) {
-	statusCode=10;
-	statusString = "Server took too long to return data, it is either busy or there is a connection problem";
-	request.abort();
-	reportError(statusCode, statusString);
-}
-
 function catchFailure(response) {
 		reportError(-1, "There was a problem contacting the server:"+response.status+":"+response.statusText);
 }
@@ -366,7 +353,7 @@ function lookupGraph(params) {
 				});
 
 				if (useSVG) { 
-					initSVG();
+					initSVG(framework);
 				} else { 
 					$('G').descendants().each(function(a) { 
 						if (a.id.search('_') != -1) { 
@@ -777,16 +764,7 @@ function numberFormat(nStr){
   return '$'+x1 + x2;
 }
 
-function killRequests() {
-	requests.each(function(r, index) {
-		if (! r) { return; }
-		if (r.transport && r.transport.readyState != 4) { 
-			r.abort();
-		}
-		requests.splice(requests.indexOf(r), 1);
-		return; 
-	});
-}
+
 
 
 function unhighlight(id) { 

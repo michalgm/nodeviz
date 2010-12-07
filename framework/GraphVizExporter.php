@@ -8,26 +8,30 @@
 class GraphVizExporter {
 
  	static $GV_PARAMS = array(
-		 'graph' => array(
-		 			'outputorder' => 'edgesfirst',
-		 			'truecolor' => 'true',
-		 			//'maxiter' => '10000', //turning this off speeds things up, but does it mean that some might not converge?
-		 			'size' => '9,9!',
-		 			'dpi' => '96',
-		 			//'sep=' => '0.2',
-		 			'bgcolor' => 'transparent',
-		 			'splines' => '1',
-		 			'epsilon'=>'0.0'),
-		 'node' => array(
-		 			'style' => 'setlinewidth(16), filled',
-		 			'fontsize' => '10',
-		 			'fixedsize' => 'true', 
-		 			'label'=>' '),
-		 'edge' => array(
-		 			'len' => '8',
-		 			'style'=>'setlinewidth(2)',
-		 			'labelfloat' => 'true')
-
+		'graph' => array(
+			'outputorder' => 'edgesfirst',
+			'truecolor' => 'true',
+			//'maxiter' => '10000', //turning this off speeds things up, but does it mean that some might not converge?
+			'size' => '9,9!',
+			'dpi' => '96',
+			//'sep=' => '0.2',
+			'bgcolor' => 'transparent',
+			'splines' => '1',
+			'epsilon'=>'0.0',
+			'layoutEngine'=>'neato'
+		),
+		'node' => array(
+			'style' => 'setlinewidth(16), filled',
+			'fontsize' => '10',
+			'fixedsize' => 'true', 
+			'label'=>' ',
+			'imagescale'=>'true'
+		),
+		'edge' => array(
+			'len' => '8',
+			'style'=>'setlinewidth(2)',
+			'labelfloat' => 'true'
+		)
 	);
 
 	static function createDot($graph){ //add more arguments to control dot file creation
@@ -212,8 +216,8 @@ class GraphVizExporter {
 			$imapstr .= $line."\n";
 		}
 		//convert array to string
-		$string = 'graphviz = '.json_encode($jsgraph).';'; 
-		$string .= 'graph = '.json_encode($graph).';';
+		#$string = 'graphviz = '.json_encode($jsgraph).';'; 
+		$string = 'graph = '.json_encode($graph,JSON_FORCE_OBJECT).';';
 		return(array("<map id='G' name='G'>$imapstr</map>", $string));
 	}
 
@@ -227,11 +231,11 @@ class GraphVizExporter {
 		   2 => array("file", "log/graphviz.log", "a") // stderr is a file to write to
 		);
 		if ($dropIsolates){
-			$exportCommand = "dot -vvv -x -T$format | mogrify -format $format -resize 800x600 $format:- ";
+			$exportCommand = "neato -vvv -x -T$format | mogrify -format $format -resize 800x600 $format:- ";
 	//pipe through mogrify to resize image //FIXME: we can't do this - it will break the imap file
 		} else {
 			#$exportCommand = "neato -Tpng | mogrify -format $format -resize 800x600 png:- ";
-			$exportCommand = "dot -T$format  ";
+			$exportCommand = "neato -T$format  ";
 		}
 		$process = proc_open($exportCommand, $descriptorspec, $pipes);
 		fwrite($pipes[0], $dot);
@@ -247,6 +251,11 @@ class GraphVizExporter {
 
 		$graphname = $graph->graphname();
 		$dotString = GraphVizExporter::createDot($graph->data);
+		$GV_PARAMS = GraphVizExporter::$GV_PARAMS;
+		if (isset($graph->data['graphvizProperties'])) {
+			$GV_PARAMS = array_merge_recursive_unique($GV_PARAMS, $graph->data['graphvizProperties']);
+		}
+		$layoutEngine = $GV_PARAMS['graph']['layoutEngine'];
 		$imageFile = "$datapath/$graphname.png";
 		$dotFile = "$datapath/$graphname.dot";
 		$svgFile = "$datapath/$graphname.svg.raw";
@@ -264,7 +273,7 @@ class GraphVizExporter {
 		   2 => array("file", "$logdir/graphviz.log", "a") // stderr is a file to write to
 		);
 		//use neato to generate and save image file, and generate imap file to STDOUT
-		$process = proc_open(" dot -vvv -Tsvg -o $svgFile -Tdot -o $dotFile -Tpng -o $imageFile -Tcmapx ", $descriptorspec, $pipes);
+		$process = proc_open("$layoutEngine -vvv -Tsvg -o $svgFile -Tdot -o $dotFile -Tpng -o $imageFile -Tcmapx ", $descriptorspec, $pipes);
 		fwrite($pipes[0], $dotString);
 		fclose($pipes[0]);
 		$imap =  stream_get_contents($pipes[1]); //store imap file

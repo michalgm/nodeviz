@@ -1,6 +1,7 @@
 <?php
 include_once('../config.php');
 include_once('Graph.php');
+$dbname = 'oilchange';
 /*
 creates the graph data structure that will be used to pass data among components.  Structure must not change
 */
@@ -26,10 +27,13 @@ class FECCanComGraph extends Graph {
 		$this->data['properties'] = array(
 			'electionyear' => '00',
 			'congress_num' => '110',
-			'racecode' => 'P',
-			'minCandidateAmount' =>'-99999999',
-			'minCompanyAmount' => '-99999999',
-			'minContribAmount' => '-99999999',
+			'racecode' => 'S',
+			//'minCandidateAmount' =>'-99999999',
+			//'minCompanyAmount' => '-99999999',
+			//'minContribAmount' => '-99999999',
+			'minCandidateAmount' =>'122750',
+			'minCompanyAmount' => '31600',
+			'minContribAmount' => '2500',
 			'candidateFilterIndex' => -1,
 			'companyFilterIndex' => -1,
 			'contribFilterIndex' => -1,
@@ -41,14 +45,14 @@ class FECCanComGraph extends Graph {
 			//sets the scaling of the elements in the gui
 			'minSize' => array('candidates' => '.25', 'companies' => '.25', 'com2can' =>'1'),
 			'maxSize' => array('candidates' => '3', 'companies' => '3', 'com2can' =>'80'),
-			'sitecode' => ''
+			'sitecode' => 'carbon'
 		);
 		// special properties for controling layout software
 		//BROKEN, USE GV PARAMS
 		$this->data['graphvizProperties'] = array(
 			'graph'=> array(
 				'bgcolor'=>'#FFFFFF',
-				'size' => '6.52,6.52!'
+				'size' => '6.52,6.52!',
 			),
 			'node'=> array('label'=> ' ', 'imagescale'=>'true','fixedsize'=>1, 'style'=> 'setlinewidth(7), filled', 'regular'=>'true'),
 			'edge'=>array('len'=>8, 'arrowhead'=>'none', 'color'=>'#66666666')
@@ -95,8 +99,8 @@ class FECCanComGraph extends Graph {
 		$this->addquery('candidates', $query, $graph);
 
 		$result = dbLookupArray($query);
-		$graph['nodes']['candidates'] = $result;
-		return $graph;
+		#$graph['nodes']['candidates'] = $result;
+		return $result;
 	}
 
 	function companies_fetchNodes() {
@@ -130,8 +134,8 @@ class FECCanComGraph extends Graph {
 		$query ="select CompanyID as id from contributions a join candidates c use index(CandidateID) on a.CandidateID = c.CandidateID $allcandidates where $congress $racecode_filter and a.congress_num is not null $sitecode group by a.COmpanyID having sum(amount) >= $minCompanyAmount order by sum(amount) desc";
 		$this->addquery('companies', $query, $graph);
 		$result = dbLookupArray($query);
-		$graph['nodes']['companies'] = $result;
-		return $graph;
+		#$graph['nodes']['companies'] = $result;
+		return $result;
 	}
 
 
@@ -175,7 +179,7 @@ class FECCanComGraph extends Graph {
 			$company_ids = "";
 		}
 		if ($graph['properties']['candidateLimit']) { $limit = " limit ".$graph['properties']['candidateLimit']; }
-		$idlist = arrayToInString($graph['nodes']['candidates']);
+		$idlist = arrayToInString($graph['nodetypesindex']['candidates']);
 		if ($graph['properties']['allcandidates'] || $racecode == 'P') { 
 			$cantable = "select CandidateID, CandidateName, substr(PartyDesignation1,1,1) as PartyDesignation1, currentdistrict, campaignstate, congress_num from candidates a where a.CandidateID in ($idlist) ";
 		} else { 
@@ -184,14 +188,15 @@ class FECCanComGraph extends Graph {
 		$query ="select a.CandidateID as id,  CandidateName as Name, PartyDesignation1, sum(Amount) as cash, format(sum(Amount),0) as nicecash ,max(Amount+0) as max, min(Amount+0) as min, currentdistrict, campaignstate, if(d.congress_num = $current_congress, 1, 0) as current_member $breakdown from ($cantable) a join contributions c on a.CandidateID = c.CandidateID left join (select fec_id, max(congress_num) as congress_num from congressmembers group by fec_id) d on d.fec_id = a.CandidateID where $congress c.congress_num is not null $racecode_filter $company_ids $sitecode group by a.CandidateID order by cash desc $limit";
 		$this->addquery('candidates_props', $query, $graph);
 		$nodes = dbLookupArray($query);
-		$graph['nodes']['candidates'] = $nodes;
-		foreach($graph['nodes']['candidates'] as &$node) {
+		#$graph['nodes']['candidates'] = $nodes;
+		foreach($nodes as &$node) {
 			$node['shape'] = 'box';
-			$node['onClick'] = "selectNode('".$node['id']."');";
+			$node['onClick'] = "this.Framework.selectNode('".$node['id']."');";
 			if ($node['campaignstate'] != '00' && $node['campaignstate'] != '') {
 				$state = "-$node[campaignstate]";
 			} else { $state = ""; }
-			$node['onMouseover'] = "highlightNode('".$node['id']."', '".safeLabel(niceName($node['Name'])." (".$node['PartyDesignation1'][0]."$state)").'<br/>$'.$node['nicecash']."');";
+			$node['onMouseover'] = "this.Framework.highlightNode('".$node['id']."');";
+			$node['tooltip'] = safeLabel(niceName($node['Name'])." (".$node['PartyDesignation1'][0]."$state)").'<br/>$'.$node['nicecash'];
 			$node['FName'] = htmlspecialchars(niceName($node['Name']), ENT_QUOTES);
 			$node['Name'] = htmlspecialchars(niceName($node['Name'], 1), ENT_QUOTES);
 			$node['color'] = lookupPartyColor($node['PartyDesignation1']);
@@ -199,10 +204,11 @@ class FECCanComGraph extends Graph {
 			$image = "$candidate_images".$node['id'].".jpg";
 			if (! file_exists($image)) { $image = "$candidate_images"."unknownCandidate.jpg"; }
 			$node['image'] = $image;
+			$node['image'] = '../www/images/carbon_round.png';
 			$node['type'] = 'Can';
 		}
-		$this->scaleSizes('candidates', 'cash');
-		return $graph;
+		$nodes = $this->scaleSizes($nodes, 'candidates', 'cash');
+		return $nodes;
 	}
 
 	function companies_nodeProperties() {
@@ -215,7 +221,7 @@ class FECCanComGraph extends Graph {
 		if (isset($this->racecode_filter_values[$racecode])) { 
 			$racecode_filter = ' and '.$this->racecode_filter_values[$racecode];
 		}
-		$company_ids = arrayToInString($graph['nodes']['companies']);
+		$company_ids = arrayToInString($graph['nodetypesindex']['companies']);
 		$candidate_ids = "";
 		$sitecode = "";
 		$limit = "";
@@ -247,11 +253,12 @@ class FECCanComGraph extends Graph {
 		$query ="select CompanyID as id,b.Name , sum(Amount) as cash, format(sum(Amount),0) as nicecash, max(0 + Amount) as max, min(0 + Amount) as min, image_name as image, if(oil_related < coal_related, 'coal', 'oil') as sitecode $breakdown from contributions a join companies b on a.CompanyID = b.id join candidates c on a.CandidateID = c.CandidateID where $congress a.congress_num is not null and a.CompanyID in ($company_ids) $candidate_ids $racecode_filter $sitecode group by a.COmpanyID order by cash desc $limit";
 		$this->addquery('companies_props', $query,$graph);
 		$nodes = dbLookupArray($query);
-		$graph['nodes']['companies'] = $nodes;
-		foreach($graph['nodes']['companies'] as &$node) {
+		#$graph['nodes']['companies'] = $nodes;
+		foreach($nodes as &$node) {
 			$node['shape'] = 'circle';
-			$node['onClick'] = "selectNode('".$node['id']."');";
-			$node['onMouseover'] = "highlightNode('".$node['id']."', '".safeLabel($node['Name']).'<br/>$'.$node['nicecash']."');";
+			$node['onClick'] = "this.Framework.selectNode('".$node['id']."');";
+			$node['onMouseover'] = "this.Framework.highlightNode('".$node['id']."');";
+			$node['tooltip'] = safeLabel($node['Name']).'<br/>$'.$node['nicecash'];
 			$node['color'] = lookupPartyColor($node['sitecode']);
 			//$node['fillcolor'] = 'white';
 			$image = "$company_images"."c".$node['image'].".png";
@@ -262,11 +269,12 @@ class FECCanComGraph extends Graph {
 					$image = "$company_images"."cunknown_".$graph['properties']['sitecode']."_co.png"; 
 				}
 			}
-			$node['image'] = $image;
+			$node['image'] = '../www/images/coal_round.png';
 			$node['type'] = 'Com';
 			$node['Name'] = htmlspecialchars($node['Name'], ENT_QUOTES);
 		}
-		$this->scaleSizes('companies', 'cash');
+		$nodes = $this->scaleSizes($nodes, 'companies', 'cash');
+		return $nodes;
 	}
 
 	//NEED TO HAVE COMMENTS GIVING THE NAMES OF THE PROPERTIES ADDED
@@ -276,8 +284,8 @@ class FECCanComGraph extends Graph {
 		dbwrite("SET group_concat_max_len := @@max_allowed_packet");
 		$graph = &$this->data;
 		$congress_num = $graph['properties']['congress_num'];
-		$candidateIds = arrayToInString($graph['nodes']['candidates']);
-		$companyIds = arrayToInString($graph['nodes']['companies']);
+		$candidateIds = arrayToInString($graph['nodetypesindex']['candidates']);
+		$companyIds = arrayToInString($graph['nodetypesindex']['companies']);
 		$minContribAmount = $graph['properties']['minContribAmount'];
 		$limit = "";
 		$sitecode = "";
@@ -300,15 +308,15 @@ class FECCanComGraph extends Graph {
 		//	$query ="select concat(a.CompanyID, '_', a.CandidateId) as id, a.CandidateID as toId, a.CompanyID as fromId, group_concat(concat(\"'\", a.crp_key, \"'\")) as ContribIDs from contributions a  where a.CandidateID in ($candidateIds) and a.CompanyID in ($companyIds) and a.congress_num is not null and $congress abs(amount) >= $minContribAmount group by concat(a.CandidateID, a.CompanyID) order by a.CandidateId, CompanyID desc";
 		$this->addquery('com2can', $query, $graph);
 		$result = dbLookupArray($query);
-		$graph['edges']['com2can'] = $result;	
-		return $graph;
+		#$graph['edges']['com2can'] = $result;	
+		return $result;
 	}
 
 	function com2can_edgeProperties() {
 		$graph = &$this->data;
 		$congress_num = $graph['properties']['congress_num'];
-		$candidateIds = arrayToInString($graph['nodes']['candidates']);
-		$companyIds = arrayToInString($graph['nodes']['companies']);
+		$candidateIds = arrayToInString($graph['nodetypesindex']['candidates']);
+		$companyIds = arrayToInString($graph['nodetypesindex']['companies']);
 		$sitecode = "";
 		$congress = "";
 		$precheck = "";
@@ -334,30 +342,32 @@ class FECCanComGraph extends Graph {
 		$query ="select concat(a.CompanyID, '_', a.CandidateId) as id, sum(Amount) as cash, format(sum(Amount), 0) as nicecash $breakdown from contributions a $precheck where $congress a.congress_num is not null and a.CandidateID in ($candidateIds) and a.CompanyID in ($companyIds) $sitecode group by concat(a.CandidateID, a.CompanyID)  order by cash desc, a.CandidateId, CompanyID desc";
 		$this->addquery('com2can_props', $query, $graph);
 		$edgeprops = dbLookupArray($query);
+		$edges = array();
 		//$graph['edges']['com2can'] = $nodes;  //don't use this, would replace the edges
-		
-		foreach(array_keys($graph['edges']['com2can']) as $key) {
-			$edge = $graph['edges']['com2can'][$key];
+		foreach($graph['edgetypesindex']['com2can'] as $key) {
+		   	$edge = $graph['edges'][$key];
 			if(! array_key_exists($edge['id'], $edgeprops)) { 
-				unset($graph['edges']['com2can'][$key]); 
+				unset($graph['edges'][$key]); 
 				continue;
 			}
-			$edge['onClick'] = "selectEdge('".$edge['id']."');";
-			$edge['onClick'] = "selectEdge(eventObject)";
+			$edge['onClick'] = "framework.Graph.selectEdge('".$edge['id']."');";
+			$edge['onClick'] = "this.Framework.selectEdge(eventObject)";
 			$edge['cash'] = $edgeprops[$edge['id']]['cash'];   //get the appropriate ammount properties
 			$edge['nicecash'] = $edgeprops[$edge['id']]['nicecash']; 
-			$edge['Name'] = htmlspecialchars($graph['nodes']['companies'][$edge['fromId']]['Name'], ENT_QUOTES);
-			$edge['CandidateName'] = $graph['nodes']['candidates'][$edge['toId']]['Name'];
+			$edge['tooltip'] = $edgeprops[$edge['id']]['nicecash']; 
+			$edge['Name'] = htmlspecialchars($graph['nodes'][$edge['fromId']]['Name'], ENT_QUOTES);
+			$edge['CandidateName'] = $graph['nodes'][$edge['toId']]['Name'];
 			$edge['weight'] = $edge['cash'];
-			$edge['onMouseover'] = "this.style.cursor = 'pointer'; showTooltip('$".$edge['nicecash']."');";
+			$edge['onMouseover'] = "this.showTooltip('$".$edge['nicecash']."');";
 			$edge['type'] = 'com2can';
 			if (isset($edgeprops[$edge['id']]['coalcash'])) {
 				$edge['coalcash'] = $edgeprops[$edge['id']]['coalcash'];
 				$edge['oilcash'] = $edgeprops[$edge['id']]['oilcash'];
 			}
-			$graph['edges']['com2can'][$key] = $edge;
+			$edges[$key] = $edge;
 		}
-		$this->scaleSizes('com2can', 'cash');
+		$edges = $this->scaleSizes($edges, 'com2can', 'cash');
+		return $edges;
 	}
 
 	function graphname() {

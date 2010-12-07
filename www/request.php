@@ -23,16 +23,18 @@ if (isset($_REQUEST['search'])) {
 	$output = initSearch($_REQUEST);
 } else {
 	if (isset($_REQUEST['setupfile'])) { 
-		if ($setupfiles[$_REQUEST['setupfile']]) {
-			include_once('../framework/'.$_REQUEST['setupfile']); 
-		} else { echo "'Invalid setup file.'; statusCode='8';"; exit; }
+		//if ($setupfiles[$_REQUEST['setupfile']]) {
+			$setupfile = $_REQUEST['setupfile'];
+			#include_once('../framework/'.$_REQUEST['setupfile']); 
+		//} else { echo "'Invalid setup file.'; statusCode='8';"; exit; }
 	} else { 
-		include_once('../framework/ContributionGraph.php');
+		$setupfile = 'ContributionGraph';
 	}
+	include_once("../framework/$setupfile.php");
 
 	$webdatapath = "";
 
-	$graph = new ContributionGraph();
+	$graph = new $setupfile();
 
 	if (isset($_REQUEST['csv'])) {
 		include_once('lib/csv.php');
