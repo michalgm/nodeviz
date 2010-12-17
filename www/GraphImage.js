@@ -9,7 +9,7 @@ GraphImage.prototype = {
 			$(document.body).insert({ top: new Element('div', {'id': 'tooltip'}) });
 		}
 		if (! $('highlight')) { 
-			$(document.body).insert({ top: new Element('div', {'id': 'tooltip'}) });
+			$(document.body).insert({ top: new Element('div', {'id': 'highlight'}) });
 		}
 		$(this.graphdiv).innerHTML += "<div id='images'></div>";
 		$(this.graphdiv).innerHTML += "<div id='imagescreen' style='display:none;'></div>";
@@ -23,7 +23,7 @@ GraphImage.prototype = {
 	mousemove: function(e) {
 		if($('tooltip').style.visibility == 'visible') { 
 			var mousepos = { 'x': Event.pointerX(e), 'y': Event.pointerY(e) };
-			$('tooltip').setStyle({'top': (mousepos['y']- this.tooltipOffsetY - $('tooltip').getHeight()) + 'px', 'left': (mousepos['x']  - this.tooltipOffsetX) + 'px'});
+			$('tooltip').setStyle({'top': (mousepos['y']- this.Framework.tooltipOffsetY - $('tooltip').getHeight()) + 'px', 'left': (mousepos['x']  - this.Framework.tooltipOffsetX) + 'px'});
 		}
 	},
 	setupListeners: function() { 
@@ -50,6 +50,9 @@ GraphImage.prototype = {
 		$('images').style.cursor = 'default';	
 	},
 	highlightNode: function(id, noshowtooltip) {
+		if (! this.Framework.offsetY) { 
+			this.Framework.setOffsets();
+		}
 		if (! noshowtooltip) { 
 			id = id.toString();
 			this.showTooltip(this.Framework.data.nodes[id].tooltip); //Set the tooltip contents

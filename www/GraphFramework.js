@@ -9,6 +9,7 @@ GraphFramework.prototype = {
 			$(document.body).insert({ top: new Element('div', {'id': 'error'}) });
 		}
 		this.graphDimensions = $(graphdiv).getDimensions();
+		//if (document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")) { 
 		if (document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")) { 
 			this.useSVG = 1;
 			this.GraphImage = new GraphSVG(this);
@@ -111,7 +112,7 @@ GraphFramework.prototype = {
 					delete graph;	
 					delete img;
 					delete overlay;
-					this.setOffsets();
+					//this.setOffsets();
 				//	console.time('lists');
 					this.GraphList.renderLists();
 				//	console.timeEnd('lists');
@@ -123,7 +124,8 @@ GraphFramework.prototype = {
 	},
 	highlightNode: function(id, noshowtooltip) {
 		id = id.toString();
-		if(typeof this.data.nodes[id] == 'undefined') { id = this.current['node']; }
+		if (! id) { return; }
+		//if(typeof this.data.nodes[id] == 'undefined') { id = this.current['node']; }
 		if (this.data.nodes[id]) {
 			this.current['node'] = id;
 			this.GraphImage.highlightNode(id, noshowtooltip);
@@ -131,15 +133,18 @@ GraphFramework.prototype = {
 		}
 	},
 	unhighlightNode: function(id) {
+		if (typeof(id) == 'object') { id = this.current.node; }
+		if (! id) { return; }
 		id = id.toString();
 		this.GraphImage.unhighlightNode(id);
 		this.GraphList.unhighlightNode(id);
 		this.current['node'] = '';
 	},
 	selectNode: function(id, noscroll) { 
+		if (typeof(id) == 'object') { id = this.current.node; }
 		id = id.toString();
 		if (id == this.current['network']) { 
-			this.unselectNode();
+			this.unselectNode(1);
 			return;
 		}
 		this.unselectNode();
@@ -196,10 +201,10 @@ GraphFramework.prototype = {
 			showDetails(id, type, 0, 1);
 		}
 	},
-	unselectNode: function() {
+	unselectNode: function(fade) {
 		if (this.current.network == '') { return; }
-		this.GraphImage.unselectNode(this.current.network);
-		this.GraphList.unselectNode(this.current.network);
+		this.GraphImage.unselectNode(this.current.network, fade);
+		this.GraphList.unselectNode(this.current.network, fade);
 		//this.highlightNode(this.current.network);
 		this.current.network = '';
 	},

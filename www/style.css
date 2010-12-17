@@ -110,7 +110,8 @@
 	.nodelist { display: none; }
 	.nodelist .highlight { background-color: #ccbbdd; }
 	.nodelist .highlight div { background-color: #fff; }
-	.nodelist>li { color: blue; } 
+	.nodelist>li { color: blue; cursor: pointer;} 
 	.nodelist.selected { display: block; }
+
 	#list_menu li { display: inline;  padding: 5px; cursor: pointer;}
 	#list_menu li.selected {font-weight: bold; } 

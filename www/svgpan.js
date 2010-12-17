@@ -66,6 +66,12 @@ SVGPan.prototype = {
 		this.zoomlevels = 8;
 		this.zoom_delta = .8;
 		this.current_zoom = 1;
+		if (this.zoomSlider) { 
+			this.zoomSlider.setValue(this.current_zoom);
+		}
+		Event.stopObserving('zoomin');
+		Event.stopObserving('zoomout');
+		Event.stopObserving('zoomreset');
 	},
 
 /**
@@ -300,7 +306,7 @@ SVGPan.prototype = {
 
 		var origin = this.getEventPoint(evt).matrixTransform(this.stateTf);
 		if (this.stateOrigin.x == origin.x && this.stateOrigin.y == origin.y) { 
-			this.GraphSVG.Framework.unselectNode();
+			this.GraphSVG.Framework.unselectNode(1);
 		}
 
 		if(this.state == 'pan' || this.state == 'move') {

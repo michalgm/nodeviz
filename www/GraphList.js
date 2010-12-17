@@ -92,7 +92,8 @@ GraphList.prototype = {
 		} else { 
 			label = node.id;
 		}
-		return "<span style='color:"+color+"'>"+label+"</span>";
+		var link = "<span onclick='graphframework.selectNode(\""+node.id+"\");'>-&gt;</span>";
+		return "<span style='color:"+color+"'>"+label+"</span>"+link;
 	},
 	highlightNode: function (id) { 
 		if(this.Framework.current.network) { 
@@ -106,7 +107,6 @@ GraphList.prototype = {
 			}, this);
 		} else {
 			$('list_'+id).addClassName('highlight');
-			$('list_'+id).setStyle({'cursor': 'pointer'});
 		}
 	},
 	unhighlightNode: function (id) { 
@@ -127,7 +127,7 @@ GraphList.prototype = {
 		this.displayList(this.Framework.data.nodes[id].type);
 		$(id+'_sublists').setStyle({'display': 'block'});
 	},
-	unselectNode: function(id) { 
+	unselectNode: function(id, fade) { 
 		$(id+'_sublists').setStyle({'display': 'none'});
 	}
 };

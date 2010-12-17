@@ -10,31 +10,33 @@ var GraphRaster = Class.create(GraphImage, {
 		var map = " usemap='#G'";
 		$('images').update("<img id='img0' "+map+" border='0' src='"+image+"' />"+overlay);
 		$('G').descendants().each(function(a) { 
-			if (a.id.search('_') != -1) { 
-				Event.observe($(a), 'mouseout', hideTooltip, 1); 
-				Event.observe($(a), 'mousemove', mousemove);
+			if (this.Framework.data.edges[a.id]) { 
+				Event.observe($(a), 'mouseout', this.hideTooltip.bind(this)); 
+				Event.observe($(a), 'mousemove', this.mousemove.bind(this));
+			} else if (this.Framework.data.nodes[a.id]) { 
+				if (this.Framework.data.nodes[a.id].onMouseover != '') { Event.observe($(a), 'mouseover', function(e) { eval(this.Framework.data.nodes[a.id].onMouseover); }.bind(this)); }
+				if (this.Framework.data.nodes[a.id].onClick != '') { Event.observe($(a), 'click', function(e) { eval(this.Framework.data.nodes[a.id].onClick); }.bind(this)); }
+				//Event.observe($(a), 'mouseout', function(e) { this.Framework.unhighlightNode(a.id); }.bind(this)); 
 			}
-			if (framework.nodes[a.id]) { 
-				if (framework.nodes[a.id].onMouseover != '') { Event.observe($(a), 'mouseover', function(eventObject) { eval(framework.nodes[a.id].onMouseover); }); }
-				if (framework.nodes[a.id].onClick != '') { Event.observe($(a), 'click', function(eventObject) { eval(framework.nodes[a.id].onClick); }); }
-			}
-		});
+		}, this);
 		this.setupListeners();
 	},
 	setupListeners: function($super) {
 		$super();
 		Event.observe($('highlight'), 'mousemove', this.mousemove.bind(this));
+		Event.observe($('highlight'), 'click', this.Framework.selectNode.bind(this.Framework));
+		//Event.observe($('highlightimg'), 'click', this.Framework.selectNode.bind(this.Framework));
 		//Event.observe($('highlight'), 'mouseover', this.highlightNode);
-		Event.observe($('highlightimg'), 'mouseout', this.hideTooltip.bind(this));
-		Event.observe($('highlight'), 'mouseout', this.hideTooltip.bind(this));
+		Event.observe($('highlightimg'), 'mouseout', this.Framework.unhighlightNode.bind(this.Framework));
+		Event.observe($('highlight'), 'mouseout', this.Framework.unhighlightNode.bind(this.Framework));
 	},
 	highlightNode: function($super, id, text, noshowtooltip) {
 		$super(id, text, noshowtooltip);
 		var node = this.Framework.data.nodes[id];
 		$('highlight').style.width = parseFloat(node['width']) +2 +'px';
 		$('highlight').style.height = parseFloat(node['height']) +2 +'px';
-		$('highlight').style.top = parseFloat(node['posy']) -1 + offsetY + 'px';
-		$('highlight').style.left = parseFloat(node['posx']) -1 + offsetX + 'px';
+		$('highlight').style.top = parseFloat(node['posy']) -1 + this.Framework.offsetY + 'px';
+		$('highlight').style.left = parseFloat(node['posx']) -1 + this.Framework.offsetX + 'px';
 		$('highlight').style.visibility = 'visible';
 		if (node['shape'] != 'circle') { 
 			$('highlight').addClassName('selected');

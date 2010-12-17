@@ -57,8 +57,8 @@ var GraphSVG = Class.create(GraphImage, {
 	setupListeners: function($super) {
 		$super();
 		Event.observe($('svgscreen'),'click', this.Framework.unselectNode.bind(this.Framework));
-		Event.observe($('svg'), 'mousemove', this.mousemove.bind(this.Framework));
-		Event.observe($('graphs'), 'mousemove', this.mousemove.bind(this.Framework));
+		Event.observe($('svg'), 'mousemove', this.mousemove.bind(this));
+		Event.observe($('graphs'), 'mousemove', this.mousemove.bind(this));
 		$$('.node').each( function(n) {
 			if (n.id[0] == 'f') { return; }
 			if (n.childNodes[1]) {
@@ -150,9 +150,9 @@ var GraphSVG = Class.create(GraphImage, {
 			}, this);
 		}, this);
 	},
-	unselectNode: function($super, id) { 
+	unselectNode: function($super, id, fade) { 
 		$super();
-		if ($('img0').getOpacity() != '1') {
+		if (fade) {
 			new Effect.Opacity('img0', { from: .3, to: 1, duration: .3});
 		}
 		$H(this.Framework.data.nodes[id].relatedNodes).keys().each(function(e) {
