@@ -201,7 +201,7 @@ class GraphVizExporter {
 			}
 			//add node to graph array, indexed by id
 	
-			$jsgraph[$node['id']]  = $node;
+			$graph->data['nodes'][$node['id']]  = $node;
 			/*
 			foreach (array_keys($node) as $key) { 
 				if(strstr($key, 'on')) { 
