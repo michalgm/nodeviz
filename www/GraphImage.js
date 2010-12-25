@@ -33,7 +33,7 @@ GraphImage.prototype = {
 		//Event.observe($('highlight'), 'mouseover', this.highlightNode);
 		Event.observe($('tooltip'), 'mouseout', this.hideTooltip.bind(this));
 		//Event.observe($('highlight'), 'mousedown', this.selectNode);
-		Event.observe(window, 'resize', this.setOffsets );
+		Event.observe(window, 'resize', this.Framework.setOffsets.bind(this));
 		//window.setTimeout("setOffsets()", 250);
 	},
 
