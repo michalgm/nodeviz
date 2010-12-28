@@ -338,7 +338,7 @@ function org2org_edgeProperties() {
 				continue;
 			}
 			$edge['onClick'] = "this.Framework.selectEdge('".$edge['id']."');";
-			$edge['onClick'] = "this.Framework.selectEdge(eventObject)";
+			#$edge['onClick'] = "this.Framework.selectEdge(eventObject)";
 			$edge['cash'] = $edgeprops[$edge['id']]['cash'];   //get the appropriate ammount properties
 			$edge['nicecash'] = $edgeprops[$edge['id']]['nicecash']; 
 			$edge['Name'] = htmlspecialchars($graph['nodes'][$edge['fromId']]['Name'], ENT_QUOTES);
@@ -375,8 +375,7 @@ function orgOwnOrg_edgeProperties() {
 				unset($graph['edges']['orgOwnOrg'][$key]); 
 				continue;
 			}
-			$edge['onClick'] = "selectEdge('".$edge['id']."');";
-			$edge['onClick'] = "this.Framework.selectEdge(eventObject)";
+			$edge['onClick'] = "this.Framework.selectEdge('".$edge['id']."');";
 			$edge['weight'] = $edgeprops[$edge['id']]['weight'];   //get the appropriate ammount properties
 			$edge['nicecash'] = $edgeprops[$edge['id']]['nicecash']; 
 			$edge['Name'] = htmlspecialchars($graph['nodes'][$edge['fromId']]['Name'], ENT_QUOTES);

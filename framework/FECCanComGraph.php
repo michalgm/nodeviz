@@ -350,8 +350,7 @@ class FECCanComGraph extends Graph {
 				unset($graph['edges'][$key]); 
 				continue;
 			}
-			$edge['onClick'] = "framework.Graph.selectEdge('".$edge['id']."');";
-			$edge['onClick'] = "this.Framework.selectEdge(eventObject)";
+			$edge['onClick'] = "this.Framework.selectEdge('".$edge['id']."');";
 			$edge['cash'] = $edgeprops[$edge['id']]['cash'];   //get the appropriate ammount properties
 			$edge['nicecash'] = $edgeprops[$edge['id']]['nicecash']; 
 			$edge['tooltip'] = $edgeprops[$edge['id']]['nicecash']; 
@@ -440,6 +439,15 @@ class FECCanComGraph extends Graph {
 			*/
 		}
 		return $output;
+	}
+
+	function ajax_displayEdge($graph) {
+		$id = dbEscape($_REQUEST['edgeid']);
+		$edge = $graph->data['edges'][$id];
+		$ids = $edge['ContribIDs'];
+		$query = "select * from contributions where crp_key in ($ids)";
+		$results = dbLookupArray($query);
+		return "statusCode = 1; data = ".json_encode($results, JSON_FORCE_OBJECT).";";
 	}
 
 	function ajax_showComInfo() {

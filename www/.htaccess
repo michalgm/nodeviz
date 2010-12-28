@@ -3,13 +3,3 @@ AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application
 <FilesMatch "\\.(js|css|html|htm|php|xml|otf)$">
 	SetOutputFilter DEFLATE
 </FilesMatch>
-php_flag zlib.output_compression On
-
-#fourohfour
-ErrorDocument 404 /404.php
-
-#Redirects
-RewriteEngine On
-RewriteBase /
-RewriteRule ^federalRaceGraph\.php view\.php?%{QUERY_STRING} [R=permanent]
-RewriteRule ^faq\.php about\.php?%{QUERY_STRING} [R=permanent]

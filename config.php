@@ -19,7 +19,7 @@ if(file_exists('../dbaccess.php')) { include_once("../dbaccess.php"); }
 $logdir = "../log";
 $datapath = "./cache/";
 $electionyear = '08';
-$dbhost = 'localhost';
+$dbhost = '192.168.2.2';
 $dblogin = 'oilchange';
 $dbpass = 'oilchange';
 $dbname = 'turboprop';

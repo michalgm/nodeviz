@@ -96,9 +96,11 @@ GraphList.prototype = {
 		return "<span style='color:"+color+"'>"+label+"</span>"+link;
 	},
 	highlightNode: function (id) { 
-		if(this.Framework.current.network) { 
+		var networkNode = this.Framework.data.nodes[this.Framework.current.network];
+		var highlightNode = this.Framework.data.nodes[id];
+		if(networkNode && networkNode.type != highlightNode.type && networkNode.type == this.Framework.current.nodetype) { 
 			var other_id = this.Framework.current.network;
-			$H(this.Framework.data.nodes[id].relatedNodes[other_id]).values().each( function(edgeid) { 
+			$H(highlightNode.relatedNodes[other_id]).values().each( function(edgeid) { 
 				var edge = this.Framework.data.edges[edgeid];
 				var type = edge.type;
 				var dir = edge.toId == id ? 'from' : 'to';
@@ -110,24 +112,28 @@ GraphList.prototype = {
 		}
 	},
 	unhighlightNode: function (id) { 
-		if(this.Framework.current.network) { 
+		var networkNode = this.Framework.data.nodes[this.Framework.current.network];
+		var highlightNode = this.Framework.data.nodes[id];
+		if(networkNode && networkNode.type != highlightNode.type && networkNode.type == this.Framework.current.nodetype) { 
 			var other_id = this.Framework.current.network;
-			$H(this.Framework.data.nodes[id].relatedNodes[other_id]).values().each( function(edgeid) { 
+			$H(highlightNode.relatedNodes[other_id]).values().each( function(edgeid) { 
 				var edge = this.Framework.data.edges[edgeid];
 				var type = edge.type;
 				var dir = edge.toId == id ? 'from' : 'to';
 				var subnodeid = 'list_'+other_id+'_'+type+'_'+dir+'_'+id;
 				$(subnodeid).removeClassName('highlight');
 			}, this);
-		} else {
+		} else { 
 			$('list_'+id).removeClassName('highlight');
 		}
 	},
 	selectNode: function(id) { 
 		this.displayList(this.Framework.data.nodes[id].type);
+		$('list_'+id).addClassName('selected');
 		$(id+'_sublists').setStyle({'display': 'block'});
 	},
 	unselectNode: function(id, fade) { 
+		$('list_'+id).removeClassName('selected');
 		$(id+'_sublists').setStyle({'display': 'none'});
 	}
 };

@@ -21,6 +21,7 @@ var GraphSVG = Class.create(GraphImage, {
 		$('img0').show();
 
 		$('svg').style.setProperty('position','absolute', '');
+		//$('svg').clonePosition($('img0'));
 		$('svg').style.setProperty('top','35px', '');
 		$('svgscreen').style.setProperty('cursor','move', 'important');
 		
@@ -140,11 +141,13 @@ var GraphSVG = Class.create(GraphImage, {
 	selectNode: function($super, id) { 
 		$super();
 		this.showSVGElement(id);
+		this.addClassName($(id), 'selected');
 		if ($('img0').getOpacity() == 1) {
 			new Effect.Opacity('img0', { from: 1, to: .3, duration: .5});
 		}
 		$H(this.Framework.data.nodes[id].relatedNodes).keys().each(function(e) {
 			this.showSVGElement(e);
+			this.addClassName($(e), 'oselected');
 			$H(this.Framework.data.nodes[id].relatedNodes[e]).values().each( function(edge) { 
 				this.showSVGElement(edge);
 			}, this);
@@ -155,8 +158,10 @@ var GraphSVG = Class.create(GraphImage, {
 		if (fade) {
 			new Effect.Opacity('img0', { from: .3, to: 1, duration: .3});
 		}
+		this.removeClassName($(id), 'selected');
 		$H(this.Framework.data.nodes[id].relatedNodes).keys().each(function(e) {
 			this.hideSVGElement(e);
+			this.removeClassName($(e), 'oselected');
 			$H(this.Framework.data.nodes[id].relatedNodes[e]).values().each( function(edge) { 
 				this.hideSVGElement(edge);
 			}, this);
@@ -164,6 +169,27 @@ var GraphSVG = Class.create(GraphImage, {
 		this.hideSVGElement(id);
 		this.unhighlightNode(id);
 	},
+  hasClassName: function(element, className) {
+    var elementClassName = element.getAttribute('class');
+    return (elementClassName.length > 0 && (elementClassName == className ||
+      new RegExp("(^|\\s)" + className + "(\\s|$)").test(elementClassName)));
+  },
+
+  addClassName: function(element, className) {
+    var elementClassName = element.getAttribute('class');
+    if (!this.hasClassName(element, className))
+      elementClassName += (elementClassName ? ' ' : '') + className;
+	element.setAttribute('class', elementClassName);
+    return element;
+  },
+
+  removeClassName: function(element, className) {
+	elementClassName = element.getAttribute('class');
+    elementClassName = elementClassName.replace(
+      new RegExp("(^|\\s+)" + className + "(\\s+|$)"), ' ').strip();
+	element.setAttribute('class', elementClassName);
+    return element;
+  },
 
 
 });

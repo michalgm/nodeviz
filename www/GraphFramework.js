@@ -31,10 +31,12 @@ GraphFramework.prototype = {
 			} else { //probably means it was stopped by time out
 			   this.reportError(statusCode,statusString);
 			}
-		} catch (e) {}//HEY FIXME, WHY CATCH WITHOUT PRINTING A MESSAGE
+		//} catch (e) {console.log('umm'); console.log(e.name); this.reportError(10, e.name);}//HEY FIXME, WHY CATCH WITHOUT PRINTING A MESSAGE
+		} catch (e) {statusString = e.name+': '+e.message+'<br/>'; statusCode=null; }//HEY FIXME, WHY CATCH WITHOUT PRINTING A MESSAGE
 			
 		if (!statusCode){  //NO STATUS CODE
-		   this.reportError(-1, "Unknown response from server:\n\n"+response.responseText);
+		   statusString = statusString ? statusString : "Unknown response from server:\n\n";
+		   this.reportError(-1, statusString+response.responseText.escapeHTML());
 		} else if(statusCode == 1) { //EVERYTHING OK
 			return 1;
 		} else {  //STATUS INDICATES AN ERROR
@@ -53,8 +55,8 @@ GraphFramework.prototype = {
 		request.abort();
 		request.options.Framework.reportError(statusCode, statusString);
 	},
-	onLoading: function(request) {
-		this.loading('images');
+	onLoading: function(div) {
+		this.loading($(div));
 	},
 	loading: function(element) {
 		$(element).innerHTML = "<span class='loading' style='display: block; text-align: center; margin: 20px; background-color: white;'><img class='loadingimage' src='images/loading.gif' alt='Loading Data' /><br /><span class='message'>Loading...</span></span>";
@@ -66,9 +68,8 @@ GraphFramework.prototype = {
 			if (r.transport && r.transport.readyState != 4) { 
 				r.abort();
 			}
-			this.requests.splice(requests.indexOf(r), 1);
-			return; 
-		});
+			this.requests.splice(this.requests.indexOf(r), 1);
+		}, this);
 	},
 	setOffsets: function() { 
 		if ($('img0')) {
@@ -100,7 +101,7 @@ GraphFramework.prototype = {
 		var request = new Ajax.Request('request.php', {
 			parameters: params,
 			timeOut: this.timeOutLength,
-			onLoading: this.onLoading.bind(this),
+			onLoading: function() { this.onLoading('images'); }.bind(this),
 			onTimeOut: this.timeOutExceeded.bind(this),
 			onComplete: function(response,json) {
 				//console.timeEnd('fetch');
@@ -109,13 +110,13 @@ GraphFramework.prototype = {
 				//	console.time('render');
 					this.GraphImage.renderGraph(img, overlay);
 				//	console.timeEnd('render');
+				//	console.time('lists');
+					this.GraphList.renderLists();
+				//	console.timeEnd('lists');
 					delete graph;	
 					delete img;
 					delete overlay;
 					//this.setOffsets();
-				//	console.time('lists');
-					this.GraphList.renderLists();
-				//	console.timeEnd('lists');
 				//	console.timeEnd('load');
 				}
 			}.bind(this)
@@ -127,6 +128,7 @@ GraphFramework.prototype = {
 		if (! id) { return; }
 		//if(typeof this.data.nodes[id] == 'undefined') { id = this.current['node']; }
 		if (this.data.nodes[id]) {
+			this.unhighlightNode(this.current['node']);
 			this.current['node'] = id;
 			this.GraphImage.highlightNode(id, noshowtooltip);
 			this.GraphList.highlightNode(id);
@@ -153,7 +155,7 @@ GraphFramework.prototype = {
 		this.GraphImage.selectNode(id);
 		this.GraphList.selectNode(id);
 		this.current.network = id;
-		return;
+		/*
 		if (
 			(id == current['candidate'] || id == current['company']) && 
 			(
@@ -200,6 +202,7 @@ GraphFramework.prototype = {
 		} else {
 			showDetails(id, type, 0, 1);
 		}
+		*/
 	},
 	unselectNode: function(fade) {
 		if (this.current.network == '') { return; }
@@ -208,7 +211,32 @@ GraphFramework.prototype = {
 		//this.highlightNode(this.current.network);
 		this.current.network = '';
 	},
-	selectEdge: function() {
+	selectEdge: function(id) {
+		if (! $('edgeview')) { 
+			$(document.body).insert({ top: new Element('div', {'id': 'edgeview'}) });
+		}
+		var params = this.getGraphOptions();
+		params.action = 'displayEdge';
+		params.edgeid = id;
+		var request = new Ajax.Request('request.php', {
+			parameters: params,
+			timeOut: this.timeOutLength,
+			onLoading: function() { this.onLoading('edgeview'); }.bind(this),
+			onTimeOut: this.timeOutExceeded.bind(this),
+			onComplete: function(response,json) {
+				if (this.checkResponse(response)) {
+					var edgelist = "";
+					$H(data).keys().each(function (key) { 
+						var edge = data[key];
+						edgelist+= '<tr><td>'+[edge.CompanyName, edge.recipientname, edge.date, edge.amount].join('</td><td>')+'</td></tr>';
+					});
+					$('edgeview').update('<table>'+edgelist+'</table>');
+				} else { 
+					$('edgeview').hide();
+				}
+			}.bind(this)
+		});
+		this.requests[this.requests.length+1] = request;
 	},
 	unselectEdge: function() {
 	}

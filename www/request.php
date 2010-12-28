@@ -55,7 +55,11 @@ if (isset($_REQUEST['search'])) {
 
 		if(isset($_REQUEST['action'])) {
 			$ajaxfunc = 'ajax_'.$_REQUEST['action'];
-			$output = $graph->$ajaxfunc($graph);
+			if (method_exists($graph, $ajaxfunc)) { 
+				$output = $graph->$ajaxfunc($graph);
+			} else {
+				$output = "statusCode = 3; statusString = '\"".$_REQUEST['action']."\" is an invalid method.';";
+			}
 		} else if (isset($_REQUEST['table'])) {
 			include_once('lib/graphtable.php');
 			$output = createTable($graph);

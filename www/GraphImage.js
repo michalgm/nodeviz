@@ -38,6 +38,9 @@ GraphImage.prototype = {
 	},
 
 	showTooltip: function(label) {
+		if (! this.Framework.offsetY) { 
+			this.Framework.setOffsets();
+		}
 		tooltip = $('tooltip');
 		if(label) { 
 			tooltip.innerHTML = label;
@@ -50,16 +53,12 @@ GraphImage.prototype = {
 		$('images').style.cursor = 'default';	
 	},
 	highlightNode: function(id, noshowtooltip) {
-		if (! this.Framework.offsetY) { 
-			this.Framework.setOffsets();
-		}
 		if (! noshowtooltip) { 
 			id = id.toString();
 			this.showTooltip(this.Framework.data.nodes[id].tooltip); //Set the tooltip contents
 		}
 	},
 	unhighlightNode: function(id) { 
-		this.Framework.current['node'] = "";
 		this.hideTooltip();
 	},
 	selectNode: function(id) {

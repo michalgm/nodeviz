@@ -95,9 +95,11 @@
 	#svg path{fill-opacity:.9 !important;cursor:pointer}
 	#svg ellipse, #svg polygon{fill-opacity:.8 !important;cursor:pointer}
 	#svg path{stroke-opacity:.9 !important;stroke:#93f !important;cursor:pointer}
+	#svg .searchhelp{color:#666666;font-style:italic}
+	#svg .selected polygon, #svg .selected ellipse{fill:#eebbbb !important;}
+	#svg .oselected polygon, #svg .oselected ellipse{fill:#bbddbb;}
 	#svg .highlight path{stroke:#93f !important;stroke-opacity:.9 !important}
 	#svg .nhighlight{fill:#ccbbdd !important;}
-	#svg .searchhelp{color:#666666;font-style:italic}
 
 	#highlight.selected, .nhighlight { background-color: #ccbbdd !important; }
 	.levelfour { display: none; }
@@ -109,9 +111,12 @@
 	.sublists_container { display: none; cursor: default; }
 	.nodelist { display: none; }
 	.nodelist .highlight { background-color: #ccbbdd; }
-	.nodelist .highlight div { background-color: #fff; }
+	.nodelist .selected { background-color: #eebbbb; font-weight: bold; }
+	.nodelist .selected div { background-color: #fff; font-weight: normal;}
 	.nodelist>li { color: blue; cursor: pointer;} 
 	.nodelist.selected { display: block; }
 
 	#list_menu li { display: inline;  padding: 5px; cursor: pointer;}
 	#list_menu li.selected {font-weight: bold; } 
+
+	#edgeview { position: absolute; z-index: 20; width: 80%; background-color: #fff; margin: auto; padding: 20px;}
