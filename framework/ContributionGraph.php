@@ -39,7 +39,7 @@ class ContributionGraph extends Graph {
 		$this->data['graphvizProperties'] = array(
 			'graph'=> array(
 				'bgcolor'=>'#FFFFFF',
-				'size' => '9.79,7.00!',
+				#'size' => '9.79,7.00!',
 				'rankdir' => 'RL',
 				'ranksep' => '30',
 				'pad' => '1,5',
