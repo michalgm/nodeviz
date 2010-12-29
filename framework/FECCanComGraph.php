@@ -52,7 +52,7 @@ class FECCanComGraph extends Graph {
 		$this->data['graphvizProperties'] = array(
 			'graph'=> array(
 				'bgcolor'=>'#FFFFFF',
-				'size' => '6.52,6.52!',
+#				'size' => '6.52,6.52!',
 			),
 			'node'=> array('label'=> ' ', 'imagescale'=>'true','fixedsize'=>1, 'style'=> 'setlinewidth(7), filled', 'regular'=>'true'),
 			'edge'=>array('len'=>8, 'arrowhead'=>'none', 'color'=>'#66666666')

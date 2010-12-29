@@ -21,6 +21,9 @@ class Graph {
 			'edgetypesindex'=> array(),
 		);
 
+		$this->width = null;
+		$this->height = null;
+
 		$this->data = $data;
 
 		return $this;
@@ -45,6 +48,12 @@ class Graph {
 				$this->data['properties'][$key]  = dbEscape($request_parameters[$key]);
 			}
 		}	
+		if (isset($request_parameters['graphWidth'])) {
+			$this->width = $request_parameters['graphWidth'];
+		}
+		if (isset($request_parameters['graphHeight'])) {
+			$this->height = $request_parameters['graphHeight'];
+		}
 		if (method_exists($this, 'preProcessGraph')) {
 			$this->preProcessGraph();
 		}	
@@ -65,7 +74,6 @@ class Graph {
 				}
 			}
 		}
-		
 		
 		return $this;	
 	}

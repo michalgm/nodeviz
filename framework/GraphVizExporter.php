@@ -18,7 +18,8 @@ class GraphVizExporter {
 			'bgcolor' => 'transparent',
 			'splines' => '1',
 			'epsilon'=>'0.0',
-			'layoutEngine'=>'neato'
+			'layoutEngine'=>'neato',
+			#'ratio'=>'fill'
 		),
 		'node' => array(
 			'style' => 'setlinewidth(16), filled',
@@ -47,12 +48,16 @@ class GraphVizExporter {
 		//FIXME included unassigned properties as comments
 		//write out the header for the graphviz file
 		//THESE PROPS SHOULD BE
-
+		if (isset($graph->width)) { 
+			$size = ($graph->width/96).','.($graph->height/96)."!";
+			$graph->data['graphvizProperties']['graph']['size'] = $size;
+		}
 		//Merge any properties set in graphSetup into GV_PARAMS
-		if (isset($graph['graphvizProperties'])) {
-			$GV_PARAMS = array_merge_recursive_unique($GV_PARAMS, $graph['graphvizProperties']);
+		if (isset($graph->data['graphvizProperties'])) {
+			$GV_PARAMS = array_merge_recursive_unique($GV_PARAMS, $graph->data['graphvizProperties']);
+			#$GV_PARAMS = array_merge_replace_recursive($GV_PARAMS, $graph->data['graphvizProperties']);
+			//print_r($GV_PARAMS); exit;
 		} 
-
 		$dot = "digraph G {\ngraph ["; 
 
 		//get the graph-level params from the params object
@@ -77,7 +82,7 @@ class GraphVizExporter {
 		$dot .= "];\n";
 
 		//for each node
-		foreach ($graph['nodes'] as $node){
+		foreach ($graph->data['nodes'] as $node){
 			if(! isset($node['size'])) { print_r($node); }
 			//format the the string.  
 			$dot .= "\"".$node['id'].'" ['; //id of node
@@ -108,7 +113,7 @@ class GraphVizExporter {
 		$dot .="];\n";
 
 		//for each edge
-		foreach($graph['edges'] as $edge ){
+		foreach($graph->data['edges'] as $edge ){
 			//format the string
 			$dot .= '"'.$edge['fromId'].'" -> "'.$edge['toId']."\" [".
 			'href="a" '.
@@ -132,9 +137,9 @@ class GraphVizExporter {
 		}
 		
 //hack test subgraph function
-		foreach (array_keys($graph['subgraphs']) as $sg_name){
+		foreach (array_keys($graph->data['subgraphs']) as $sg_name){
 			$dot .= "subgraph $sg_name {\n";
-			$subgraph = $graph['subgraphs'][$sg_name];
+			$subgraph = $graph->data['subgraphs'][$sg_name];
 			//add any properties
 			if (isset($subgraph['properties'])){
 				foreach (array_keys($subgraph['properties']) as $prop){
@@ -250,12 +255,13 @@ class GraphVizExporter {
 		global $old_graphviz;
 
 		$graphname = $graph->graphname();
-		$dotString = GraphVizExporter::createDot($graph->data);
+		$dotString = GraphVizExporter::createDot($graph);
 		$GV_PARAMS = GraphVizExporter::$GV_PARAMS;
 		if (isset($graph->data['graphvizProperties'])) {
 			$GV_PARAMS = array_merge_recursive_unique($GV_PARAMS, $graph->data['graphvizProperties']);
 		}
 		$layoutEngine = $GV_PARAMS['graph']['layoutEngine'];
+		$layoutEngine = (isset($layoutEngine) && $layoutEngine != 'neato') ? "-K$layoutEngine" : "";
 		$imageFile = "$datapath/$graphname.png";
 		$dotFile = "$datapath/$graphname.dot";
 		$svgFile = "$datapath/$graphname.svg.raw";
@@ -273,11 +279,17 @@ class GraphVizExporter {
 		   2 => array("file", "$logdir/graphviz.log", "a") // stderr is a file to write to
 		);
 		//use neato to generate and save image file, and generate imap file to STDOUT
-		$process = proc_open("$layoutEngine -vvv -Tsvg -o $svgFile -Tdot -o $dotFile -Tpng -o $imageFile -Tcmapx ", $descriptorspec, $pipes);
+		$process = proc_open("neato -vvv $layoutEngine -Tsvg -o $svgFile -Tdot -o $dotFile -Tpng -o $imageFile -Tcmapx ", $descriptorspec, $pipes);
 		fwrite($pipes[0], $dotString);
 		fclose($pipes[0]);
 		$imap =  stream_get_contents($pipes[1]); //store imap file
 		fclose($pipes[1]);
+		$result = proc_close($process);
+		if($result) { 
+			//FIXME - we need to set up a real way to pass errors - gm - 12/28/10
+			print "statusCode=10; statusString = 'graphviz interpreter failed - returned $result';";
+			exit;
+		}
 
 		$imap = preg_replace("/target=\"[^\"]+\"/", "", $imap)	;
 		$imap = str_replace(" href=\"a\"", "", $imap)	;

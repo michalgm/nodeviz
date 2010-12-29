@@ -26,27 +26,33 @@ GraphFramework.prototype = {
 	checkResponse: function(response) {
 		var statusCode = null;
 		var statusString = "Something went wrong";  
-		try {   //need this incase there is giberish and eval() throws js errors
-			if (eval(response.responseText)) { 
-			} else { //probably means it was stopped by time out
-			   this.reportError(statusCode,statusString);
+		if (response.status == '200') { 
+			try {   //need this incase there is giberish and eval() throws js errors
+				if (eval(response.responseText)) { 
+				} else { //probably means it was stopped by time out
+					this.reportError(statusCode,statusString.escapeHTML());
+					this.killRequests();
+					return 0;
+				}
+			//} catch (e) {console.log('umm'); console.log(e.name); this.reportError(10, e.name);}//HEY FIXME, WHY CATCH WITHOUT PRINTING A MESSAGE
+			} catch (e) {statusString = e.name+': '+e.message.escapeHTML()+'<br/>'; statusCode=null; }//HEY FIXME, WHY CATCH WITHOUT PRINTING A MESSAGE
+				
+			if (!statusCode){  //NO STATUS CODE
+			   statusString = statusString ? statusString : "Unknown response from server:\n\n";
+			   this.reportError(-1, statusString+response.responseText.escapeHTML());
+			} else if(statusCode == 1) { //EVERYTHING OK
+				return 1;
+			} else {  //STATUS INDICATES AN ERROR
+			   this.reportError(statusCode, statusString.escapeHTML());
 			}
-		//} catch (e) {console.log('umm'); console.log(e.name); this.reportError(10, e.name);}//HEY FIXME, WHY CATCH WITHOUT PRINTING A MESSAGE
-		} catch (e) {statusString = e.name+': '+e.message+'<br/>'; statusCode=null; }//HEY FIXME, WHY CATCH WITHOUT PRINTING A MESSAGE
-			
-		if (!statusCode){  //NO STATUS CODE
-		   statusString = statusString ? statusString : "Unknown response from server:\n\n";
-		   this.reportError(-1, statusString+response.responseText.escapeHTML());
-		} else if(statusCode == 1) { //EVERYTHING OK
-			return 1;
-		} else {  //STATUS INDICATES AN ERROR
-		   this.reportError(statusCode, statusString);
+		} else {
+			this.reportError(response.status, response.statusText.escapeHTML());
 		}
 		this.killRequests();
 		return 0;	
 	},
 	reportError: function(code, message) {
-		$('error').update(message);
+		$('error').update("We're sorry, an error has occured: <span class='errorstring'>"+message+"</span> (<span class='errorcode'>"+code+"</span>)");
 		$('error').show();
 	},
 	timeOutExceeded: function(request) {
@@ -70,6 +76,7 @@ GraphFramework.prototype = {
 			}
 			this.requests.splice(this.requests.indexOf(r), 1);
 		}, this);
+		$$('.loading').each(function (e) { e.remove(); });
 	},
 	setOffsets: function() { 
 		if ($('img0')) {
@@ -83,6 +90,8 @@ GraphFramework.prototype = {
 	getGraphOptions: function() {
 		var params = Form.serialize($('graphoptions'), true);
 		params.useSVG = this.useSVG;
+		params.graphWidth = this.graphDimensions.width;
+		params.graphHeight = this.graphDimensions.height;
 		return params;
 	},
 	resetGraph: function(params) {
@@ -92,6 +101,7 @@ GraphFramework.prototype = {
 		this.GraphImage.reset();
 		this.GraphList.reset();
 		$('error').update('');
+		$('error').hide();
 	},
 	reloadGraph: function(params) {
 		//console.time('load');

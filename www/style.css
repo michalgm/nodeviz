@@ -120,3 +120,5 @@
 	#list_menu li.selected {font-weight: bold; } 
 
 	#edgeview { position: absolute; z-index: 20; width: 80%; background-color: #fff; margin: auto; padding: 20px;}
+	#error { z-index: 1000; color: #f00; background: #ddd; border: 1px solid black; width: 60%; margin: auto; padding: 10px; }
+	#error .errorstring { display:block; max-height: 200px; overflow: auto; background: #fee; padding: 3px; }
