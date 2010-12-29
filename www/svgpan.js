@@ -72,6 +72,9 @@ SVGPan.prototype = {
 		Event.stopObserving('zoomin');
 		Event.stopObserving('zoomout');
 		Event.stopObserving('zoomreset');
+		Event.stopObserving('zoomSlider');
+		Event.stopObserving('zoomHandle');
+		Event.stopObserving(this.root);
 	},
 
 /**

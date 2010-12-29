@@ -8,13 +8,11 @@ GraphImage.prototype = {
 		if (! $('tooltip')) { 
 			$(document.body).insert({ top: new Element('div', {'id': 'tooltip'}) });
 		}
-		if (! $('highlight')) { 
-			$(document.body).insert({ top: new Element('div', {'id': 'highlight'}) });
-		}
 		$(this.graphdiv).innerHTML += "<div id='images'></div>";
 		$(this.graphdiv).innerHTML += "<div id='imagescreen' style='display:none;'></div>";
 	},
 	reset: function() {
+		Event.stopObserving($('img0'));
 	},
 	renderGraph: function(img, overlay) {
 
@@ -28,13 +26,9 @@ GraphImage.prototype = {
 	},
 	setupListeners: function() { 
 		Event.observe($('img0'), 'mousemove', this.mousemove.bind(this));
-		//Event.observe($('info'), 'mousemove', this.mousemove);
 		Event.observe($('tooltip'), 'mousemove', this.mousemove.bind(this))
-		//Event.observe($('highlight'), 'mouseover', this.highlightNode);
 		Event.observe($('tooltip'), 'mouseout', this.hideTooltip.bind(this));
-		//Event.observe($('highlight'), 'mousedown', this.selectNode);
 		Event.observe(window, 'resize', this.Framework.setOffsets.bind(this));
-		//window.setTimeout("setOffsets()", 250);
 	},
 
 	showTooltip: function(label) {

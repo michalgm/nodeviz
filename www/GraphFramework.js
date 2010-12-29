@@ -95,17 +95,39 @@ GraphFramework.prototype = {
 		return params;
 	},
 	resetGraph: function(params) {
-		this.requests = [];
-		this.current = {'zoom': 1, 'network': '', 'node': '', 'nodetype': ''};
-		this.data = [];
 		this.GraphImage.reset();
 		this.GraphList.reset();
+		this.current = {'zoom': 1, 'network': '', 'node': '', 'nodetype': ''};
+		this.requests = [];
+		this.data = [];
 		$('error').update('');
 		$('error').hide();
 	},
 	reloadGraph: function(params) {
 		//console.time('load');
+		//console.time('reset');
 		this.resetGraph();
+		//console.timeEnd('reset');
+		
+		/*	
+		var eventcount = 0;
+		$('graphs').descendants().each( function(e) { 
+			if (Element.getStorage(e).get('prototype_event_registry') ) {
+				//eventcount += Element.getStorage(e).get('prototype_event_registry').values().size();
+				Element.getStorage(e).get('prototype_event_registry').values().each(function (v) { 
+					if (v[0]) { 
+						eventcount++;		
+						console.log(e);
+					} 
+				});
+				//console.log(Element.getStorage(e).get('prototype_event_registry'));
+				//console.log(e);
+			}
+		});
+		console.log(eventcount);
+		//if (this.data) { console.log('fuck'); return; }
+		*/	
+
 		var params = this.getGraphOptions();
 		//console.time('fetch');
 		var request = new Ajax.Request('request.php', {

@@ -7,6 +7,8 @@ var GraphSVG = Class.create(GraphImage, {
 	reset: function($super) {
 		$super();
 		this.SVGPan.reset();
+		$$('.node').each(function(e) { Element.stopObserving(e); });
+		$$('.edge', '#svg', '#graphs', '#svgscreen').each(function(e) { Element.stopObserving(e); });
 	},
 	renderGraph: function($super, image, overlay) { 
 		$super();

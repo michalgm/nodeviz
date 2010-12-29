@@ -1,9 +1,23 @@
 var GraphRaster = Class.create(GraphImage, {
 	initialize: function($super, framework) {
 		$super(framework);
-		$(this.graphdiv).innerHTML += this.highlightImageHTML;
+		if (! $('highlight')) { 
+			$('graphs').insert({ top: new Element('div', {'id': 'highlight'}) });
+		}
+		$('highlight').innerHTML += this.highlightImageHTML;
 	},
-	reset: function() {
+	reset: function($super) {
+		$super();
+		if ($('G')) { 
+			var data = this.Framework.data;
+			$('G').descendants().each(function(a) { 
+				if (data.edges[a.id] || data.nodes[a.id]) { 
+					$(a).stopObserving();
+				}
+			});
+		}
+		$('highlight').stopObserving();
+		$('highlightimg').stopObserving();
 	},
 	renderGraph: function($super, image, overlay) { 
 		$super();
@@ -53,7 +67,7 @@ var GraphRaster = Class.create(GraphImage, {
 	},
 
 	highlightImageHTML: "\
-		<div id='highlight' style='position: absolute; z-index: 5; visibility: hidden; filter:alpha(opacity=50); opacity: .50; cursor: pointer; top: 0px; left: 0px;'><img id='highlightimg' alt='' style='visibility: hidden; width: 100%; height: 100%;' src='images/highlight.gif' /></div>\
+		<div id='highlight'><img id='highlightimg' alt='' src='images/highlight.gif' /></div>\
 	",
 
 });

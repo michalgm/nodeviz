@@ -8,6 +8,12 @@ GraphList.prototype = {
 		this.listdiv = this.Framework.listdiv;
 	},
 	reset: function() { 
+		var data = this.Framework.data;
+		var parent = '#'+this.listdiv;
+		//TODO - there may be a slightly more efficient way of finding these nodes - gm - 12/28/10
+		$$(parent+' li', parent+' div').each(function(e) { 
+			e.stopObserving();
+		});
 		$(this.listdiv).update('');
 	},
 	renderLists: function() {
