@@ -19,7 +19,7 @@ GraphList.prototype = {
 	appendOptions: function() {
 
 	},
-	renderLists: function() {
+	render: function(responseData) {
 		var data = this.Framework.data;
 		$(this.listdiv).insert({ top: new Element('ul', {'id': 'list_menu'}) });
 		$H(data.nodetypes).values().each( function(nodetype) {

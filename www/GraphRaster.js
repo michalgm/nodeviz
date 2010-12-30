@@ -19,8 +19,10 @@ var GraphRaster = Class.create(GraphImage, {
 		$('highlight').stopObserving();
 		$('highlightimg').stopObserving();
 	},
-	renderGraph: function($super, image, overlay) { 
+	render: function($super, responseData) { 
 		$super();
+		var image = responseData.image;
+		var overlay = responseData.overlay;
 		var map = " usemap='#G'";
 		$('images').update("<img id='img0' "+map+" border='0' src='"+image+"' />"+overlay);
 		$('G').descendants().each(function(a) { 

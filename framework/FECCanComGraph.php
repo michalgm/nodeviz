@@ -447,7 +447,7 @@ class FECCanComGraph extends Graph {
 		$ids = $edge['ContribIDs'];
 		$query = "select * from contributions where crp_key in ($ids)";
 		$results = dbLookupArray($query);
-		return "statusCode = 1; data = ".json_encode($results, JSON_FORCE_OBJECT).";";
+		return $results;
 	}
 
 	function ajax_showComInfo() {

@@ -222,8 +222,8 @@ class GraphVizExporter {
 		}
 		//convert array to string
 		#$string = 'graphviz = '.json_encode($jsgraph).';'; 
-		$string = 'graph = '.json_encode($graph,JSON_FORCE_OBJECT).';';
-		return(array("<map id='G' name='G'>$imapstr</map>", $string));
+		#$string = 'graph = '.json_encode($graph,JSON_FORCE_OBJECT).';';
+		return(array("<map id='G' name='G'>$imapstr</map>", $graph));
 	}
 
 	//displayDotFile: accepts dot file as string, dropIsolates flag, processed through neato, writes out image header and image
@@ -287,8 +287,7 @@ class GraphVizExporter {
 		$result = proc_close($process);
 		if($result) { 
 			//FIXME - we need to set up a real way to pass errors - gm - 12/28/10
-			print "statusCode=10; statusString = 'graphviz interpreter failed - returned $result';";
-			exit;
+			trigger_error("GraphViz interpreter failed - returned $result", E_USER_ERROR);
 		}
 
 		$imap = preg_replace("/target=\"[^\"]+\"/", "", $imap)	;
@@ -298,7 +297,7 @@ class GraphVizExporter {
 		$imap = str_replace("</map>", "", $imap);
 		$imap = preg_replace("/title=\"[^\"]+\"/", "", $imap)	;
 		$imap = "<map id='G' name='G'>".join("\n", array_reverse(explode("\n", $imap)))."</map>";
-		list($imap, $jsCoords) = GraphVizExporter::parseDotCoords($imap, $graph); //read dotfile coords from imap file
+		list($imap, $graphobject) = GraphVizExporter::parseDotCoords($imap, $graph); //read dotfile coords from imap file
 		$imapfile = fopen ("$datapath/$graphname.imap", 'w');
 		fwrite($imapfile, $imap);
 		fclose($imapfile);
@@ -394,7 +393,7 @@ class GraphVizExporter {
 				}
 			}
 		}	   
-		return array($imap, $jsCoords, $svg);
+		return array($imap, $graphobject, $svg);
 	}
 
 	public static function generateGraphvizOutput($graph, $datapath, $format, $returnsvg = 0) {
@@ -405,24 +404,21 @@ class GraphVizExporter {
 		global $cache;
 		$output = "";
 		if ($cache != 1) {
-			list($imap, $jsCoords,$svg) = GraphVizExporter::generateGraphFiles($graph, $datapath, $format);
+			list($imap, $graphobject,$svg) = GraphVizExporter::generateGraphFiles($graph, $datapath, $format);
 		} else {
 			$imap = file_get_contents("$datapath/$graphname.imap");
 			$svg = file_get_contents("$datapath/$graphname.svg");
-			list($imap2, $jsCoords) = GraphVizExporter::parseDotCoords($imap, $graph); //read dotfile coords from imap file
+			list($imap2, $graphobject) = GraphVizExporter::parseDotCoords($imap, $graph); //read dotfile coords from imap file
 			//$jsCoords = file_get_contents("$datapath/$graphname.js");
 		}
 		if (! $cache) { $imageFile .= "?".(rand()%1000); } //append random # to image name to prevent browser caching
 		//$output .= "dotfile = '$dotFile';\n";
-		$output = "\nstatusCode= 1;\n"; //tell the gui everything is ok in the world
-		$output .= "img = '$imageFile';\n"; 
-		$output .= $jsCoords;
 		if (isset($_REQUEST['useSVG']) && $_REQUEST['useSVG'] == 1) { 
-			$output .= "overlay = ".json_encode("<div id='svg' style='display: none'>$svg</div>");
+			$overlay = "<div id='svg' style='display: none'>$svg</div>";
 		} else {
-			$output .= "overlay = ".json_encode($imap);
+			$overlay = $imap;
 		}
-		return $output;
+		return array('img'=>$imageFile, 'graph'=>$graphobject, 'overlay'=>$overlay);
 	}
 }
 ?>

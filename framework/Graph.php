@@ -42,6 +42,7 @@ class Graph {
 		global $datapath;
 		global $cache;
 		
+		$this->input_parameters = $request_parameters;
 		//Override defaults with input values if they exist
 		foreach( array_keys($this->data['properties']) as $key) {
 			if(isset($request_parameters[$key])) {
@@ -237,20 +238,11 @@ class Graph {
 	function checkGraph() {
 		global $debug;
 		$graph = $this->data;
-		if ($debug)  { return; }
 		if ($graph == "") {
-			echo "statusCode = 2; statusString = 'We\'re sorry. The files needed to display these options are missing. Please contact the site administrator.';";
-			exit;
+			 trigger_error("We're sorry. The files needed to display these options are missing. Please contact the site administrator.", E_USER_ERROR);
 		}
-		if ($graph == 'empty graph') {
-			echo "statusCode = 3; statusString = 'These options return no relationship.';";
-			exit;
-		}
-		foreach ($graph['nodes'] as $nodetype) {
-			if (sizeof($nodetype) ==0 ) { 
-				echo "statusCode = 3; statusString = 'These options return no relationship.';";
-				exit;
-			}
+		if ($graph['nodes'] == "" || sizeof($graph['nodes']) == 0 || gettype(current($graph['nodes'])) != 'array') {
+			 trigger_error('These options return no relationship.', E_USER_ERROR);
 		}
 	}
 

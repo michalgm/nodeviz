@@ -10,8 +10,10 @@ var GraphSVG = Class.create(GraphImage, {
 		$$('.node').each(function(e) { Element.stopObserving(e); });
 		$$('.edge', '#svg', '#graphs', '#svgscreen').each(function(e) { Element.stopObserving(e); });
 	},
-	renderGraph: function($super, image, overlay) { 
+	render: function($super, responseData) { 
 		$super();
+		var image = responseData.img;
+		var overlay = responseData.overlay;
 		$('images').update(overlay);
 		$('svg').setAttribute('id', 'img0');
 		$('svgscreen').setAttribute('id', 'fsvgscreen');

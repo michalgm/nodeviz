@@ -15,7 +15,7 @@ GraphImage.prototype = {
 	reset: function() {
 		Event.stopObserving($('img0'));
 	},
-	renderGraph: function(img, overlay) {
+	render: function(responseData) {
 	},
 	appendOptions: function() {
 		this.Framework.params.useSVG = this.Framework.useSVG;

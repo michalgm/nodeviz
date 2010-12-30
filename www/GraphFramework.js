@@ -30,25 +30,15 @@ GraphFramework.prototype = {
 	},
 	checkResponse: function(response) {
 		var statusCode = null;
-		var statusString = "Something went wrong";  
+		var statusString = "Unknown response from server: ";  
 		if (response.status == '200') { 
-			try {   //need this incase there is giberish and eval() throws js errors
-				if (eval(response.responseText)) { 
-				} else { //probably means it was stopped by time out
-					this.reportError(statusCode,statusString.escapeHTML());
-					this.killRequests();
-					return 0;
-				}
-			//} catch (e) {console.log('umm'); console.log(e.name); this.reportError(10, e.name);}//HEY FIXME, WHY CATCH WITHOUT PRINTING A MESSAGE
-			} catch (e) {statusString = e.name+': '+e.message.escapeHTML()+'<br/>'; statusCode=null; }//HEY FIXME, WHY CATCH WITHOUT PRINTING A MESSAGE
-				
-			if (!statusCode){  //NO STATUS CODE
-			   statusString = statusString ? statusString : "Unknown response from server:\n\n";
-			   this.reportError(-1, statusString+response.responseText.escapeHTML());
-			} else if(statusCode == 1) { //EVERYTHING OK
-				return 1;
+			var responseData = response.responseJSON;
+			if ( typeof(responseData) == 'undefined' || ! responseData.statusCode){  //NO STATUS CODE
+			   this.reportError(-1, statusString+' Response was <div class="code">'+response.responseText.escapeHTML()+'</div>');
+			} else if(responseData.statusCode == 1) { //EVERYTHING OK
+				return responseData.data;
 			} else {  //STATUS INDICATES AN ERROR
-			   this.reportError(statusCode, statusString.escapeHTML());
+			   this.reportError(responseData.statusCode, responseData.statusString.escapeHTML());
 			}
 		} else {
 			this.reportError(response.status, response.statusText.escapeHTML());
@@ -137,15 +127,18 @@ GraphFramework.prototype = {
 			timeOut: this.timeOutLength,
 			onLoading: function() { this.onLoading('images'); }.bind(this),
 			onTimeOut: this.timeOutExceeded.bind(this),
+			sanitizeJSON: true,
 			onComplete: function(response,json) {
 				//console.timeEnd('fetch');
-				if (this.checkResponse(response)) {
-					this.data = graph.data;
+				var responseData = this.checkResponse(response);
+				if (responseData) {
+					this.data = responseData.graph.data;
 				//	console.time('render');
-					this.renderers.GraphImage.renderGraph(img, overlay);
+					$H(this.renderers).values().invoke('render', responseData);
+					//this.renderers.GraphImage.renderGraph(data.img, data.overlay);
 				//	console.timeEnd('render');
 				//	console.time('lists');
-					this.renderers.GraphList.renderLists();
+					//this.renderers.GraphList.renderLists();
 				//	console.timeEnd('lists');
 					delete graph;	
 					delete img;
@@ -205,8 +198,10 @@ GraphFramework.prototype = {
 			timeOut: this.timeOutLength,
 			onLoading: function() { this.onLoading('edgeview'); }.bind(this),
 			onTimeOut: this.timeOutExceeded.bind(this),
+			sanitizeJSON: true,
 			onComplete: function(response,json) {
-				if (this.checkResponse(response)) {
+				var data = this.checkResponse(response);
+				if (data) {
 					var edgelist = "";
 					$H(data).keys().each(function (key) { 
 						var edge = data[key];
