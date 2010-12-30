@@ -29,7 +29,7 @@
 	<script type="text/javascript">
 	//<![CDATA[
 		function initGraph() {
-			graphframework = new GraphFramework('graphs', 'lists');
+			gf = new GraphFramework({graphdiv: 'graphs', listdiv:'lists'});
 		}	
 	//]]>	
 	</script>

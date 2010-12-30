@@ -16,6 +16,9 @@ GraphList.prototype = {
 		});
 		$(this.listdiv).update('');
 	},
+	appendOptions: function() {
+
+	},
 	renderLists: function() {
 		var data = this.Framework.data;
 		$(this.listdiv).insert({ top: new Element('ul', {'id': 'list_menu'}) });

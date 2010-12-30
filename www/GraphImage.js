@@ -10,12 +10,17 @@ GraphImage.prototype = {
 		}
 		$(this.graphdiv).innerHTML += "<div id='images'></div>";
 		$(this.graphdiv).innerHTML += "<div id='imagescreen' style='display:none;'></div>";
+		this.graphDimensions = $(this.graphdiv).getDimensions();
 	},
 	reset: function() {
 		Event.stopObserving($('img0'));
 	},
 	renderGraph: function(img, overlay) {
-
+	},
+	appendOptions: function() {
+		this.Framework.params.useSVG = this.Framework.useSVG;
+		this.Framework.params.graphWidth = this.graphDimensions.width;
+		this.Framework.params.graphHeight = this.graphDimensions.height;
 	},
 	//Catches mousemove events
 	mousemove: function(e) {
