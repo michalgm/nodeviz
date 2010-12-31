@@ -117,6 +117,7 @@ SVGPan.prototype = {
 				}
 			}.bind(this),
 		});
+		this.center = {'x': ($('svg').childNodes[0].getBBox().width/2), 'y':($('svg').childNodes[0].getBBox().height/2)};
 		this.resetsvg = $('graph0').getCTM();
 	},
 
@@ -340,8 +341,9 @@ SVGPan.prototype = {
 		var g = $("graph0");
 		//var p = {'x': ($('svg').childNodes[0].getBBox().width/2), 'y':($('svg').childNodes[0].getBBox().height/2)};
 		var p = this.root.createSVGPoint();
-		p.x = 122;
-		p.y = 257;
+		var dimensions = $(this.GraphSVG.Framework.graphdiv).getDimensions();
+		p.x = this.center.x;
+		p.y = this.center.y;
 		p = p.matrixTransform(g.getCTM().inverse());
 		z = Math.pow(z, zoom_amount);
 		var k = this.root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);

@@ -8,6 +8,7 @@
 	.nosvg #zoomcontrols { display: none; }
 	#nosvgbrowser {display:none; border-radius:10px; -webkit-border-radius:10px; -moz-border-radius:10px; color:#630; background:#ff9; border:1px solid #630; margin-bottom:10px; padding:10px;}
 	.nosvg #nosvgbrowser { display: block; }
+
 	#zoomcontrols {position:absolute; top:5px; left:5px; z-index:1000; padding:5px; background:rgba(128,128,128,0.25); border-radius:10px; -webkit-border-radius:10px; -moz-border-radius:10px; overflow:auto;}
 	#zoomcontrols span {display:block; float:left; height:16px; width:16px; text-indent:-9999px; background-repeat:no-repeat; cursor:pointer;}
 	#zoomcontrols #zoomSlider {float:left;}
@@ -56,7 +57,7 @@
 	
 	li.sub.selected {height:auto;}
 	
-	#images {text-align:left;padding:10px 20px;  margin-top: 25px;}
+	#images {text-align:left;}
 
 	#lightbox, .modal {position:fixed; max-height:80%; width:600px; background:#fff; z-index:1002; top:30px; left:50%; margin-left:-300px; padding:15px; overflow-y:auto; border-radius:10px; -webkit-border-radius:10px; -moz-border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.75); -webkit-box-shadow:0 3px 10px rgba(0,0,0,0.75); -moz-box-shadow:0 3px 10px rgba(0,0,0,0.75);}
 	#screen {width:100%; height:100%; position:absolute; z-index:1001; top:0; left:0; background:#000; opacity:0.5; -moz-opacity:0.5; filter:alpha(opacity=50); overflow:hidden;}

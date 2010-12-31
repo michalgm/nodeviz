@@ -26,8 +26,18 @@ var GraphSVG = Class.create(GraphImage, {
 
 		$('svg').style.setProperty('position','absolute', '');
 		//$('svg').clonePosition($('img0'));
-		$('svg').style.setProperty('top','35px', '');
+		$('svg').style.setProperty('top','0px', '');
 		$('svgscreen').style.setProperty('cursor','move', 'important');
+		$('graph0').style.setProperty('opacity', '1', '');
+		$('svg').style.setProperty('visibility', 'visible', '');
+		//var left = Math.round((parseInt($('graphs').getStyle('width')) - $('svg').childNodes[0].getAttribute('width').replace('px', ''))/2);
+		//$('svg').style.setProperty('left',left+'px' , '');
+		$('svg').style.setProperty('display', 'block','');
+		$('svg').childNodes[0].setAttribute('width', $('images').getWidth());
+		$('img0').childNodes[0].setAttribute('width', $('images').getWidth());
+		$('svg').childNodes[0].setAttribute('height', $('images').getHeight());
+		$('img0').childNodes[0].setAttribute('height', $('images').getHeight());
+
 		
 			/*
 		//Tag and hide second level nodes and edges
@@ -44,17 +54,6 @@ var GraphSVG = Class.create(GraphImage, {
 			}
 		});
 			*/
-		$('graph0').style.setProperty('opacity', '1', '');
-		$('svg').style.setProperty('visibility', 'visible', '');
-		//var left = Math.round((parseInt($('graphs').getStyle('width')) - $('svg').childNodes[0].getAttribute('width').replace('px', ''))/2);
-		//$('svg').style.setProperty('left',left+'px' , '');
-		$('svg').style.setProperty('left','20px' , '');
-		$('svg').style.setProperty('display', 'block','');
-		$('svg').childNodes[0].setAttribute('width', $('images').getWidth());
-		$('img0').childNodes[0].setAttribute('width', $('images').getWidth());
-		$('svg').childNodes[0].setAttribute('height', $('images').getHeight());
-		$('img0').childNodes[0].setAttribute('height', $('images').getHeight());
-
 		//$('graphs').style.height = $('svg').childNodes[0].getAttribute('height');
 		//$('svg').clonePosition($('img0'), {'setLeft': true});
 		this.setupListeners();
