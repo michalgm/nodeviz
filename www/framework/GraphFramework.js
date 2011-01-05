@@ -4,11 +4,13 @@ GraphFramework.prototype = {
 	initialize: function(options) { 
 		this.timeOutLength = 100;
 		this.errordiv = 'error';
+		this.lightboxdiv = 'lightbox';
+		this.lightboxscreen = 'lightboxscreen';
 		this.optionsform = 'graphoptions';
 		this.frameworkPath = 'framework/';
 		Object.extend(this, options);
 		if (! $(this.errordiv)) { 
-			$(document.body).insert({ top: new Element('div', {'id': 'error'}) });
+			$(document.body).insert({ top: new Element('div', {'id': this.errordiv}) });
 		}
 		//if (document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")) { 
 		this.renderers = {};
@@ -53,8 +55,8 @@ GraphFramework.prototype = {
 		return 0;	
 	},
 	reportError: function(code, message) {
-		$('error').update("We're sorry, an error has occured: <span class='errorstring'>"+message+"</span> (<span class='errorcode'>"+code+"</span>)");
-		$('error').show();
+		$(this.errordiv).update("We're sorry, an error has occured: <span class='errorstring'>"+message+"</span> (<span class='errorcode'>"+code+"</span>)");
+		$(this.errordiv).show();
 	},
 	timeOutExceeded: function(request) {
 		statusCode=10;
@@ -98,8 +100,8 @@ GraphFramework.prototype = {
 		this.current = {'zoom': 1, 'network': '', 'node': '', 'nodetype': ''};
 		this.requests = [];
 		this.data = [];
-		$('error').update('');
-		$('error').hide();
+		$(this.errordiv).update('');
+		$(this.errordiv).hide();
 	},
 	reloadGraph: function(params) {
 		//console.time('load');
@@ -194,16 +196,13 @@ GraphFramework.prototype = {
 		this.current.network = '';
 	},
 	selectEdge: function(id) {
-		if (! $('edgeview')) { 
-			$(document.body).insert({ top: new Element('div', {'id': 'edgeview'}) });
-		}
 		var params = this.getGraphOptions();
 		params.action = 'displayEdge';
 		params.edgeid = id;
 		var request = new Ajax.Request(this.frameworkPath+'request.php', {
 			parameters: params,
 			timeOut: this.timeOutLength,
-			onLoading: function() { this.onLoading('edgeview'); }.bind(this),
+			onLoading: function() { this.onLoading(this.lightboxdiv+'contents'); }.bind(this),
 			onTimeOut: this.timeOutExceeded.bind(this),
 			sanitizeJSON: true,
 			onComplete: function(response,json) {
@@ -214,16 +213,39 @@ GraphFramework.prototype = {
 						var edge = data[key];
 						edgelist+= '<tr><td>'+[edge.CompanyName, edge.recipientname, edge.date, edge.amount].join('</td><td>')+'</td></tr>';
 					});
-					$('edgeview').update('<table>'+edgelist+'</table>');
+					this.showLightbox('<table>'+edgelist+'</table>');
 				} else { 
-					$('edgeview').hide();
+					this.hideLightbox();
 				}
 			}.bind(this)
 		});
 		this.requests[this.requests.length+1] = request;
 	},
 	unselectEdge: function() {
-	}
+		$(this.lightboxdiv+'contents').update();
+		$(this.lightboxdiv).hide();
+		$(this.lightboxscreen).hide();
+
+	},
+	showLightbox: function(contents) { 
+		if (! $(this.lightboxdiv)) { 
+			$(document.body).insert({ top: new Element('div', {'id': this.lightboxdiv}) });
+			$(this.lightboxdiv).insert({top: new Element('img', {'id': this.lightboxdiv+'close', 'src': 'images/close.png', 'alt': 'Close', 'class': 'close'}) });
+			$(this.lightboxdiv+'close').observe('click', this.hideLightbox.bind(this));
+			$(this.lightboxdiv).insert({ bottom: new Element('div', {'id': this.lightboxdiv+'contents'}) });
+		}
+		if (! $(this.lightboxscreen)) { 
+			$(document.body).insert({ top: new Element('div', {'id': this.lightboxscreen}) });
+		}
+		$(this.lightboxdiv+'contents').update(contents);
+		$(this.lightboxdiv).show();
+		$(this.lightboxscreen).show();
+
+	},
+	hideLightbox: function() {
+		$(this.lightboxdiv).hide();
+		$(this.lightboxscreen).hide();
+	},
 //
 //
 //
