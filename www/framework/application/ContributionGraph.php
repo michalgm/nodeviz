@@ -1,5 +1,5 @@
 <?php
-include_once('../config.php');
+include_once('config.php');
 include_once('Graph.php');
 /*
 creates the graph data structure that will be used to pass data among components.  Structure must not change
@@ -417,7 +417,7 @@ function orgOwnOrg_edgeProperties() {
 			$props = $graph['properties'];
 			$localdatapath = "$datapath$props[sitecode]";
 			if (! is_dir("$localdatapath")) {
-				mkdir("$localdatapath") || print "unable to create dir $localdatapath"; 
+				mkdir("$localdatapath") || die("unable to create dir $localdatapath"); 
 				chmod("$localdatapath", 0777);
 			}	
 			

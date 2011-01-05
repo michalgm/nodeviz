@@ -8,9 +8,9 @@ Called by html frontend via HTTP RPC. Returns HTML and javascript strings to be 
 header('Content-type: application/json');
 set_error_handler('handleError');
 require_once("FrameworkUtils.php");
-set_include_path($framework_config['framework_path'].PATH_SEPARATOR.$framework_config['application_path']);
-chdir($framework_config['web_path']);
-reinterpret_paths();
+set_include_path($framework_config['library_path'].PATH_SEPARATOR.$framework_config['application_path']);
+#chdir($framework_config['web_path']);
+#reinterpret_paths();
 
 $framework_config['debug'] = 1;
 #sleep(3);
@@ -30,7 +30,7 @@ if (isset($framework_config['setupfiles']["$setupfile.php"])) {
 	#include_once('../framework/'.$_REQUEST['setupfile']); 
 } else { trigger_error("Invalid setup file: $setupfile", E_USER_ERROR); }
 
-$webdatapath = "";
+$datapath = $framework_config['framework_path'].'/'.$framework_config['cache_path'];
 
 $graph = new $setupfile();
 
@@ -58,8 +58,8 @@ setResponse(1, 'Success', $data);
 function setResponse($statusCode, $statusString, $data="") {
 	$response = array('statusCode'=>$statusCode, 'statusString'=>$statusString, 'data'=>$data);
 	print json_encode($response, JSON_FORCE_OBJECT);
-		exit;
 	if ($statusCode == 256) { 
+		exit;
 	}
 }
 
@@ -67,6 +67,7 @@ function handleError($errno, $errstr, $errfile, $errline) {
 	global $framework_config;
 	$details = $framework_config['debug'] ? " ($errfile - line $errline)" : "";
 	setResponse($errno, "$errstr$details");
+	return true;
 }
 
 ?>

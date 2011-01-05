@@ -1,6 +1,6 @@
 <?php
 include_once('config.php');
-include_once('www/framework/Graph.php');
+include_once('Graph.php');
 $dbname = 'oilchange';
 /*
 creates the graph data structure that will be used to pass data among components.  Structure must not change

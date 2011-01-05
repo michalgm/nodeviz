@@ -278,12 +278,14 @@ class GraphVizExporter {
 		   2 => array("file", $framework_config['log_path']."/graphviz.log", "a") // stderr is a file to write to
 		);
 		//use neato to generate and save image file, and generate imap file to STDOUT
+		chdir($framework_config['web_path']);
 		$process = proc_open("neato -vvv $layoutEngine -Tsvg -o $svgFile -Tdot -o $dotFile -Tpng -o $imageFile -Tcmapx ", $descriptorspec, $pipes);
 		fwrite($pipes[0], $dotString);
 		fclose($pipes[0]);
 		$imap =  stream_get_contents($pipes[1]); //store imap file
 		fclose($pipes[1]);
 		$result = proc_close($process);
+		chdir($framework_config['framework_path']);
 		if($result) { 
 			//FIXME - we need to set up a real way to pass errors - gm - 12/28/10
 			trigger_error("GraphViz interpreter failed - returned $result", E_USER_ERROR);
