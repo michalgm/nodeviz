@@ -53,9 +53,9 @@
  * or implied, of Andrea Leofreddi.
  */
 
-var SVGPan = Class.create();
+var GraphSVGZoom = Class.create();
 
-SVGPan.prototype = {
+GraphSVGZoom.prototype = {
 	initialize: function(GraphSVG) {
 		this.GraphSVG = GraphSVG;
 		$(this.GraphSVG.graphdiv).innerHTML += this.zoomControlsHTML;

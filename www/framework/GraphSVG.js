@@ -2,11 +2,11 @@ var GraphSVG = Class.create(GraphImage, {
 	initialize: function($super, framework) {
 		$super(framework);
 		if (this.Framework.useSVG != 1 ) { return; } 
-		this.SVGPan = new SVGPan(this);
+		this.GraphSVGZoom = new GraphSVGZoom(this);
 	},
 	reset: function($super) {
 		$super();
-		this.SVGPan.reset();
+		this.GraphSVGZoom.reset();
 		$$('.node').each(function(e) { Element.stopObserving(e); });
 		$$('.edge', '#svg', '#graphs', '#svgscreen').each(function(e) { Element.stopObserving(e); });
 	},
@@ -78,7 +78,7 @@ var GraphSVG = Class.create(GraphImage, {
 			Event.observe(n,'click', function(eventObject) { eval(this.Framework.data.edges[n.id].onClick); }.bind(this));
 			//Event.observe(n,'click', graphviz[n.id].onClick);
 		}, this);
-		this.SVGPan.setupListeners($('svg').childNodes[0]);
+		this.GraphSVGZoom.setupListeners($('svg').childNodes[0]);
 	},
 	highlightNode: function($super, id, text, noshowtooltip) {
 		$super(id, text, noshowtooltip);

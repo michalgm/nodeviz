@@ -15,15 +15,14 @@
 	<script type="text/javascript" src="framework/js/effects.js" ></script>
 	<script type="text/javascript" src="framework/js/slider.js" ></script>
 	<script type="text/javascript" src="framework/js/controls.js" ></script>
-	<script type="text/javascript" src="framework/svgpan.js" ></script>
-
 	<script type="text/javascript" src="framework/js/tablekit/tablekit.js"></script>
-	<!--<script type="text/javascript" src="js/rsh.js"></script>-->
+
 	<script type="text/javascript" src="framework/GraphFramework.js" ></script>
 	<script type="text/javascript" src="framework/GraphImage.js" ></script>
 	<script type="text/javascript" src="framework/GraphList.js" ></script>
 	<script type="text/javascript" src="framework/GraphRaster.js" ></script>
 	<script type="text/javascript" src="framework/GraphSVG.js" ></script>
+	<script type="text/javascript" src="framework/GraphSVGZoom.js" ></script>
 	<script type="text/javascript">
 	//<![CDATA[
 		function initGraph() {
