@@ -21,14 +21,23 @@ GraphList.prototype = {
 	},
 	render: function(responseData) {
 		var data = this.Framework.data;
+		this.nodeLists = new Hash();
 		$(this.listdiv).insert({ top: new Element('ul', {'id': 'list_menu'}) });
 		$H(data.nodetypes).values().each( function(nodetype) {
+			this.nodeLists[nodetype] = new Hash();
 			$('list_menu').insert({ bottom: new Element('li', {'id': nodetype+'_menu'}).update(nodetype)});
 			$(this.listdiv).insert({ bottom: new Element('ul', {'id': nodetype+'_list', 'class': 'nodelist'}) });
-			$(nodetype+'_list').insert({bottom: new Element('span', {'id': nodetype+'_list_header'}).update(nodetype+' Nodes')});
+			$(nodetype+'_list').insert({bottom: new Element('div', {'id': nodetype+'_list_header'}).update(nodetype+' Nodes')});
+
+			var search = ' <label for="'+nodetype+'_search">Search</label> <input class="node_search" id="'+nodetype+'_search" autocomplete="off" size="20" type="text" value="" /> <div class="autocomplete node_search_list" id="'+nodetype+'_search_list" style="display:none"></div>';
+			$(nodetype+'_list_header').insert({bottom: new Element('div', {'id': nodetype+'_search_container', 'class': 'node_search_container'}).update(search)});
+
 			Event.observe($(nodetype+'_menu'), 'click', function(e) { this.displayList(nodetype); }.bind(this));
 			$H(data.nodetypesindex[nodetype]).values().each( function(nodeid) {
 				var node = data.nodes[nodeid];
+				if (node['Name']) { 
+					this.nodeLists[nodetype].set(node['Name'], nodeid);
+				}
 				$(nodetype+'_list').insert({ bottom: new Element('li', {'id': 'list_'+nodeid}) });
 				$('list_'+nodeid).update(this.listNodeEntry(node));
 				$('list_'+nodeid).insert({ bottom: new Element('div', {'id': nodeid+'_sublists', 'class': 'sublists_container'}) });
@@ -42,6 +51,17 @@ GraphList.prototype = {
 					this.setupSubLists(node, edgetype, 'to'); 
 				}, this);
 			}, this);
+			if (this.nodeLists[nodetype].keys()[0]) { 
+				new Autocompleter.Local(nodetype+'_search', nodetype+'_search_list', this.nodeLists[nodetype].keys(), {
+					'fullSearch': true, 
+					afterUpdateElement: function (t, l) {
+						if (t.value && this.nodeLists[this.Framework.current.nodetype].get(t.value)) { 
+							this.Framework.selectNode(this.nodeLists[this.Framework.current.nodetype].get(t.value));
+						}
+						t.value = '';
+					}.bind(this)
+				}, this);
+			}
 		}, this);
 		this.displayList(data.nodetypes[0]);
 	},
@@ -138,8 +158,12 @@ GraphList.prototype = {
 	},
 	selectNode: function(id) { 
 		this.displayList(this.Framework.data.nodes[id].type);
-		$('list_'+id).addClassName('selected');
+		var elem = $('list_'+id);
+		elem.addClassName('selected');
 		$(id+'_sublists').setStyle({'display': 'block'});
+		if (this.Framework.scrollList) { 
+			elem.parentNode.scrollTop = elem.offsetTop;
+		}
 	},
 	unselectNode: function(id, fade) { 
 		$('list_'+id).removeClassName('selected');

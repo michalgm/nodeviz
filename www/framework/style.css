@@ -28,16 +28,16 @@
 
 	/* Node Search */
 	
-	#node_search_container {padding:5px; background:#ddd; text-align:right;}
-	#node_search_container label {color:#fff; font-size:10px; text-transform:uppercase; padding-right:5px;}
-	#node_search {width:150px; padding:5px 25px 5px 5px; background:#fff url(icons/magnifier-small.png) 160px center no-repeat; border:0; border-radius:10px; -moz-border-radius:10px; -webkit-box-shadow:0 1px 1px rgba(0,0,0,0.25) inset; text-align:center;}
-	#node_list {margin:2px 0 0 0; padding:0; width:207px; background:#fff; border:1px solid #999; position:absolute; z-index:100;  border-radius:10px; -moz-border-radius:10px; -webkit-box-shadow:0 3px 10px rgba(0,0,0,0.25);}
-	#node_list ul {margin:0; padding:0; list-style:none;}
-	#node_list li {margin:0; padding:5px; height:auto; font-size:10px; list-style:none; cursor:pointer;}
-	#node_list li:first-child {border-radius:10px 10px 0 0; -moz-border-radius:10px 10px 0 0;}
-	#node_list li:last-child {border-radius:0 0 10px 10px; -moz-border-radius:0 0 10px 10px;}
-	#node_list li:nth-child(odd) {background:#eee;}
-	#node_list li.selected {background:#cbd;}
+	.node_search_container {padding:5px; background:#ddd; text-align:right;}
+	.node_search_container label {color:#fff; font-size:10px; text-transform:uppercase; padding-right:5px;}
+	.node_search {width:150px; padding:5px 25px 5px 5px; background:#fff url(icons/magnifier-small.png) 160px center no-repeat; border:0; border-radius:10px; -moz-border-radius:10px; -webkit-box-shadow:0 1px 1px rgba(0,0,0,0.25) inset; text-align:center;}
+	.node_search_list {margin:2px 0 0 0; padding:0; width:207px; background:#fff; border:1px solid #999; position:absolute; z-index:100;  border-radius:10px; -moz-border-radius:10px; -webkit-box-shadow:0 3px 10px rgba(0,0,0,0.25);}
+	.node_search_list ul {margin:0; padding:0; list-style:none;}
+	.node_search_list li {margin:0; padding:5px; height:auto; font-size:10px; list-style:none; cursor:pointer;}
+	.node_search_list li:first-child {border-radius:10px 10px 0 0; -moz-border-radius:10px 10px 0 0;}
+	.node_search_list li:last-child {border-radius:0 0 10px 10px; -moz-border-radius:0 0 10px 10px;}
+	.node_search_list li:nth-child(odd) {background:#eee;}
+	.node_search_list li.selected {background:#cbd;}
 
 	#candidateInfo, #companyInfo {clear:both; height:auto; margin:0;}
 	#candidateInfo ul, #companyInfo ul {height:615px; overflow:hidden; overflow-y:scroll;}
@@ -112,7 +112,7 @@
 
 
 	.sublists_container { display: none; cursor: default; }
-	.nodelist { display: none; }
+	.nodelist { display: none; overflow-y: scroll; height: 600px; position: relative; }
 	.nodelist .highlight { background-color: #ccbbdd; }
 	.nodelist .selected { background-color: #eebbbb; font-weight: bold; }
 	.nodelist .selected div { background-color: #fff; font-weight: normal;}

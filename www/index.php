@@ -26,7 +26,7 @@
 	<script type="text/javascript">
 	//<![CDATA[
 		function initGraph() {
-			gf = new GraphFramework({graphdiv: 'graphs', listdiv:'lists'});
+			gf = new GraphFramework({graphdiv: 'graphs', listdiv:'lists', scrollList: 1});
 		}	
 	//]]>	
 	</script>
