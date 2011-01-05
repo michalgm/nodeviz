@@ -5,6 +5,7 @@ GraphFramework.prototype = {
 		this.timeOutLength = 100;
 		this.errordiv = 'error';
 		this.optionsform = 'graphoptions';
+		this.frameworkPath = 'framework/';
 		Object.extend(this, options);
 		if (! $(this.errordiv)) { 
 			$(document.body).insert({ top: new Element('div', {'id': 'error'}) });
@@ -32,7 +33,12 @@ GraphFramework.prototype = {
 		var statusCode = null;
 		var statusString = "Unknown response from server: ";  
 		if (response.status == '200') { 
-			var responseData = response.responseJSON;
+			var responseData;
+			if (response.responseJSON) {
+				responseData = response.responseJSON;
+			} else {
+				responseData = response.responseText;
+			}
 			if ( typeof(responseData) == 'undefined' || ! responseData.statusCode){  //NO STATUS CODE
 			   this.reportError(-1, statusString+' Response was <div class="code">'+response.responseText.escapeHTML()+'</div>');
 			} else if(responseData.statusCode == 1) { //EVERYTHING OK
@@ -122,11 +128,12 @@ GraphFramework.prototype = {
 
 		var params = this.getGraphOptions();
 		//console.time('fetch');
-		var request = new Ajax.Request('request.php', {
+		var request = new Ajax.Request(this.frameworkPath+'request.php', {
 			parameters: params,
 			timeOut: this.timeOutLength,
 			onLoading: function() { this.onLoading('images'); }.bind(this),
 			onTimeOut: this.timeOutExceeded.bind(this),
+			evalJS: true,
 			sanitizeJSON: true,
 			onComplete: function(response,json) {
 				//console.timeEnd('fetch');
@@ -193,7 +200,7 @@ GraphFramework.prototype = {
 		var params = this.getGraphOptions();
 		params.action = 'displayEdge';
 		params.edgeid = id;
-		var request = new Ajax.Request('request.php', {
+		var request = new Ajax.Request(this.frameworkPath+'request.php', {
 			parameters: params,
 			timeOut: this.timeOutLength,
 			onLoading: function() { this.onLoading('edgeview'); }.bind(this),

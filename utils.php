@@ -1,15 +1,5 @@
 <?php 
 
-//writelog: writes string out to logfile
-function writelog($string) {
-	global $logdir, $logfile;
-	if (!$logfile) {  //open logfile if it isn't open
-			$logfilename = "$logdir/".basename($_SERVER['PHP_SELF']).".log";
-			$logfile= fopen($logfilename, 'a'); 
-	}
-	fwrite($logfile, time()." - $string\n");
-}
-
 function niceName($name, $lastfirst = 0) { 
 	$titles	= array('dr','miss','mr','mrs','ms','judge', 'rep', 'sen', 'md', 'phd', 'hon', 'honorable', 'senator');
 	$suffices = array('esq','esquire','jr','sr','2', 'ii','iii','iv');

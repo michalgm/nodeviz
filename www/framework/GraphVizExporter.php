@@ -250,8 +250,7 @@ class GraphVizExporter {
 	}
 
 	public static function generateGraphFiles($graph, $datapath, $format) {
-		global $logdir;
-		global $debug;
+		global $framework_config;
 		global $old_graphviz;
 
 		$graphname = $graph->graphname();
@@ -265,7 +264,7 @@ class GraphVizExporter {
 		$imageFile = "$datapath/$graphname.png";
 		$dotFile = "$datapath/$graphname.dot";
 		$svgFile = "$datapath/$graphname.svg.raw";
-		if ($debug) { 
+		if ($framework_config['debug']) { 
 			$nicegraphfile = fopen("$datapath/$graphname.nicegraph", "w");
 			fwrite($nicegraphfile, print_r($graph, 1));
 			fclose($nicegraphfile);
@@ -276,7 +275,7 @@ class GraphVizExporter {
 		$descriptorspec = array(
 		   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
 		   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-		   2 => array("file", "$logdir/graphviz.log", "a") // stderr is a file to write to
+		   2 => array("file", $framework_config['log_path']."/graphviz.log", "a") // stderr is a file to write to
 		);
 		//use neato to generate and save image file, and generate imap file to STDOUT
 		$process = proc_open("neato -vvv $layoutEngine -Tsvg -o $svgFile -Tdot -o $dotFile -Tpng -o $imageFile -Tcmapx ", $descriptorspec, $pipes);
@@ -358,7 +357,7 @@ class GraphVizExporter {
 		fclose($svgout);
 	
 		#delete the raw svg
-		if (! $debug) { unlink($svgFile); }
+		if (! $framework_config['debug']) { unlink($svgFile); }
 
 		$graphout = $graph->data;
 		unset($graphout['properties']['graphvizProperties']);

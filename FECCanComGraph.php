@@ -1,6 +1,6 @@
 <?php
-include_once('../config.php');
-include_once('Graph.php');
+include_once('config.php');
+include_once('www/framework/Graph.php');
 $dbname = 'oilchange';
 /*
 creates the graph data structure that will be used to pass data among components.  Structure must not change
@@ -204,7 +204,7 @@ class FECCanComGraph extends Graph {
 			$image = "$candidate_images".$node['id'].".jpg";
 			if (! file_exists($image)) { $image = "$candidate_images"."unknownCandidate.jpg"; }
 			$node['image'] = $image;
-			$node['image'] = '../www/images/carbon_round.png';
+			$node['image'] = 'images/carbon_round.png';
 			$node['type'] = 'Can';
 		}
 		$nodes = $this->scaleSizes($nodes, 'candidates', 'cash');
@@ -269,7 +269,7 @@ class FECCanComGraph extends Graph {
 					$image = "$company_images"."cunknown_".$graph['properties']['sitecode']."_co.png"; 
 				}
 			}
-			$node['image'] = '../www/images/coal_round.png';
+			$node['image'] = 'images/coal_round.png';
 			$node['type'] = 'Com';
 			$node['Name'] = htmlspecialchars($node['Name'], ENT_QUOTES);
 		}
