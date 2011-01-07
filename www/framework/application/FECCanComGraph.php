@@ -447,6 +447,12 @@ class FECCanComGraph extends Graph {
 		$ids = $edge['ContribIDs'];
 		$query = "select * from contributions where crp_key in ($ids)";
 		$results = dbLookupArray($query);
+		foreach($results as &$contrib) { 
+			foreach($contrib as &$value) {
+				$value = htmlspecialchars($value);
+			}
+			unset($contrib['fec_id']);
+		}
 		return $results;
 	}
 

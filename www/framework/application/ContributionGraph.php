@@ -231,7 +231,8 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 			if ($node['cash'] == 0){
 				$nodeamount = "(amount not disclosed)";
 			}
-			$node['onMouseover'] = "this.Framework.highlightNode('".$node['id']."', '".safeLabel($node['Name']).'<br/>'.$nodeamount."');";
+			$node['tooltip'] = safeLabel($node['Name']).'<br/>'.$nodeamount;
+			$node['onMouseover'] = "this.Framework.highlightNode('".$node['id']."');";
 			$node['color'] = lookupIndustryColor($node['industry']);
 			$node['fillcolor'] = '#c0c0c0';
 			$node['tileimage'] = "$company_images"."c".$node['image'].".png";
@@ -465,14 +466,22 @@ function orgOwnOrg_edgeProperties() {
 		return $output;
 	}
 
-	function ajax_showorg2orgInfo($graph) {
-		require_once('../www/lib/graphtable.php');
-		$id = dbEscape($_GET['id']);
-		$ids = $graph->data['edges']['org2org'][$id]['ContribIDs'];
-		$nodes = explode('_', $id);
-		$output = "<h2>Contributions from ".$graph->data['nodes']['companies'][$nodes[0]]['Name'];
-		$output.= " to ".$graph->data['nodes']['companies'][$nodes[1]]['Name']."</h2>";
-		//$output .= createContributionTable($graph, $nodes[0], $nodes[1]);
+	function ajax_displayEdge($graph) {
+		//require_once('graphtable.php');
+		$id = dbEscape($_REQUEST['edgeid']);
+		$edge = $graph->data['edges'][$id];
+		$ids = $edge['ContribIDs'];
+		$nodes = array($edge['fromId'], $edge['toId']);
+		if ($edge['type'] == 'org2org') { 
+			$query = "select transaction_id as id,from_name as 'Donor Name', Details, f.state 'State', f.zip 'Zip',transaction_date Date, concat('$',format(amount,0)) as Contribution, concat('<a href=\"', r.source, '\">Source</a>') as URL from relationships r join entities f on from_id = f.entityid where transaction_id in ($ids)";
+		} else {
+			$query ="select transaction_id as id,from_name as 'Owner/Member Name', Details, f.state 'State', f.zip 'Zip',transaction_date Date, 'Unknown amount' as Contribution, concat('<a href=\"', r.source, '\">Source</a>') as URL from relationships r join entities f on from_id = f.entityid where transaction_id in ($ids)";
+		}
+		$output = dbLookupArray($query);
+		foreach($output as &$contrib) { 
+			$contrib['URL'] = "<a href='".htmlspecialchars($contrib['URL'])."'>URL</a>";
+			unset($contrib['id']);
+		}
 		return $output;
 	}
 
@@ -484,8 +493,6 @@ function orgOwnOrg_edgeProperties() {
 			$props['prop'] = 23;
 		}
 	}
-	
-	
 	
 }
 

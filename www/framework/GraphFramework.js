@@ -58,6 +58,10 @@ GraphFramework.prototype = {
 		$(this.errordiv).update("We're sorry, an error has occured: <span class='errorstring'>"+message+"</span> (<span class='errorcode'>"+code+"</span>)");
 		$(this.errordiv).show();
 	},
+	clearError: function() {
+		$(this.errordiv).update('');
+		$(this.errordiv).hide();
+	},
 	timeOutExceeded: function(request) {
 		statusCode=10;
 		statusString = "Server took too long to return data, it is either busy or there is a connection problem";
@@ -100,8 +104,7 @@ GraphFramework.prototype = {
 		this.current = {'zoom': 1, 'network': '', 'node': '', 'nodetype': ''};
 		this.requests = [];
 		this.data = [];
-		$(this.errordiv).update('');
-		$(this.errordiv).hide();
+		this.clearError();
 	},
 	reloadGraph: function(params) {
 		//console.time('load');
@@ -206,14 +209,16 @@ GraphFramework.prototype = {
 			onTimeOut: this.timeOutExceeded.bind(this),
 			sanitizeJSON: true,
 			onComplete: function(response,json) {
-				var data = this.checkResponse(response);
+				data = this.checkResponse(response);
 				if (data) {
-					var edgelist = "";
-					$H(data).keys().each(function (key) { 
-						var edge = data[key];
-						edgelist+= '<tr><td>'+[edge.CompanyName, edge.recipientname, edge.date, edge.amount].join('</td><td>')+'</td></tr>';
+					var edge = this.data.edges[id];
+					var header = "<h3>From "+this.data.nodes[edge['fromId']].Name+" to "+this.data.nodes[edge['toId']].Name+"</h3>";
+					var tableheader = '<thead><tr><th>'+$H($H(data).values().first()).keys().join('</th><th>')+'</th></tr></thead>';
+					var tablebody = "<tbody>";
+					$H(data).values().each(function (row) { 
+						tablebody += '<tr><td>'+$H(row).values().join('</td><td>')+'</td></tr>';
 					});
-					this.showLightbox('<table>'+edgelist+'</table>');
+					this.showLightbox(header+'<table>'+tableheader+tablebody+'</tbody></table>');
 				} else { 
 					this.hideLightbox();
 				}
@@ -228,6 +233,7 @@ GraphFramework.prototype = {
 
 	},
 	showLightbox: function(contents) { 
+		this.clearError();
 		if (! $(this.lightboxdiv)) { 
 			$(document.body).insert({ top: new Element('div', {'id': this.lightboxdiv}) });
 			$(this.lightboxdiv).insert({top: new Element('img', {'id': this.lightboxdiv+'close', 'src': 'images/close.png', 'alt': 'Close', 'class': 'close'}) });

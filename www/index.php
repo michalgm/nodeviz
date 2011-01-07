@@ -39,9 +39,7 @@
 		<input name='setupfile' type='radio' value='ContributionGraph' /> ContributionGraph
 	</form>	
 		
-	<div id='graphs'>
-	</div>
-	<div id='lists'>
-	</div>
+	<div id='lists'> </div>
+	<div id='graphs'> </div>
 </body>
 </html>

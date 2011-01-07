@@ -381,7 +381,9 @@ class GraphVizExporter {
 		if ($format != 'png') { 
 			#system("convert -quality 92 $datapath$graphname.png $datapath$graphname.$format");
 			#system("grep -v levelfour $datapath$graphname.svg | convert -quality 92 svg:- $datapath$graphname.$format");
-			system("cd ../www/; grep -v levelfour $datapath$graphname.svg | convert -quality 92 svg:- $datapath$graphname.$format");
+			chdir($framework_config['web_path']);
+			system("grep -v levelfour $datapath$graphname.svg | convert -quality 92 svg:- $datapath$graphname.$format");
+			chdir($framework_config['framework_path']);
 			unlink("$datapath$graphname.png");
 		}
 		
