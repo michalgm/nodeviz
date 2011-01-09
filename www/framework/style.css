@@ -1,9 +1,10 @@
-	
+	html { height: 100%; }	
+	body { height: 99%;  overflow: hidden;}	
 	#debug {position:absolute;}
 	
 	#graphcontent {position:relative; clear:both; margin-bottom:10px; height:700px; background:#fff; border-top:1px solid #ccc; overflow:hidden;}
 	
-	#graphs {position:relative; float:left; width:630px; height:640px; background-color:white; overflow:hidden; border-radius:0 0 0 10px;}
+	#graphs {position:relative; background-color:white; overflow:hidden; border-radius:0 0 0 10px;}
 	
 	.nosvg #zoomcontrols { display: none; }
 	#nosvgbrowser {display:none; border-radius:10px; -webkit-border-radius:10px; -moz-border-radius:10px; color:#630; background:#ff9; border:1px solid #630; margin-bottom:10px; padding:10px;}
@@ -25,7 +26,6 @@
 	#lightboxcontents h3 { text-align: center; margin-top: 0px;}
 	#lightbox .close {position:absolute; top:5px; right:5px; display:block; cursor: pointer;}
 	
-	#lists {position:absolute; right:0; height:225px; width:320px; background:#ccc; border-radius:0 0 10px 0;}
 	#tables, #cotables {position:relative; z-index:99; width:319px; background:#fff; border-left:1px solid #ccc;}
 	#tables ul, #cotables ul {list-style:none; padding:0; width:319px;}
 	#tables ul ul, #cotables ul ul {width:285px; overflow: hidden; }
@@ -74,13 +74,9 @@
 	#tables, #cotables {height: auto;  -webkit-box-shadow:0 2px 2px rgba(0,0,0,0.25); -moz-box-shadow:0 2px 2px rgba(0,0,0,0.25); }
 	li.mini.selected { display:block }
 	li.mini {display:none;}
-	#companyList { overflow: hidden; }
-	#companyList ul {  margin:0px;}
-	#companyList ul li { width: 300px; }
-	#lists { height: 0px; }
-	#graphs { width: 950px; height: 700px;}
-	#graphcontent { height: 700px; }
-	#companySort { height: 10px; padding: 5px;}
+
+	#lists {float: right; height:90%; width:30%; background:#ccc; border-radius:0 0 10px 0;}
+	#graphs { width: 70%; height: 90%;}
 	/*.mini.selected .close { display: none; }*/
 
 	#zoomcontrols fieldset.slider {width: 126px;}
@@ -117,7 +113,7 @@
 
 
 	.sublists_container { display: none; cursor: default; }
-	.nodelist { display: none; overflow-y: scroll; height: 600px; position: relative; }
+	.nodelist { display: none; overflow-y: scroll; height: 80%; position: relative; }
 	.nodelist .highlight { background-color: #ccbbdd; }
 	.nodelist .selected { background-color: #eebbbb; font-weight: bold; }
 	.nodelist .selected div { background-color: #fff; font-weight: normal;}

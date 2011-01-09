@@ -14,6 +14,7 @@ GraphImage.prototype = {
 	},
 	reset: function() {
 		Event.stopObserving($('img0'));
+		this.graphDimensions = $(this.graphdiv).getDimensions();
 	},
 	render: function(responseData) {
 	},

@@ -187,7 +187,6 @@ GraphFramework.prototype = {
 			return;
 		}
 		this.unselectNode();
-		if (!$(id)) { return; }
 		if(typeof this.data.nodes[id] == 'undefined') { id = this.current['node']; }
 		$H(this.renderers).values().invoke('selectNode', id);
 		this.current.network = id;
