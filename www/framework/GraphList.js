@@ -26,8 +26,9 @@ GraphList.prototype = {
 		$H(data.nodetypes).values().each( function(nodetype) {
 			this.nodeLists[nodetype] = new Hash();
 			$('list_menu').insert({ bottom: new Element('li', {'id': nodetype+'_menu'}).update(nodetype)});
-			$(this.listdiv).insert({ bottom: new Element('ul', {'id': nodetype+'_list', 'class': 'nodelist'}) });
-			$(nodetype+'_list').insert({bottom: new Element('div', {'id': nodetype+'_list_header'}).update(nodetype+' Nodes')});
+			$(this.listdiv).insert({ bottom: new Element('div', {'id': nodetype+'_list_container', 'class': 'nodelist_container'}) });
+			$(nodetype+'_list_container').insert({top: new Element('div', {'id': nodetype+'_list_header', 'class': 'nodelist_header'}).update(nodetype+' Nodes')});
+			$(nodetype+'_list_container').insert({ bottom: new Element('ul', {'id': nodetype+'_list', 'class': 'nodelist'}) });
 
 			var search = ' <label for="'+nodetype+'_search">Search</label> <input class="node_search" id="'+nodetype+'_search" autocomplete="off" size="20" type="text" value="" /> <div class="autocomplete node_search_list" id="'+nodetype+'_search_list" style="display:none"></div>';
 			$(nodetype+'_list_header').insert({bottom: new Element('div', {'id': nodetype+'_search_container', 'class': 'node_search_container'}).update(search)});
@@ -68,10 +69,10 @@ GraphList.prototype = {
 	displayList: function(nodetype) { 
 		oldnodetype = this.Framework.current['nodetype'];
 		if(oldnodetype != '') { 
-			$(oldnodetype+'_list').removeClassName('selected');
+			$(oldnodetype+'_list_container').removeClassName('selected');
 			$(oldnodetype+'_menu').removeClassName('selected');
 		}
-		$(nodetype+'_list').addClassName('selected');
+		$(nodetype+'_list_container').addClassName('selected');
 		$(nodetype+'_menu').addClassName('selected');
 		this.Framework.current['nodetype'] = nodetype;
 	},

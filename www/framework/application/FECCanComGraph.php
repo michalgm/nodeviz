@@ -68,11 +68,12 @@ class FECCanComGraph extends Graph {
 		$graph = &$this->data;
 		$precheck = "";
 		if ($graph['properties']['candidateids']) {
+			$results = array();
 			foreach (explode(',', $graph['properties']['candidateids']) as $id) { 
-				$graph['nodes']['candidates'][$id] = Array();
-				$graph['nodes']['candidates'][$id]['id'] = $id;
+				$results[$id] = Array();
+				$results[$id]['id'] = $id;
 			}
-			return $graph;
+			return $results;
 		}
 		$congress_num = $graph['properties']['congress_num'];
 		$racecode = $graph['properties']['racecode'];
@@ -106,11 +107,12 @@ class FECCanComGraph extends Graph {
 	function companies_fetchNodes() {
 		$graph = &$this->data;
 		if ($graph['properties']['companyids']) {
+			$results = array();
 			foreach (explode(',', $graph['properties']['companyids']) as $id) { 
-				$graph['nodes']['companies'][$id] = Array();
-				$graph['nodes']['companies'][$id]['id'] = $id;
+				$results[$id] = Array();
+				$results[$id]['id'] = $id;
 			}
-			return $graph;
+			return $results;
 		}
 		$congress_num = $graph['properties']['congress_num'];
 		$racecode = $graph['properties']['racecode'];
@@ -134,6 +136,8 @@ class FECCanComGraph extends Graph {
 		$query ="select CompanyID as id from contributions a join candidates c use index(CandidateID) on a.CandidateID = c.CandidateID $allcandidates where $congress $racecode_filter and a.congress_num is not null $sitecode group by a.COmpanyID having sum(amount) >= $minCompanyAmount order by sum(amount) desc";
 		$this->addquery('companies', $query, $graph);
 		$result = dbLookupArray($query);
+		//$result['S6OR00094'] = array();
+		//$result['S6OR00094']['id'] = 'S6OR00094';
 		#$graph['nodes']['companies'] = $result;
 		return $result;
 	}
@@ -206,6 +210,8 @@ class FECCanComGraph extends Graph {
 			$node['image'] = $image;
 			$node['image'] = 'images/carbon_round.png';
 			$node['type'] = 'Can';
+			$node['zoom'] = rand(0,8);
+			$node['class'] = 'oompa';
 		}
 		$nodes = $this->scaleSizes($nodes, 'candidates', 'cash');
 		return $nodes;

@@ -9,6 +9,15 @@ GraphFramework.prototype = {
 		this.optionsform = 'graphoptions';
 		this.frameworkPath = 'framework/';
 		Object.extend(this, options);
+		if (! this.prefix) { 
+
+			if (typeof(graphframeworkcounter) == 'undefined') { 
+				graphframeworkcounter = 1;
+			} else {
+				graphframeworkcounter++;
+			}
+			this.prefix = 'graph'+graphframeworkcounter+'_';
+		}
 		if (! $(this.errordiv)) { 
 			$(document.body).insert({ top: new Element('div', {'id': this.errordiv}) });
 		}
@@ -86,9 +95,9 @@ GraphFramework.prototype = {
 		$$('.loading').each(function (e) { e.remove(); });
 	},
 	setOffsets: function() { 
-		if ($('img0')) {
-			this.offsetX = Position.positionedOffset($('img0'))[0] ;
-			this.offsetY = Position.positionedOffset($('img0'))[1] ;
+		if ($('image')) {
+			this.offsetX = Position.positionedOffset($('image'))[0] ;
+			this.offsetY = Position.positionedOffset($('image'))[1] ;
 			this.tooltipOffsetX = Position.cumulativeOffset(this.graphdiv)[0] - 15;
 			//tooltipOffsetY = Position.cumulativeOffset($('graphs'))[1];
 			this.tooltipOffsetY = 5;
@@ -96,6 +105,7 @@ GraphFramework.prototype = {
 	},
 	getGraphOptions: function() {
 		this.params = Form.serialize($('graphoptions'), true);
+		this.params['prefix'] = this.prefix;
 		$H(this.renderers).values().invoke('appendOptions');
 		return this.params;
 	},
@@ -149,13 +159,6 @@ GraphFramework.prototype = {
 					$H(this.renderers).values().invoke('render', responseData);
 					//this.renderers.GraphImage.renderGraph(data.img, data.overlay);
 				//	console.timeEnd('render');
-				//	console.time('lists');
-					//this.renderers.GraphList.renderLists();
-				//	console.timeEnd('lists');
-					delete graph;	
-					delete img;
-					delete overlay;
-					//this.setOffsets();
 				//	console.timeEnd('load');
 				}
 			}.bind(this)

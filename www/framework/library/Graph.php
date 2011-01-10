@@ -90,6 +90,7 @@ class Graph {
 				$nodes = $this->$function();
 				$this->data['nodetypesindex'][$nodetype] = array_keys($nodes);
 				foreach ($nodes as $node) { 
+					if(isset($this->data['nodes'][$node['id']])) { trigger_error('Node id '.$node['id']." already exists", E_USER_ERROR); }
 					$this->data['nodes'][$node['id']] = $node;
 					$this->data['nodes'][$node['id']]['type'] = $nodetype;
 				}
@@ -102,17 +103,21 @@ class Graph {
 				$edges = $this->$function();
 				$this->data['edgetypesindex'][$edgetype] = array_keys($edges);
 				foreach ($edges as $edge) { 
+					if(! isset($edge['toId'])) { trigger_error("toId is not set for edge ".$edge['id'], E_USER_ERROR); }
+					if(! isset($edge['fromId'])) { trigger_error("fromId is not set for edge ".$edge['id'], E_USER_ERROR); }
+					if(isset($this->data['edges'][$edge['id']])) { trigger_error('Node id '.$edge['id']." already exists", E_USER_ERROR); }
 					$this->data['edges'][$edge['id']] = $edge;
 					$this->data['edges'][$edge['id']]['type'] = $edgetype;
 				}
 			}
 		}
 
+		//Get rid of any isolated nodes if retainIsolates is set to 0
 		if (! isset($this->data['properties']['retainIsolates'])) {
 			foreach (array_keys($this->data['nodes']) as $id) {
 				$test = 0;
 				foreach (array_keys($this->data['edges']) as $edgeid) {
-					if (! isset($this->data['edges'][$edgeid]['toId'])) { print_r($this->data['edges'][$edgeid]); print $edgeid;}
+					//if (! isset($this->data['edges'][$edgeid]['toId'])) { print_r($this->data['edges'][$edgeid]); print $edgeid;}
 					if ($this->data['edges'][$edgeid]['toId'] == $id || $this->data['edges'][$edgeid]['fromId'] == $id) { $test = 1; }
 				}
 				if (! $test) { 
@@ -150,7 +155,6 @@ class Graph {
 				}
 			}
 		}
-
 		//Populate the related nodes fields for each node by stepping through the edges
 		foreach ($this->data['edges'] as $edge) {
 			if (! $edge['toId']) { print 'none!'; print_r($edge); } 

@@ -13,7 +13,7 @@ GraphImage.prototype = {
 		this.graphDimensions = $(this.graphdiv).getDimensions();
 	},
 	reset: function() {
-		Event.stopObserving($('img0'));
+		Event.stopObserving($('image'));
 		this.graphDimensions = $(this.graphdiv).getDimensions();
 	},
 	render: function(responseData) {
@@ -31,7 +31,7 @@ GraphImage.prototype = {
 		}
 	},
 	setupListeners: function() { 
-		Event.observe($('img0'), 'mousemove', this.mousemove.bind(this));
+		Event.observe($('image'), 'mousemove', this.mousemove.bind(this));
 		Event.observe($('tooltip'), 'mousemove', this.mousemove.bind(this))
 		Event.observe($('tooltip'), 'mouseout', this.hideTooltip.bind(this));
 		Event.observe(window, 'resize', this.Framework.setOffsets.bind(this));

@@ -66,6 +66,7 @@ GraphSVGZoom.prototype = {
 		this.zoomlevels = 8;
 		this.zoom_delta = .8;
 		this.current_zoom = 1;
+		this.previous_zoom = 1;
 		if (this.zoomSlider) { 
 			this.zoomSlider.setValue(this.current_zoom);
 		}
@@ -83,12 +84,12 @@ GraphSVGZoom.prototype = {
 	setupListeners: function(root){
 		this.root = root;
 		this.stateTf = $('graph0').getCTM().inverse();
-		Event.observe($('svg'), 'mousedown', function(e) { this.handleMouseDown(e); }.bind(this));
-		Event.observe($('svg'), 'mousemove', function(e) { this.handleMouseMove(e); }.bind(this));
-		Event.observe($('svg'), 'mouseup', function(e) { this.handleMouseUp(e); }.bind(this));
+		Event.observe($('svg_overlay'), 'mousedown', function(e) { this.handleMouseDown(e); }.bind(this));
+		Event.observe($('svg_overlay'), 'mousemove', function(e) { this.handleMouseMove(e); }.bind(this));
+		Event.observe($('svg_overlay'), 'mouseup', function(e) { this.handleMouseUp(e); }.bind(this));
 		Event.stopObserving('svgscreen', 'click');
 		Event.observe($('svgscreen'), 'mouseup', function(e) { this.handleMouseUp(e); }.bind(this));
-		//Event.observe($('svg'), 'mouseout', function(e) { this.handleMouseUp(e); }.bind(this));
+		//Event.observe($('svg_overlasvg_overlay'), 'mouseout', function(e) { this.handleMouseUp(e); }.bind(this));
 		Event.observe($('zoomin'), 'click', function(e) { this.zoom('in'); }.bind(this));
 		Event.observe($('zoomout'), 'click', function(e) { this.zoom('out'); }.bind(this));
 		Event.observe($('zoomreset'), 'click', function(e) { this.zoom('reset'); }.bind(this));
@@ -117,7 +118,7 @@ GraphSVGZoom.prototype = {
 				}
 			}.bind(this),
 		});
-		this.center = {'x': ($('svg').childNodes[0].getBBox().width/2), 'y':($('svg').childNodes[0].getBBox().height/2)};
+		this.center = {'x': ($('svg_overlay').childNodes[0].getBBox().width/2), 'y':($('svg_overlay').childNodes[0].getBBox().height/2)};
 		this.resetsvg = $('graph0').getCTM();
 	},
 
@@ -129,7 +130,7 @@ GraphSVGZoom.prototype = {
 
 		p.x = evt.clientX;
 		p.y = evt.clientY;
-		var offset = $('svg').viewportOffset();
+		var offset = $('svg_overlay').viewportOffset();
 		p.x = p.x -offset[0];
 		p.y = p.y  - offset[1];
 
@@ -145,21 +146,10 @@ GraphSVGZoom.prototype = {
 		element.setAttribute("transform", s);
 		$('fgraph0').setAttribute("transform", s);
 		this.zoomSlider.setValue(this.current_zoom);
-		if(this.current_zoom >= 2) {
-			$('img0').addClassName('showtwo');
-			$('svg').addClassName('showtwo');
-		} else {
-			$('img0').removeClassName('showtwo');
-			$('svg').removeClassName('showtwo');
-		}
-
-		if(this.current_zoom >= 4) {
-			$('img0').addClassName('showall');
-			$('svg').addClassName('showall');
-		} else {
-			$('img0').removeClassName('showall');
-			$('svg').removeClassName('showall');
-		}
+		$('image').removeClassName('zoom_'+this.previous_zoom);
+		$('svg_overlay').removeClassName('zoom_'+this.previous_zoom);
+		$('image').addClassName('zoom_'+this.current_zoom);
+		$('svg_overlay').addClassName('zoom_'+this.current_zoom);
 	},
 
 /**
@@ -198,7 +188,7 @@ GraphSVGZoom.prototype = {
 		var svgDoc = evt.target.ownerDocument;
 
 		var delta;
-
+		this.previous_zoom = this.current_zoom;
 		if(evt.wheelDelta)
 			delta = evt.wheelDelta / 360; // Chrome/Safari
 		else
@@ -273,7 +263,7 @@ GraphSVGZoom.prototype = {
 		evt.returnValue = false;
 
 		var svgDoc = this.root;
-		if (evt.target.id != 'svgscreen' && evt.target.tagName != 'svg') { 
+		if (evt.target.id != 'svgscreen' && evt.target.tagName != 'svg_overlay') { 
 			return;
 		}
 		var g = $('graph0');
@@ -320,7 +310,7 @@ GraphSVGZoom.prototype = {
 		}
 	},
 	zoom: function(d) {
-		var previouszoom = this.current_zoom;
+		this.previous_zoom = this.current_zoom;
 		if (d == 'in') { 
 			d = ++this.current_zoom;
 		} else if (d == 'out') { 
@@ -334,12 +324,12 @@ GraphSVGZoom.prototype = {
 			return;
 		}
 		this.current_zoom = d;
-		var zoom_amount = d - previouszoom;
+		var zoom_amount = d - this.previous_zoom;
 
 		var delta = 0.3333333333333333;
 		var z = Math.pow(1 + this.zoom_delta, delta);
 		var g = $("graph0");
-		//var p = {'x': ($('svg').childNodes[0].getBBox().width/2), 'y':($('svg').childNodes[0].getBBox().height/2)};
+		//var p = {'x': ($('svg_overlay').childNodes[0].getBBox().width/2), 'y':($('svg_overlay').childNodes[0].getBBox().height/2)};
 		var p = this.root.createSVGPoint();
 		var dimensions = $(this.GraphSVG.Framework.graphdiv).getDimensions();
 		p.x = this.center.x;

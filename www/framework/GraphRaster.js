@@ -24,7 +24,7 @@ var GraphRaster = Class.create(GraphImage, {
 		var image = responseData.image;
 		var overlay = responseData.overlay;
 		var map = " usemap='#G'";
-		$('images').update("<img id='img0' "+map+" border='0' src='"+image+"' />"+overlay);
+		$('images').update("<img id='image' "+map+" border='0' src='"+image+"' />"+overlay);
 		$('G').descendants().each(function(a) { 
 			if (this.Framework.data.edges[a.id]) { 
 				Event.observe($(a), 'mouseout', this.hideTooltip.bind(this)); 

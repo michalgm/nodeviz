@@ -1,5 +1,5 @@
 	html { height: 100%; }	
-	body { height: 99%;  overflow: hidden;}	
+	body { height: 99%;}	
 	#debug {position:absolute;}
 	
 	#graphcontent {position:relative; clear:both; margin-bottom:10px; height:700px; background:#fff; border-top:1px solid #ccc; overflow:hidden;}
@@ -81,7 +81,7 @@
 
 	#zoomcontrols fieldset.slider {width: 126px;}
 	#zoomcontrols div.slider {position:relative; float:right; margin:3px; height:12px; width:90px; background:#999;}
-	#zoomcontrols div.slider .handle {position:absolute; height:10px; width:10px; background:#ccc; border:1px solid #999; -webkit-box-shadow:0 1px 2px rgba(0,0,0,0.25); -moz-box-shadow:0 1px 2px rgba(0,0,0,0.25);}
+	#zoomcontrols div.slider .handle {position:absolute; height:10px; width:10px; background:#ccc; border:1px solid #999; -webkit-box-shadow:0 1px 2px rgba(0,0,0,0.25); -moz-box-shadow:0 1px 2px rgba(0,0,0,0.25); cursor: move;}
 	#companySort { display: none; }
 	
 	#tooltip { padding: 3px; z-index: 100; position: absolute; visibility: hidden; text-align: center; background-color: white; top: 0px; left: 0px; filter:alpha(opacity=70);-moz-opacity:.70;opacity:.70; font-weight: bold; border: 1px solid black; }
@@ -93,15 +93,15 @@
 	/*SVG Styles */
 	path { stroke-opacity: .7; }
 	
-	#svg g{opacity:0}
-	#svg path{fill-opacity:.9 !important;cursor:pointer}
-	#svg ellipse, #svg polygon{fill-opacity:.8 !important;cursor:pointer}
-	#svg path{stroke-opacity:.9 !important;stroke:#93f !important;cursor:pointer}
-	#svg .searchhelp{color:#666666;font-style:italic}
-	#svg .selected polygon, #svg .selected ellipse{fill:#eebbbb !important;}
-	#svg .oselected polygon, #svg .oselected ellipse{fill:#bbddbb;}
-	#svg .highlight path{stroke:#93f !important;stroke-opacity:.9 !important}
-	#svg .nhighlight{fill:#ccbbdd !important;}
+	#svg_overlay g{opacity:0}
+	#svg_overlay path{fill-opacity:.9 !important;cursor:pointer}
+	#svg_overlay ellipse, #svg_overlay polygon{fill-opacity:.8 !important;cursor:pointer}
+	#svg_overlay path{stroke-opacity:.9 !important;stroke:#93f !important;cursor:pointer}
+	#svg_overlay .searchhelp{color:#666666;font-style:italic}
+	#svg_overlay .selected polygon, #svg_overlay .selected ellipse{fill:#eebbbb !important;}
+	#svg_overlay .oselected polygon, #svg_overlay .oselected ellipse{fill:#bbddbb;}
+	#svg_overlay .highlight path{stroke:#93f !important;stroke-opacity:.9 !important}
+	#svg_overlay .nhighlight{fill:#ccbbdd !important;}
 	
 	#highlight { position: absolute; z-index: 5; visibility: hidden; filter:alpha(opacity=50); opacity: .50; cursor: pointer; top: 0px; left: 0px; }
 	#highlightimg { visibility: hidden; width: 100%; height: 100%; }
@@ -113,12 +113,13 @@
 
 
 	.sublists_container { display: none; cursor: default; }
-	.nodelist { display: none; overflow-y: scroll; height: 80%; position: relative; }
-	.nodelist .highlight { background-color: #ccbbdd; }
-	.nodelist .selected { background-color: #eebbbb; font-weight: bold; }
-	.nodelist .selected div { background-color: #fff; font-weight: normal;}
+	.nodelist_container { display: none; position: relative; height: 75%}
+	.nodelist { overflow-y: scroll; height: 80%; position: relative; }
+	.nodelist_container .highlight { background-color: #ccbbdd; }
+	.nodelist_container .selected { background-color: #eebbbb; font-weight: bold; }
+	.nodelist_container .selected div { background-color: #fff; font-weight: normal;}
 	.nodelist>li { color: blue; cursor: pointer;} 
-	.nodelist.selected { display: block; }
+	.nodelist_container.selected { display: block; }
 
 	#list_menu li { display: inline;  padding: 5px; cursor: pointer;}
 	#list_menu li.selected {font-weight: bold; } 
@@ -127,3 +128,14 @@
 	#error { z-index: 1000; color: #f00; background: #ddd; border: 1px solid black; width: 60%; margin: auto; padding: 10px; }
 	#error .errorstring { display:block; max-height: 200px; overflow: auto; background: #fee; padding: 3px; }
 	#error .code { font-family: monospace; }
+
+	.zoom_0 .zoom_1, .zoom_0 .zoom_2, .zoom_0 .zoom_3, .zoom_0 .zoom_4, .zoom_0 .zoom_5, .zoom_0 .zoom_6, .zoom_0 .zoom_7, .zoom_0 .zoom_8, .zoom_0 .zoom_9, .zoom_0 .zoom_10  { display: none; }
+	.zoom_1 .zoom_2, .zoom_1 .zoom_3, .zoom_1 .zoom_4, .zoom_1 .zoom_5, .zoom_1 .zoom_6, .zoom_1 .zoom_7, .zoom_1 .zoom_8, .zoom_1 .zoom_9, .zoom_1 .zoom_10  { display: none; }
+	.zoom_2 .zoom_3, .zoom_2 .zoom_4, .zoom_2 .zoom_5, .zoom_2 .zoom_6, .zoom_2 .zoom_7, .zoom_2 .zoom_8, .zoom_2 .zoom_9, .zoom_2 .zoom_10  { display: none; }
+	.zoom_3 .zoom_4, .zoom_3 .zoom_5, .zoom_3 .zoom_6, .zoom_3 .zoom_7, .zoom_3 .zoom_8, .zoom_3 .zoom_9, .zoom_3 .zoom_10  { display: none; }
+	.zoom_4 .zoom_5, .zoom_4 .zoom_6, .zoom_4 .zoom_7, .zoom_4 .zoom_8, .zoom_4 .zoom_9, .zoom_4 .zoom_10  { display: none; }
+	.zoom_5 .zoom_6, .zoom_5 .zoom_7, .zoom_5 .zoom_8, .zoom_5 .zoom_9, .zoom_5 .zoom_10  { display: none; }
+	.zoom_6 .zoom_7, .zoom_6 .zoom_8, .zoom_6 .zoom_9, .zoom_6 .zoom_10  { display: none; }
+	.zoom_7 .zoom_8, .zoom_7 .zoom_9, .zoom_7 .zoom_10  { display: none; }
+	.zoom_8 .zoom_9, .zoom_8 .zoom_10  { display: none; }
+	.zoom_9 .zoom_10 { display: none; }

@@ -206,7 +206,8 @@ class GraphVizExporter {
 			}
 			//add node to graph array, indexed by id
 	
-			$graph->data['nodes'][$node['id']]  = $node;
+			//FIXME - commenting this out cuz it broke stuff, but it might break imap to comment - 1/10/11 - gm
+			//$graph->data['nodes'][$node['id']]  = $node;
 			/*
 			foreach (array_keys($node) as $key) { 
 				if(strstr($key, 'on')) { 
@@ -417,7 +418,7 @@ class GraphVizExporter {
 		if (! $cache) { $imageFile .= "?".(rand()%1000); } //append random # to image name to prevent browser caching
 		//$output .= "dotfile = '$dotFile';\n";
 		if (isset($_REQUEST['useSVG']) && $_REQUEST['useSVG'] == 1) { 
-			$overlay = "<div id='svg' style='display: none'>$svg</div>";
+			$overlay = "<div id='svg_overlay' style='display: none'>$svg</div>";
 		} else {
 			$overlay = $imap;
 		}

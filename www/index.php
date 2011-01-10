@@ -8,7 +8,6 @@
 <head>
 	<title>!Page Title!</title>
 	<link rel="stylesheet" type="text/css" href="framework/style.css"/>
-	<!--[if IE]><link rel="stylesheet" href="style/ie.css" type="text/css" /><![endif]-->
 
 	<script type="text/javascript" src="framework/js/prototype.js" ></script>
 	<script type="text/javascript" src="framework/js/prototypeex.js" ></script>

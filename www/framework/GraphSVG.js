@@ -15,30 +15,29 @@ var GraphSVG = Class.create(GraphImage, {
 		var image = responseData.img;
 		var overlay = responseData.overlay;
 		$('images').update(overlay);
-		$('svg').setAttribute('id', 'img0');
+		$('svg_overlay').setAttribute('id', 'image');
 		$('svgscreen').setAttribute('id', 'fsvgscreen');
-		$A($('img0').getElementsByTagName('g')).each( function(g) { 
+		$A($('image').getElementsByTagName('g')).each( function(g) { 
 			var id = $(g).getAttribute('id');
 			$(g).setAttribute('id', 'f'+id);
 		});
 		$('images').innerHTML += overlay;
-		$('img0').show();
+		$('image').show();
 
-		$('svg').style.setProperty('position','absolute', '');
-		//$('svg').clonePosition($('img0'));
-		$('svg').style.setProperty('top','0px', '');
+		$('svg_overlay').style.setProperty('position','absolute', '');
+		//$('svg_overlay').clonePosition($('image'));
+		$('svg_overlay').style.setProperty('top','0px', '');
 		$('svgscreen').style.setProperty('cursor','move', 'important');
 		$('graph0').style.setProperty('opacity', '1', '');
-		$('svg').style.setProperty('visibility', 'visible', '');
-		//var left = Math.round((parseInt($('graphs').getStyle('width')) - $('svg').childNodes[0].getAttribute('width').replace('px', ''))/2);
-		//$('svg').style.setProperty('left',left+'px' , '');
-		$('svg').style.setProperty('display', 'block','');
-		$('svg').childNodes[0].setAttribute('width', $('images').getWidth());
-		$('img0').childNodes[0].setAttribute('width', $('images').getWidth());
-		$('svg').childNodes[0].setAttribute('height', $('images').getHeight());
-		$('img0').childNodes[0].setAttribute('height', $('images').getHeight());
+		$('svg_overlay').style.setProperty('visibility', 'visible', '');
+		//var left = Math.round((parseInt($('graphs').getStyle('width')) - $('svg_overlay').childNodes[0].getAttribute('width').replace('px', ''))/2);
+		//$('svg_overlay').style.setProperty('left',left+'px' , '');
+		$('svg_overlay').style.setProperty('display', 'block','');
+		$('svg_overlay').childNodes[0].setAttribute('width', $('images').getWidth());
+		$('image').childNodes[0].setAttribute('width', $('images').getWidth());
+		$('svg_overlay').childNodes[0].setAttribute('height', $('images').getHeight());
+		$('image').childNodes[0].setAttribute('height', $('images').getHeight());
 
-		
 			/*
 		//Tag and hide second level nodes and edges
 		$H(graphviz).keys().each(function(n) { 
@@ -54,31 +53,55 @@ var GraphSVG = Class.create(GraphImage, {
 			}
 		});
 			*/
-		//$('graphs').style.height = $('svg').childNodes[0].getAttribute('height');
-		//$('svg').clonePosition($('img0'), {'setLeft': true});
+		//$('graphs').style.height = $('svg_overlay').childNodes[0].getAttribute('height');
+		//$('svg_overlay').clonePosition($('image'), {'setLeft': true});
 		this.setupListeners();
 	},
 	setupListeners: function($super) {
 		$super();
 		Event.observe($('svgscreen'),'click', this.Framework.unselectNode.bind(this.Framework));
-		Event.observe($('svg'), 'mousemove', this.mousemove.bind(this));
+		Event.observe($('svg_overlay'), 'mousemove', this.mousemove.bind(this));
 		Event.observe($('graphs'), 'mousemove', this.mousemove.bind(this));
 		$$('.node').each( function(n) {
 			if (n.id[0] == 'f') { return; }
+			var nodeid = n.id;
+			var node = this.Framework.data.nodes[n.id]
+			if (node['zoom']) { 
+				this.addClassName($(nodeid), 'zoom_'+node['zoom']);
+				this.addClassName($('f'+nodeid), 'zoom_'+node['zoom']);
+			}
+			if (node['class']) { 
+				node['class'].split(' ').each( function(c) { 
+					this.addClassName($(nodeid), c);	
+					this.addClassName($('f'+nodeid), c);	
+				}, this);
+			}
 			if (n.childNodes[1]) {
-				Event.observe(n,'mouseover', function(e) { eval(this.Framework.data.nodes[n.id].onMouseover); }.bind(this));
+				Event.observe(n,'mouseover', function(e) { eval(node.onMouseover); }.bind(this));
 				Event.observe(n,'mouseout', function(e) { this.Framework.unhighlightNode(n.id); }.bind(this));
-				Event.observe(n,'click', function(e) { eval(this.Framework.data.nodes[n.id].onClick); }.bind(this));
+				Event.observe(n,'click', function(e) { eval(node.onClick); }.bind(this));
 			}
 		}, this);
 		$$('.edge').each( function(n) {
-			edgeid = n.id;
-			Event.observe(n,'mouseover', function(eventObject) { eval(this.Framework.data.edges[n.id].onMouseover); }.bind(this));
+			if (n.id[0] == 'f') { return; }
+			var edgeid = n.id;
+			var edge = this.Framework.data.edges[edgeid];
+			if (edge['zoom']) { 
+				this.addClassName($(edgeid), 'zoom_'+edge['zoom']);
+				this.addClassName($('f'+edgeid), 'zoom_'+edge['zoom']);
+			}
+			if (edge['class']) { 
+				edge['class'].split(' ').each( function(c) { 
+					this.addClassName($(edgeid), c);	
+					this.addClassName($('f'+edgeid), c);	
+				}, this);
+			}
+			Event.observe(n,'mouseover', function(eventObject) { eval(edge.onMouseover); }.bind(this));
 			Event.observe(n,'mouseout', this.hideTooltip.bind(this));
-			Event.observe(n,'click', function(eventObject) { eval(this.Framework.data.edges[n.id].onClick); }.bind(this));
+			Event.observe(n,'click', function(eventObject) { eval(edge.onClick); }.bind(this));
 			//Event.observe(n,'click', graphviz[n.id].onClick);
 		}, this);
-		this.GraphSVGZoom.setupListeners($('svg').childNodes[0]);
+		this.GraphSVGZoom.setupListeners($('svg_overlay').childNodes[0]);
 	},
 	highlightNode: function($super, id, text, noshowtooltip) {
 		$super(id, text, noshowtooltip);
@@ -117,8 +140,8 @@ var GraphSVG = Class.create(GraphImage, {
 		if (this.Framework.current['network']) { 
 			this.hideNetwork(1);
 		}
-		if ($('img0').getOpacity() == 1) {
-			new Effect.Opacity('img0', { from: 1, to: .3, duration: .5});
+		if ($('image').getOpacity() == 1) {
+			new Effect.Opacity('image', { from: 1, to: .3, duration: .5});
 		}
 		showSVGElement(node);
 		$H(nodelookup[node.id]['edges']).keys().each(function(e) {
@@ -145,8 +168,8 @@ var GraphSVG = Class.create(GraphImage, {
 		$super();
 		this.showSVGElement(id);
 		this.addClassName($(id), 'selected');
-		if ($('img0').getOpacity() == 1) {
-			new Effect.Opacity('img0', { from: 1, to: .3, duration: .5});
+		if ($('image').getOpacity() == 1) {
+			new Effect.Opacity('image', { from: 1, to: .3, duration: .5});
 		}
 		$H(this.Framework.data.nodes[id].relatedNodes).keys().each(function(e) {
 			this.showSVGElement(e);
@@ -159,7 +182,7 @@ var GraphSVG = Class.create(GraphImage, {
 	unselectNode: function($super, id, fade) { 
 		$super();
 		if (fade) {
-			new Effect.Opacity('img0', { from: .3, to: 1, duration: .3});
+			new Effect.Opacity('image', { from: .3, to: 1, duration: .3});
 		}
 		this.removeClassName($(id), 'selected');
 		$H(this.Framework.data.nodes[id].relatedNodes).keys().each(function(e) {
