@@ -21,7 +21,6 @@ GraphFramework.prototype = {
 		if (! $(this.errordiv)) { 
 			$(document.body).insert({ top: new Element('div', {'id': this.errordiv}) });
 		}
-		//if (document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")) { 
 		this.renderers = {};
 		if (this.graphdiv) { 
 			if (document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")) { 

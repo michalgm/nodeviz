@@ -27,12 +27,29 @@ var GraphRaster = Class.create(GraphImage, {
 		$('images').update("<img id='image' "+map+" border='0' src='"+image+"' />"+overlay);
 		$('G').descendants().each(function(a) { 
 			if (this.Framework.data.edges[a.id]) { 
+				var edge = this.Framework.data.edges[a.id];
 				Event.observe($(a), 'mouseout', this.hideTooltip.bind(this)); 
 				Event.observe($(a), 'mousemove', this.mousemove.bind(this));
+				if (edge.onMouseover != '') { Event.observe($(a), 'mouseover', function(e) { eval(edge.onMouseover); }.bind(this)); }
+				if (edge.onClick != '') { Event.observe($(a), 'click', function(e) { eval(edge.onClick); }.bind(this)); }
 			} else if (this.Framework.data.nodes[a.id]) { 
-				if (this.Framework.data.nodes[a.id].onMouseover != '') { Event.observe($(a), 'mouseover', function(e) { eval(this.Framework.data.nodes[a.id].onMouseover); }.bind(this)); }
-				if (this.Framework.data.nodes[a.id].onClick != '') { Event.observe($(a), 'click', function(e) { eval(this.Framework.data.nodes[a.id].onClick); }.bind(this)); }
+				var node = this.Framework.data.nodes[a.id];
+				if (node.onMouseover != '') { Event.observe($(a), 'mouseover', function(e) { eval(node.onMouseover); }.bind(this)); }
+				if (node.onClick != '') { Event.observe($(a), 'click', function(e) { eval(node.onClick); }.bind(this)); }
 				//Event.observe($(a), 'mouseout', function(e) { this.Framework.unhighlightNode(a.id); }.bind(this)); 
+				var coords = $(a).getAttribute('coords').split(',');
+				if ($(a).getAttribute('shape') == 'circle') {
+					node['width'] = coords[2]*2;
+					node['height'] = coords[2]*2;
+					node['posx'] = coords[0] - (coords[2]);
+					node['posy'] = coords[1] - (coords[2]);
+					
+				} else {
+					node['width'] = (coords[2] - coords[0]);
+					node['height'] = (coords[3] - coords[1]);
+					node['posx'] = coords[0];
+					node['posy'] = coords[1];
+				}
 			}
 		}, this);
 		this.setupListeners();

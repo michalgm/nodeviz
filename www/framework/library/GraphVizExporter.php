@@ -38,35 +38,24 @@ class GraphVizExporter {
 	static function createDot($graph){ //add more arguments to control dot file creation
 		$GV_PARAMS = GraphVizExporter::$GV_PARAMS;
 
-		//include the needed sources files
-
-
-		//make file function
-
-		//make a string to contain the 
-
-		//FIXME included unassigned properties as comments
-		//write out the header for the graphviz file
-		//THESE PROPS SHOULD BE
+		//Set the size if it was passed in
 		if (isset($graph->width)) { 
 			$size = ($graph->width/96).','.($graph->height/96)."!";
 			$graph->data['graphvizProperties']['graph']['size'] = $size;
 		}
+
 		//Merge any properties set in graphSetup into GV_PARAMS
 		if (isset($graph->data['graphvizProperties'])) {
 			$GV_PARAMS = array_merge_recursive_unique($GV_PARAMS, $graph->data['graphvizProperties']);
-			#$GV_PARAMS = array_merge_replace_recursive($GV_PARAMS, $graph->data['graphvizProperties']);
-			//print_r($GV_PARAMS); exit;
 		} 
-		$dot = "digraph G {\ngraph ["; 
 
+		$dot = "digraph G {\ngraph ["; 
 		//get the graph-level params from the params object
 		foreach (array_keys($GV_PARAMS['graph']) as $key) {
 			if ($GV_PARAMS['graph'][$key] != null){
 				$dot .= $key.'="'.$GV_PARAMS['graph'][$key].'" ';
 			}
 		}
-
 		$dot .="];\n";
 
 		
@@ -136,7 +125,7 @@ class GraphVizExporter {
 			//also add properties
 		}
 		
-//hack test subgraph function
+		//hack test subgraph function
 		foreach (array_keys($graph->data['subgraphs']) as $sg_name){
 			$dot .= "subgraph $sg_name {\n";
 			$subgraph = $graph->data['subgraphs'][$sg_name];
@@ -169,99 +158,20 @@ class GraphVizExporter {
 	  return $value;
 	}
 
-
-	//read in imap file and construct table of coords 
-	//TODO: this function breaks if node labels contain line breaks
-	static function parseDotCoords($imap, $graph){
-		$lines = explode("\n", $imap); 
-		$imapstr = "";
-		$jsgraph = array();
-		foreach( $lines as &$line){
-			$node = array();
-			$attribs = "";
-			preg_match("/id=\"([^\"]+)\".+coords=\"([^\"]+)\"/", $line, $matches); //extract type, id, label, and coords
-			if (! isset($matches[0])) {
-				continue;
-			}	
-			list($string, $id, $coords) = $matches; 
-						
-			if (!$id) { continue; } //skip if there's no node id		
-			$coords = explode(",", $coords);		
-			$node = $graph->lookupNodeID($id);
-			if (!isset($node['id'])){
-			  writelog("unable to locate graph element with id of $id");
-			  continue;
-			}
-			//use imap coords to construct node dimensions
-			if (isset($node['shape']) && $node['shape'] == "circle") {
-				$node['width'] = $coords[2]*2;
-				$node['height'] = $coords[2]*2;
-				$node['posx'] = $coords[0] - ($coords[2]);
-				$node['posy'] = $coords[1] - ($coords[2]);
-			} else {
-				$node['width'] = ($coords[2] - $coords[0]);
-				$node['height'] = ($coords[3] - $coords[1]);
-				$node['posx'] = $coords[0];
-				$node['posy'] = $coords[1];
-			}
-			//add node to graph array, indexed by id
-	
-			//FIXME - commenting this out cuz it broke stuff, but it might break imap to comment - 1/10/11 - gm
-			//$graph->data['nodes'][$node['id']]  = $node;
-			/*
-			foreach (array_keys($node) as $key) { 
-				if(strstr($key, 'on')) { 
-					$attribs .= " $key=\"".$node[$key]."\" ";
-				}
-			}*/
-			#print $attribs;
-			$line = str_replace("/>", "$attribs/>", $line);
-			$line = preg_replace('/ ContribIDs="[^"]+"/', '', $line);
-			$line = preg_replace('/ PartyDesignation1="[^"]+"/', '', $line);
-			$line = preg_replace('/  +"?/', ' ', $line);
-			$imapstr .= $line."\n";
-		}
-		//convert array to string
-		#$string = 'graphviz = '.json_encode($jsgraph).';'; 
-		#$string = 'graph = '.json_encode($graph,JSON_FORCE_OBJECT).';';
-		return(array("<map id='G' name='G'>$imapstr</map>", $graph));
-	}
-
-	//displayDotFile: accepts dot file as string, dropIsolates flag, processed through neato, writes out image header and image
-	static function displayDotFile($dot,$dropIsolates) {
-		$format = "jpg"; //output format
-		header("Content-Type: image/$format");
-		$descriptorspec = array(
-		   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-		   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-		   2 => array("file", "log/graphviz.log", "a") // stderr is a file to write to
-		);
-		if ($dropIsolates){
-			$exportCommand = "neato -vvv -x -T$format | mogrify -format $format -resize 800x600 $format:- ";
-	//pipe through mogrify to resize image //FIXME: we can't do this - it will break the imap file
-		} else {
-			#$exportCommand = "neato -Tpng | mogrify -format $format -resize 800x600 png:- ";
-			$exportCommand = "neato -T$format  ";
-		}
-		$process = proc_open($exportCommand, $descriptorspec, $pipes);
-		fwrite($pipes[0], $dot);
-		fclose($pipes[0]);
-		echo stream_get_contents($pipes[1]);
-		fclose($pipes[1]);
-	}
-
 	public static function generateGraphFiles($graph, $datapath, $format) {
 		global $framework_config;
-		global $old_graphviz;
 
 		$graphname = $graph->graphname();
 		$dotString = GraphVizExporter::createDot($graph);
+
 		$GV_PARAMS = GraphVizExporter::$GV_PARAMS;
 		if (isset($graph->data['graphvizProperties'])) {
 			$GV_PARAMS = array_merge_recursive_unique($GV_PARAMS, $graph->data['graphvizProperties']);
 		}
+
 		$layoutEngine = $GV_PARAMS['graph']['layoutEngine'];
 		$layoutEngine = (isset($layoutEngine) && $layoutEngine != 'neato') ? "-K$layoutEngine" : "";
+
 		$imageFile = "$datapath/$graphname.png";
 		$dotFile = "$datapath/$graphname.dot";
 		$svgFile = "$datapath/$graphname.svg.raw";
@@ -278,6 +188,7 @@ class GraphVizExporter {
 		   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
 		   2 => array("file", $framework_config['log_path']."/graphviz.log", "a") // stderr is a file to write to
 		);
+
 		//use neato to generate and save image file, and generate imap file to STDOUT
 		chdir($framework_config['web_path']);
 		$process = proc_open("neato -vvv $layoutEngine -Tsvg -o $svgFile -Tdot -o $dotFile -Tpng -o $imageFile -Tcmapx ", $descriptorspec, $pipes);
@@ -288,22 +199,75 @@ class GraphVizExporter {
 		$result = proc_close($process);
 		chdir($framework_config['framework_path']);
 		if($result) { 
-			//FIXME - we need to set up a real way to pass errors - gm - 12/28/10
 			trigger_error("GraphViz interpreter failed - returned $result", E_USER_ERROR);
 		}
+		
+		$imap = GraphVizExporter::processImap($imap, $datapath, $graphname);
+		
+		$svg = GraphVizExporter::processSVG($svgFile, $datapath, $graphname);
 
-		$imap = preg_replace("/target=\"[^\"]+\"/", "", $imap)	;
-		$imap = str_replace(" href=\"a\"", "", $imap)	;
-		$imap = str_replace(" alt=\"\"", "", $imap)	;
-		$imap = str_replace("<map id='G' name='G'>", "", $imap)	;
+		$graphData = GraphVizExporter::processGraphData($graph->data, $datapath, $graphname);
+		
+		if ($format != 'png') { 
+			#system("convert -quality 92 $datapath$graphname.png $datapath$graphname.$format");
+			chdir($framework_config['web_path']);
+			system("grep -v levelfour $datapath$graphname.svg | convert -quality 92 svg:- $datapath$graphname.$format");
+			chdir($framework_config['framework_path']);
+			unlink("$datapath$graphname.png");
+		}
+		
+		#chmod all our files
+		foreach (array('.svg', '.svg.raw', '.dot', '.graph', '.nicegraph', '_orig.dot', '.imap', ".$format") as $ext) {
+			if (is_file("$datapath$graphname$ext")) {
+				$perms = fileperms("$datapath$graphname$ext");
+				if (decoct(fileperms("$datapath$graphname$ext")) != '100666') { 
+					chmod("$datapath$graphname$ext", 0666) || print "can't chmod file: $datapath/$graphname$ext : ".decoct(fileperms("$datapath$graphname$ext"));
+				}
+			}
+		}	   
+		return array($imap, $svg);
+	}
+
+	public static function generateGraphvizOutput($graph, $datapath, $format, $returnsvg = 0) {
+		global $framework_config;
+		$graphname = $graph->graphname();
+		$imageFile = "$datapath$graphname.$format";
+		$dotFile = "$datapath$graphname.dot";
+		$svgFile = "$datapath$graphname.svg";
+		global $cache;
+		$output = "";
+		if ($cache != 1) {
+			list($imap, $svg) = GraphVizExporter::generateGraphFiles($graph, $datapath, $format);
+		} else {
+			$imap = file_get_contents("$datapath/$graphname.imap");
+			$svg = file_get_contents("$datapath/$graphname.svg");
+		}
+		if (! $cache) { $imageFile .= "?".(rand()%1000); } //append random # to image name to prevent browser caching
+		if (isset($_REQUEST['useSVG']) && $_REQUEST['useSVG'] == 1) { 
+			$overlay = "<div id='svg_overlay' style='display: none'>$svg</div>";
+		} else {
+			$overlay = $imap;
+		}
+		$path = preg_replace("|^".$framework_config['web_path']."|", "", $framework_config['cache_path']);
+		$image = "$path$graphname.$format";
+		$dot = "$path$graphname.dot";
+		return array('image'=>$image, 'graph'=>$graph, 'overlay'=>$overlay, 'dot'=>$dot);
+	}
+
+	public static function processImap($imap, $datapath, $graphname) {
+		$imap = str_replace('<map id="G" name="G">', "", $imap);
 		$imap = str_replace("</map>", "", $imap);
-		$imap = preg_replace("/title=\"[^\"]+\"/", "", $imap)	;
+		$imap = preg_replace("/ (target|title|href|alt)=\"[^\"]*\"/", "", $imap);
 		$imap = "<map id='G' name='G'>".join("\n", array_reverse(explode("\n", $imap)))."</map>";
-		list($imap, $graphobject) = GraphVizExporter::parseDotCoords($imap, $graph); //read dotfile coords from imap file
 		$imapfile = fopen ("$datapath/$graphname.imap", 'w');
 		fwrite($imapfile, $imap);
 		fclose($imapfile);
+		return $imap;
+	}
 
+	public static function processSVG($svgFile, $datapath, $graphname) {
+		global $old_graphviz;
+		global $framework_config;
 		#clean up the raw svg
 		$svg = file_get_contents($svgFile);
 		if ($old_graphviz) {
@@ -361,68 +325,26 @@ class GraphVizExporter {
 	
 		#delete the raw svg
 		if (! $framework_config['debug']) { unlink($svgFile); }
+		return $svg;
+	}
 
-		$graphout = $graph->data;
-		unset($graphout['properties']['graphvizProperties']);
-		unset($graphout['queries']);
-		foreach (array_keys($graphout['nodes']) as $node) {
+	public static function processGraphData($data, $datapath, $graphname) {
+		unset($data['properties']['graphvizProperties']);
+		unset($data['queries']);
+		foreach (array_keys($data['nodes']) as $node) {
 			foreach(array('mouseout', 'size', 'max', 'min', 'color', 'fillcolor', 'weight') as $key) { 
-				unset($graphout['nodes'][$node][$key]); 
+				unset($data['nodes'][$node][$key]); 
 			}
 		}
-		foreach (array_keys($graphout['edges']) as $edge) {
+		foreach (array_keys($data['edges']) as $edge) {
 			foreach(array('mouseout', 'size', 'max', 'min', 'color', 'fillcolor', 'weight', 'width') as $key) { 
-				unset($graphout['edges'][$edge][$key]); 
+				unset($data['edges'][$edge][$key]); 
 			}
 		}
 		$graphfile = fopen("$datapath/$graphname.graph", "w");
-		fwrite($graphfile, serialize($graphout));
+		fwrite($graphfile, serialize($data));
 		fclose($graphfile);
-
-		if ($format != 'png') { 
-			#system("convert -quality 92 $datapath$graphname.png $datapath$graphname.$format");
-			#system("grep -v levelfour $datapath$graphname.svg | convert -quality 92 svg:- $datapath$graphname.$format");
-			chdir($framework_config['web_path']);
-			system("grep -v levelfour $datapath$graphname.svg | convert -quality 92 svg:- $datapath$graphname.$format");
-			chdir($framework_config['framework_path']);
-			unlink("$datapath$graphname.png");
-		}
-		
-		#chmod all our files
-		foreach (array('.svg', '.svg.raw', '.dot', '.graph', '.nicegraph', '_orig.dot', '.imap', ".$format") as $ext) {
-			if (is_file("$datapath$graphname$ext")) {
-				$perms = fileperms("$datapath$graphname$ext");
-				if (decoct(fileperms("$datapath$graphname$ext")) != '100666') { 
-					chmod("$datapath$graphname$ext", 0666) || print "can't chmod file: $datapath/$graphname$ext : ".decoct(fileperms("$datapath$graphname$ext"));
-				}
-			}
-		}	   
-		return array($imap, $graphobject, $svg);
-	}
-
-	public static function generateGraphvizOutput($graph, $datapath, $format, $returnsvg = 0) {
-		$graphname = $graph->graphname();
-		$imageFile = "$datapath$graphname.$format";
-		$dotFile = "$datapath$graphname.dot";
-		$svgFile = "$datapath$graphname.svg";
-		global $cache;
-		$output = "";
-		if ($cache != 1) {
-			list($imap, $graphobject,$svg) = GraphVizExporter::generateGraphFiles($graph, $datapath, $format);
-		} else {
-			$imap = file_get_contents("$datapath/$graphname.imap");
-			$svg = file_get_contents("$datapath/$graphname.svg");
-			list($imap2, $graphobject) = GraphVizExporter::parseDotCoords($imap, $graph); //read dotfile coords from imap file
-			//$jsCoords = file_get_contents("$datapath/$graphname.js");
-		}
-		if (! $cache) { $imageFile .= "?".(rand()%1000); } //append random # to image name to prevent browser caching
-		//$output .= "dotfile = '$dotFile';\n";
-		if (isset($_REQUEST['useSVG']) && $_REQUEST['useSVG'] == 1) { 
-			$overlay = "<div id='svg_overlay' style='display: none'>$svg</div>";
-		} else {
-			$overlay = $imap;
-		}
-		return array('img'=>$imageFile, 'graph'=>$graphobject, 'overlay'=>$overlay);
+		return $data;
 	}
 }
 ?>
