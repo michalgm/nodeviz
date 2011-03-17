@@ -234,7 +234,8 @@ class GraphVizExporter {
 		$imageFile = "$datapath$graphname.$format";
 		$dotFile = "$datapath$graphname.dot";
 		$svgFile = "$datapath$graphname.svg";
-		global $cache;
+ 
+		$cache = $framework_config['cache'];
 		$output = "";
 		if ($cache != 1) {
 			list($imap, $svg) = GraphVizExporter::generateGraphFiles($graph, $datapath, $format);
