@@ -14,14 +14,29 @@ var GraphSVG = Class.create(GraphImage, {
 		$super();
 		var image = responseData.img;
 		var overlay = responseData.overlay;
-		$('images').update(overlay);
-		$('svg_overlay').setAttribute('id', 'image');
+		overlay = overlay.replace("<div id='svg_overlay' style='display: none'>", '');
+		overlay = overlay.replace("</div>", '');
+		
+		//parse the SVG into a new document
+		var dsvg = new DOMParser();
+		dsvg.async = false;
+		var svgdoc = dsvg.parseFromString(overlay, 'text/xml');
+
+		//insert the underlying image
+		$('images').update(new Element('div', {'id': 'image'}));
+		$('image').appendChild($('image').ownerDocument.importNode(svgdoc.firstChild, true));
+
+		//reset all the ids for the under-image
 		$('svgscreen').setAttribute('id', 'fsvgscreen');
-		$A($('image').getElementsByTagName('g')).each( function(g) { 
+		$A($('images').getElementsByTagName('g')).each( function(g) { 
 			var id = $(g).getAttribute('id');
 			$(g).setAttribute('id', 'f'+id);
 		});
-		$('images').innerHTML += overlay;
+
+		//insert the svg image again as the overlay
+		$('images').insert(new Element('div', {'id': 'svg_overlay'}));
+		$('svg_overlay').appendChild($('svg_overlay').ownerDocument.importNode(svgdoc.firstChild, true));
+
 		$('image').show();
 
 		$('svg_overlay').style.setProperty('position','absolute', '');
