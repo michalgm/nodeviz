@@ -98,7 +98,7 @@ GraphSVGZoom.prototype = {
 		} else {
 			Event.observe(root, 'DOMMouseScroll', function(e) { this.handleMouseWheel(e); }.bind(this)); // Chrome/Safari
 		}
-
+		Event.observe(root, 'dblclick', function(e) { this.zoom('in', this.getEventPoint(e)); }.bind(this));
 		var defaultValue = this.current_zoom;
 		var x = 0;
 		var values = new Array();
@@ -185,44 +185,18 @@ GraphSVGZoom.prototype = {
 
 		evt.returnValue = false;
 
-		var svgDoc = evt.target.ownerDocument;
-
 		var delta;
-		this.previous_zoom = this.current_zoom;
 		if(evt.wheelDelta)
 			delta = evt.wheelDelta / 360; // Chrome/Safari
 		else
 			delta = evt.detail / -9; // Mozilla
-		if (delta > 0) { 
-			this.current_zoom++;
-			delta = 1/3;
-		} else { 
-			this.current_zoom--;
-			delta = -1/3;
-		}
-		if (this.current_zoom < 0) {
-			this.current_zoom = 0;
-			this.state = '';
-			return;
-		} else if (this.current_zoom > this.zoomlevels) { 
-			this.current_zoom = this.zoomlevels;
-			this.state = '';
-			return;
-		}
-		var z = Math.pow(1 + this.zoom_delta, delta);
 
-		var g = svgDoc.getElementById("graph0");
-		
 		var p = this.getEventPoint(evt);
-
-		p = p.matrixTransform(g.getCTM().inverse());
-
-		// Compute new scale matrix in current mouse position
-		var k = this.root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
-
-		this.setCTM(g, g.getCTM().multiply(k));
-
-		this.stateTf = this.stateTf.multiply(k.inverse());
+		if (delta > 0) { 
+			this.zoom('in', p);
+		} else { 
+			this.zoom('out', p);
+		}
 		this.state = '';
 	},
 
@@ -309,7 +283,7 @@ GraphSVGZoom.prototype = {
 			this.state = '';
 		}
 	},
-	zoom: function(d) {
+	zoom: function(d, p) {
 		this.previous_zoom = this.current_zoom;
 		if (d == 'in') { 
 			d = ++this.current_zoom;
@@ -330,10 +304,12 @@ GraphSVGZoom.prototype = {
 		var z = Math.pow(1 + this.zoom_delta, delta);
 		var g = $("graph0");
 		//var p = {'x': ($('svg_overlay').childNodes[0].getBBox().width/2), 'y':($('svg_overlay').childNodes[0].getBBox().height/2)};
-		var p = this.root.createSVGPoint();
-		var dimensions = $(this.GraphSVG.Framework.graphdiv).getDimensions();
-		p.x = this.center.x;
-		p.y = this.center.y;
+		if (! p) { 
+			var p = this.root.createSVGPoint();
+			var dimensions = $(this.GraphSVG.Framework.graphdiv).getDimensions();
+			p.x = this.center.x;
+			p.y = this.center.y;
+		}
 		p = p.matrixTransform(g.getCTM().inverse());
 		z = Math.pow(z, zoom_amount);
 		var k = this.root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
