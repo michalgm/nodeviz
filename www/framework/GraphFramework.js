@@ -74,7 +74,7 @@ GraphFramework.prototype = {
 		statusCode=10;
 		statusString = "Server took too long to return data, it is either busy or there is a connection problem";
 		request.abort();
-		request.options.Framework.reportError(statusCode, statusString);
+		this.reportError(statusCode, statusString);
 	},
 	onLoading: function(div) {
 		this.loading($(div));
@@ -213,13 +213,15 @@ GraphFramework.prototype = {
 				data = this.checkResponse(response);
 				if (data) {
 					var edge = this.data.edges[id];
-					var header = "<h3>From "+this.data.nodes[edge['fromId']].Name+" to "+this.data.nodes[edge['toId']].Name+"</h3>";
+					var mainhead = "<h2>A Detailed View</h2>";
+					var header = "<h3>From <span class='org_title'>"+this.data.nodes[edge['fromId']].Name+"</span> to <span class='org_title'>"+this.data.nodes[edge['toId']].Name+"</span></h3>";
+					var subhead = "<p class='subhead'>A complete listing of the grants used to construct the edge between the organizations</p>";
 					var tableheader = '<thead><tr><th>'+$H($H(data).values().first()).keys().join('</th><th>')+'</th></tr></thead>';
 					var tablebody = "<tbody>";
 					$H(data).values().each(function (row) { 
 						tablebody += '<tr><td>'+$H(row).values().join('</td><td>')+'</td></tr>';
 					});
-					this.showLightbox(header+'<table>'+tableheader+tablebody+'</tbody></table>');
+					this.showLightbox(mainhead+subhead+header+'<table id="edge_details_table">'+tableheader+tablebody+'</tbody></table>');
 				} else { 
 					this.hideLightbox();
 				}
