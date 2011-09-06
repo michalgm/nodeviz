@@ -1,5 +1,5 @@
 	html { height: 100%; }	
-	body { height: 99%;}	
+	body { height: 99%;font-size:.8em;}	
 	#debug {position:absolute;}
 	
 	#graphcontent {position:relative; clear:both; margin-bottom:10px; height:700px; background:#fff; border-top:1px solid #ccc; overflow:hidden;}
@@ -36,7 +36,7 @@
 	/* Node Search */
 	
 	.node_search_container {padding:5px; background:#ddd; text-align:right;}
-	.node_search_container label {color:#fff; font-size:10px; text-transform:uppercase; padding-right:5px;}
+	.node_search_container label {color:#000; font-size:10px; text-transform:uppercase; padding-right:5px;}
 	.node_search {width:150px; padding:5px 25px 5px 5px; background:#fff url(icons/magnifier-small.png) 160px center no-repeat; border:0; border-radius:10px; -moz-border-radius:10px; -webkit-box-shadow:0 1px 1px rgba(0,0,0,0.25) inset; text-align:center;}
 	.node_search_list {margin:2px 0 0 0; padding:0; width:207px; background:#fff; border:1px solid #999; position:absolute; z-index:100;  border-radius:10px; -moz-border-radius:10px; -webkit-box-shadow:0 3px 10px rgba(0,0,0,0.25);}
 	.node_search_list ul {margin:0; padding:0; list-style:none;}
@@ -44,7 +44,7 @@
 	.node_search_list li:first-child {border-radius:10px 10px 0 0; -moz-border-radius:10px 10px 0 0;}
 	.node_search_list li:last-child {border-radius:0 0 10px 10px; -moz-border-radius:0 0 10px 10px;}
 	.node_search_list li:nth-child(odd) {background:#eee;}
-	.node_search_list li.selected {background:#cbd;}
+	.node_search_list li.selected {background:#BA8D72;}
 
 	#candidateInfo, #companyInfo {clear:both; height:auto; margin:0;}
 	#candidateInfo ul, #companyInfo ul {height:615px; overflow:hidden; overflow-y:scroll;}
@@ -75,7 +75,7 @@
 	li.mini.selected { display:block }
 	li.mini {display:none;}
 
-	#lists {float: right; height:90%; width:30%; background:#ccc; border-radius:0 0 10px 0;}
+	#lists {float: right; height:90%; width:30%; background:#B2B7A1; border-radius:0 0 10px 0;}
 	#graphs { width: 70%; height: 90%;}
 	/*.mini.selected .close { display: none; }*/
 
@@ -93,19 +93,19 @@
 	/*SVG Styles */
 	path { stroke-opacity: .7; }
 	
-	#svg_overlay g{opacity:0}
+	#svg_overlay g{opacity:0;cursor:pointer;}
 	#svg_overlay path{fill-opacity:.9 !important;cursor:pointer}
 	#svg_overlay ellipse, #svg_overlay polygon{fill-opacity:.8 !important;cursor:pointer}
 	#svg_overlay path{stroke-opacity:.9 !important;stroke:#93f !important;cursor:pointer}
 	#svg_overlay .searchhelp{color:#666666;font-style:italic}
-	#svg_overlay .selected polygon, #svg_overlay .selected ellipse{fill:#eebbbb !important;}
-	#svg_overlay .oselected polygon, #svg_overlay .oselected ellipse{fill:#bbddbb;}
-	#svg_overlay .highlight path{stroke:#93f !important;stroke-opacity:.9 !important}
-	#svg_overlay .nhighlight{fill:#ccbbdd !important;}
+	#svg_overlay .selected polygon, #svg_overlay .selected ellipse{fill:#BA8D72 !important;}
+	#svg_overlay .oselected polygon, #svg_overlay .oselected ellipse{fill:##B2B7A1;}
+	#svg_overlay .highlight path{stroke:##B2B7A1 !important;stroke-opacity:.9 !important}
+	#svg_overlay .nhighlight{fill:##B2B7A1 !important;}
 	
 	#highlight { position: absolute; z-index: 5; visibility: hidden; filter:alpha(opacity=50); opacity: .50; cursor: pointer; top: 0px; left: 0px; }
 	#highlightimg { visibility: hidden; width: 100%; height: 100%; }
-	#highlight.selected, .nhighlight { background-color: #ccbbdd !important; }
+	#highlight.selected, .nhighlight { background-color: #BA8D72 !important; }
 	.levelfour { display: none; }
 	.leveltwo { display: none; }
 	.showtwo .leveltwo { display: block; }
@@ -116,10 +116,15 @@
 	.nodelist_container { display: none; position: relative; height: 75%}
 	.nodelist { overflow-y: scroll; height: 80%; position: relative; }
 	.nodelist_container .highlight { background-color: #ccbbdd; }
-	.nodelist_container .selected { background-color: #eebbbb; font-weight: bold; }
+	.nodelist_container .selected { background-color: ##B2B7A1; font-weight: bold; }
 	.nodelist_container .selected div { background-color: #fff; font-weight: normal;}
-	.nodelist>li { color: blue; cursor: pointer;} 
+	.nodelist>li { color: 727780; cursor: pointer;} 
 	.nodelist_container.selected { display: block; }
+	.node_content { display: none;}
+	.nodelist>li.selected .node_content  {display: block;}
+	
+	.to_node_item {color:green;}
+	.from_node_item {color:orange;}
 
 	#list_menu li { display: inline;  padding: 5px; cursor: pointer;}
 	#list_menu li.selected {font-weight: bold; } 
