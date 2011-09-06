@@ -283,7 +283,7 @@ class GraphVizExporter {
 				return 'rx="'.$matches[1].'"'.$matches[2].'start'.$matches[3].(($matches[1])+$matches[4]+15).'"';
 			}
 			$svg = preg_replace_callback("/rx=\"([^\"]+)\"([^<]+<text text-anchor=\")[^\"]+(\" x=\")([^\"]+)\"/", "shiftlabels", $svg);
-			$svg = str_replace("font-size=\"10.00\"", "font-size=\"30.00\"", $svg);
+			$svg = str_replace("font-size=\"10.00\"", "font-size=\"16.00\"", $svg);
 			$svg = preg_replace("/<!-- ([^ ]+) -->\n/", "", $svg);
 			$svg = preg_replace("/^.*fill=\"(black|white).*\n/m", "", $svg);
 			$svg = str_replace("G</title>\n<polygon fill=\"#ffffff", "G</title>\n<polygon id='svgscreen' style=\"opacity:0;\" fill=\"#ffffff", $svg);
@@ -303,8 +303,8 @@ class GraphVizExporter {
 		$svg = preg_replace("/<title>.*/m", "", $svg);
 		$svg = preg_replace("/^<\/?a.*\n/m", "", $svg);
 		#$svg = preg_replace("/^<text.*\n/m", "", $svg);
-		$svg = preg_replace("/^<text/m", "<text class='levelfour'", $svg);
-		$svg = preg_replace("/levelfour' text-anchor=\"middle\"([^>]+ fill)/", "' text-anchor='end'$1", $svg);
+		$svg = preg_replace("/^<text/m", "<text class='zoom_7'", $svg);
+		$svg = preg_replace("/zoom_7' text-anchor=\"middle\"([^>]+ fill)/", "' text-anchor='end'$1", $svg);
 		$svg = preg_replace("/\.\.\/www\//", "", $svg);
 
 		#pull out all the node x values
