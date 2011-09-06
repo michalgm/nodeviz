@@ -27,7 +27,7 @@ GraphList.prototype = {
 			this.nodeLists[nodetype] = new Hash();
 			$('list_menu').insert({ bottom: new Element('li', {'id': nodetype+'_menu'}).update(nodetype)});
 			$(this.listdiv).insert({ bottom: new Element('div', {'id': nodetype+'_list_container', 'class': 'nodelist_container'}) });
-			$(nodetype+'_list_container').insert({top: new Element('div', {'id': nodetype+'_list_header', 'class': 'nodelist_header'}).update(nodetype+' Nodes')});
+			$(nodetype+'_list_container').insert({top: new Element('div', {'id': nodetype+'_list_header', 'class': 'nodelist_header'}).update('<span class="node_type_label">'+nodetype+' Nodes</span>')});
 			$(nodetype+'_list_container').insert({ bottom: new Element('ul', {'id': nodetype+'_list', 'class': 'nodelist'}) });
 
 			var search = ' <label for="'+nodetype+'_search">Search</label> <input class="node_search" id="'+nodetype+'_search" autocomplete="off" size="20" type="text" value="" /> <div class="autocomplete node_search_list" id="'+nodetype+'_search_list" style="display:none"></div>';
@@ -94,8 +94,10 @@ GraphList.prototype = {
 			}, this);
 			if (nodes.size() >= 1) {
 				var sublistdiv = nodediv+'_'+edgetype+'_'+direction;
-				$(nodeid+'_sublists').insert({ bottom: new Element('ul', {'id': sublistdiv}) });
-				$(sublistdiv).insert({ bottom: new Element('span', {'id': sublistdiv+'_header'}).update(edgetype+' '+direction+' Nodes') });
+				var classes = edgetype+'_list '+direction+'_list';
+				$(nodeid+'_sublists').insert({ bottom: new Element('ul', {'id': sublistdiv,'class':classes}) });
+				
+				$(sublistdiv).insert({ bottom: new Element('span', {'id': sublistdiv+'_header','class': 'node_type_label'}).update(edgetype+' '+direction+' Nodes') });
 				nodes.each(function(snode) {
 					$(sublistdiv).insert({ bottom: new Element('li', {'id': sublistdiv+'_'+snode.id}) });
 					$(sublistdiv+'_'+snode.id).update(this.listSubNodeEntry(snode, node, edgetype, direction));
@@ -107,6 +109,7 @@ GraphList.prototype = {
 	},
 	listNodeEntry: function(node) {
 		var label;
+		var content = "";
 		if (node.Name) { 
 			label = node.Name;
 		} else { 
@@ -116,14 +119,14 @@ GraphList.prototype = {
 	},
 	listSubNodeEntry: function(node, parentNode, edgetype, direction) { 
 		var label;
-		var color = direction == 'to' ? 'green' : 'orange'; 
+		var node_class = direction == 'to' ? 'to_node_item' : 'from_node_item'; 
 		if (node.Name) { 
 			label = node.Name;
 		} else { 
 			label = node.id;
 		}
-		var link = "<span onclick='graphframework.selectNode(\""+node.id+"\");'>-&gt;</span>";
-		return "<span style='color:"+color+"'>"+label+"</span>"+link;
+		var link = "<span class='link_icon' onclick='gf.selectNode(\""+node.id+"\");'>&#187;</span>";
+		return link+"<span  onclick='gf.selectNode(\""+node.id+"\");' class='"+node_class+"'>"+label+"</span>";
 	},
 	highlightNode: function (id) { 
 		var networkNode = this.Framework.data.nodes[this.Framework.current.network];
