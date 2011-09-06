@@ -145,6 +145,9 @@ class GraphVizExporter {
 		
 		//terminate dot file
 		$dot .= "}\n";
+
+		//remove all newlines from dot, so GV doesn't choke
+		$dot = str_replace("\n", " ", $dot);
 		return $dot;
 
 	}
