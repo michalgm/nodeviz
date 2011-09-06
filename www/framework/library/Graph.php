@@ -228,6 +228,7 @@ class Graph {
 		}
 		return $array;
 	}
+	
 
 	//returns the node array corresponding to an id
 	function lookupNodeID($id) {
