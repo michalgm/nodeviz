@@ -33,6 +33,7 @@ class Graph {
 	//Defines the graph's name if it isn't already set, then returns it
 	function graphname() {
 		if (! $this->name) { 
+			$this->name = crc32(serialize($this));
 			//set the name
 		}
 		return $this->name;

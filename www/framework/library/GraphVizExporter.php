@@ -186,10 +186,14 @@ class GraphVizExporter {
 			fwrite($origdot, $dotString);
 			fclose($origdot);
 		}
+		$logdir = $framework_config['log_path'];
+		if (! is_dir($logdir) || ! is_writable($logdir) || (is_file("$logdir/graphviz.log") && ! is_writable("$logdir/graphviz.log"))) {
+			trigger_error("Unable to write log to log directory '$logdir'", E_USER_ERROR);
+		}
 		$descriptorspec = array(
 		   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
 		   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-		   2 => array("file", $framework_config['log_path']."/graphviz.log", "a") // stderr is a file to write to
+		   2 => array("file", $logdir."/graphviz.log", "a") // stderr is a file to write to
 		);
 
 		//use neato to generate and save image file, and generate imap file to STDOUT
@@ -239,8 +243,14 @@ class GraphVizExporter {
 		$svgFile = "$datapath$graphname.svg";
  
 		$cache = $framework_config['cache'];
+		if (! is_dir($framework_config['cache_path']) || ! is_readable($framework_config['cache_path'])) {
+			trigger_error("Unable to read cache to cache directory '".$framework_config['cache_path']."'", E_USER_ERROR);
+		}
 		$output = "";
 		if ($cache != 1) {
+			if (! is_writable($framework_config['cache_path'])) {
+				trigger_error("Unable to write cache to cache directory '".$framework_config['cache_path']."'", E_USER_ERROR);
+			}
 			list($imap, $svg) = GraphVizExporter::generateGraphFiles($graph, $datapath, $format);
 		} else {
 			$imap = file_get_contents("$datapath/$graphname.imap");

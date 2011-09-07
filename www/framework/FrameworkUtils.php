@@ -10,18 +10,18 @@ $framework_config = array(
 	'debug' => 1,
 	'old_graphviz' => 0, #Set this to 1 if graphviz version < 2.24
 
-	'setupfiles' => array('crpgraphSetup.php'=>1, 'voteGraphSetup.php'=>1,'committeeGraphSetup.php'=>1, 'FECCanComGraph.php'=>1, 'FoundationGraph.php'=>1),
+	'setupfiles' => array(),
 );
 
 if (php_sapi_name() != 'cli') {
 	ini_set('zlib.output_compression',1);
 }
 
-//local.php will allow you to override any set globals 
-if(file_exists('local.php')) { 
-	include_once("local.php"); 
-} elseif(file_exists($framework_config['application_path'].'/local.php')) { 
-	include_once($framework_config['application_path']."/local.php"); 
+//config.php will allow you to override any set globals 
+if(file_exists('config.php')) { 
+	include_once("config.php"); 
+} elseif(file_exists($framework_config['application_path'].'/config.php')) { 
+	include_once($framework_config['application_path']."/config.php"); 
 }
 
 function reinterpret_paths() {
@@ -49,8 +49,11 @@ function setupHeaders() {
 function writelog($string) {
 	global $logdir, $logfile;
 	if (!$logfile) {  //open logfile if it isn't open
-			$logfilename = "$logdir/".basename($_SERVER['PHP_SELF']).".log";
-			$logfile= fopen($logfilename, 'a'); 
+		$logfilename = "$logdir/".basename($_SERVER['PHP_SELF']).".log";
+		$logfile= fopen($logfilename, 'a'); 
+		if (! $logfile) {
+			trigger_error("Unable to write log to log directory '$logdir'", E_USER_ERROR);
+		}
 	}
 	fwrite($logfile, time()." - $string\n");
 }

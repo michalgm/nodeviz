@@ -411,25 +411,6 @@ function orgOwnOrg_edgeProperties() {
 	}
 	*/
 
-	function graphname() {
-		if (! $this->name) { 
-			$graph = &$this->data;
-			global $datapath;
-			$props = $graph['properties'];
-			$localdatapath = "$datapath$props[sitecode]";
-			if (! is_dir("$localdatapath")) {
-				mkdir("$localdatapath") || die("unable to create dir $localdatapath"); 
-				chmod("$localdatapath", 0777);
-			}	
-			
-			$graphname = "prop".$props['prop']."_contribs";
-			
-			$this->name = $props['sitecode'].'/'.$graphname;
-		}
-		return $this->name;
-	}
-
-
 	/**
 	UI Functions for displaying info on graph ui.   fixme: need standard naming  convention.  ajax_<nodetype>_showInfo()  ?
 	**/

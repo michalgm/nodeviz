@@ -382,19 +382,23 @@ class FECCanComGraph extends Graph {
 			$props = $graph['properties'];
 			$localdatapath = "$datapath$props[sitecode]";
 			if (! is_dir("$localdatapath")) {
-				mkdir("$localdatapath") || print "unable to create dir $localdatapath"; 
-				chmod("$localdatapath", 0777);
+				if (is_writable($localdatapath)) { 
+					mkdir("$localdatapath") || trigger_error("unable to create dir $localdatapath", E_USER_ERROR); 
+					chmod("$localdatapath", 0777);
+				} else {
+					trigger_error("unable to write to dir $localdatapath", E_USER_ERROR); 
+				}
 			}	
 			if ($props['candidateids'] != '') { 
 				if( ! is_dir("$localdatapath/individuals")) { 
-					mkdir("$localdatapath/individuals") || print "unable to create dir $localdatapath/individuals"; 
+					mkdir("$localdatapath/individuals") || trigger_error("unable to create dir $localdatapath/individuals", E_USER_ERROR); 
 					chmod("$localdatapath/individuals", 0777);
 					clearstatcache();
 				}
 				$graphname = "individuals/$props[candidateids]_$props[congress_num]";
 			} elseif ($props['companyids'] != '') { 
 				if( ! is_dir("$localdatapath/companies")) { 
-					mkdir("$localdatapath/companies") || print "unable to create dir $localdatapath/companies"; 
+					mkdir("$localdatapath/companies") || trigger_error( "unable to create dir $localdatapath/companies", E_USER_ERROR); 
 					chmod("$localdatapath/companies", 0777);
 					clearstatcache();
 				}
@@ -402,7 +406,7 @@ class FECCanComGraph extends Graph {
 			} else {
 				$dir = "$props[racecode]$props[congress_num]";
 				if( ! is_dir("$localdatapath/$dir")) { 
-					mkdir("$localdatapath/$dir") || print "unable to create dir $localdatapath/$dir"; 
+					mkdir("$localdatapath/$dir") || trigger_error( "unable to create dir $localdatapath/$dir", E_USER_ERROR); 
 					chmod("$localdatapath/$dir", 0777);
 					clearstatcache();
 				}
