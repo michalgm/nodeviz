@@ -71,6 +71,10 @@ var GraphSVG = Class.create(GraphImage, {
 		//$('graphs').style.height = $('svg_overlay').childNodes[0].getAttribute('height');
 		//$('svg_overlay').clonePosition($('image'), {'setLeft': true});
 		this.setupListeners();
+
+		//apply the initial filter - this should probably by handled in GraphSVGZoom, but where?
+		$('image').addClassName('zoom_'+this.GraphSVGZoom.current_zoom);
+		$('svg_overlay').addClassName('zoom_'+this.GraphSVGZoom.current_zoom);
 	},
 	setupListeners: function($super) {
 		$super();
