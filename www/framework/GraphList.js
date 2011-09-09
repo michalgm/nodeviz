@@ -103,6 +103,7 @@ GraphList.prototype = {
 					$(sublistdiv+'_'+snode.id).update(this.listSubNodeEntry(snode, node, edgetype, direction));
 					Event.observe($(sublistdiv+'_'+snode.id), 'mouseover', function(e) { this.highlightNode(snode.id, 1); }.bind(this.Framework));
 					Event.observe($(sublistdiv+'_'+snode.id), 'mouseout', function(e) { this.unhighlightNode(snode.id); }.bind(this.Framework));
+					Event.observe($(sublistdiv+'_'+snode.id), 'click', function(e) { this.selectNode(snode.id); }.bind(this.Framework));
 				}, this);
 			}	
 		}
@@ -125,8 +126,8 @@ GraphList.prototype = {
 		} else { 
 			label = node.id;
 		}
-		var link = "<span class='link_icon' onclick='gf.selectNode(\""+node.id+"\");'>&#187;</span>";
-		return link+"<span  onclick='gf.selectNode(\""+node.id+"\");' class='"+node_class+"'>"+label+"</span>";
+		var link = "<span class='link_icon'>&#187;</span>";
+		return link+"<span class='"+node_class+"'>"+label+"</span>";
 	},
 	highlightNode: function (id) { 
 		var networkNode = this.Framework.data.nodes[this.Framework.current.network];

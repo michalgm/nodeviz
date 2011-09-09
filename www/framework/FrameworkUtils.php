@@ -47,7 +47,8 @@ function setupHeaders() {
 
 //writelog: writes string out to logfile
 function writelog($string) {
-	global $logdir, $logfile;
+	global $framework_config, $logfile;
+	$logdir = $framework_config['framework_path']."/".$framework_config['log_path'];
 	if (!$logfile) {  //open logfile if it isn't open
 		$logfilename = "$logdir/".basename($_SERVER['PHP_SELF']).".log";
 		$logfile= fopen($logfilename, 'a'); 
