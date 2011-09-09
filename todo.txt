@@ -1,6 +1,11 @@
-* cache and log dirs need to be chmod 777 before log file or specific cache dirs can be created
-* problem when GraphList.js writes out onclick links during listSubNodeEntry: onclick='graphframework.selectNode(\""+node.id+"\");'  it needs to refer to the name of the actuall instance of Graphframework, how can it discover that within the code?
-* graphviz code fails if there is an unescaped \r anywhere in a field or blurb.  Maybe we could add a check to give a warning? otherwise hard to debug
 * clicking on node it sublist seems to put the graph hiliting in a wierd state
-* scroll wheel zoom gets out of sync on chromium, makes it possible to zoom out too far
+
+
+DONE
+* cache and log dirs need to be chmod 777 before log file or specific cache dirs can be created
+	We now gracefully give errors when we can't write or find cache and log dirs
+* graphviz code fails if there is an unescaped \r anywhere in a field or blurb.  Maybe we could add a check to give a warning? otherwise hard to debug
+	We just remove all newlines before sending DOT file to GV
+* problem when GraphList.js writes out onclick links during listSubNodeEntry: onclick='graphframework.selectNode(\""+node.id+"\");'  it needs to refer to the name of the actuall instance of Graphframework, how can it discover that within the code?
 * doesn't apply zoom after initial load
+* scroll wheel zoom gets out of sync on chromium, makes it possible to zoom out too far
