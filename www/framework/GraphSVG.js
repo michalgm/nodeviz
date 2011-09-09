@@ -235,6 +235,23 @@ var GraphSVG = Class.create(GraphImage, {
 	element.setAttribute('class', elementClassName);
     return element;
   },
+  
+  zoomToNode: function(id){
+  		//get the transform of the svg coords to screen coords
+  		var ctm = $(id).getScreenCTM();
+  		//get bounding box for node 
+  		var box = $(id).getBBox();
+  		var p = this.GraphSVGZoom.root.createSVGPoint();
+  		p.x = box.x;
+		p.y = box.y ;
+		//use the transform to move the point to screen coords
+		p = p.matrixTransform(ctm);
+		//correct for differences in screen coords when page is scrolled
+		var offset = $('svg_overlay').viewportOffset();
+		p.x = p.x -offset[0];
+		p.y = p.y -offset[1];
+  		this.GraphSVGZoom.zoom('in',p);
+  }
 
 
 });

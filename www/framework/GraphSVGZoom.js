@@ -294,7 +294,7 @@ GraphSVGZoom.prototype = {
 			this.setCTM($('graph0'), this.resetsvg);
 			return;
 		}
-		if (d < 0 || d > this.zoomlevels) { 
+		if (d < 0 || d > this.zoomlevels) {
 			return;
 		}
 		this.current_zoom = d;

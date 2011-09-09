@@ -164,6 +164,12 @@ GraphFramework.prototype = {
 		});
 		this.requests[this.requests.length+1] = request;
 	},
+	zoomToNode: function(id) {
+		//zooms graph if in svg mode
+		if (this.useSVG ==1) {
+			this.renderers['GraphImage'].zoomToNode(id);
+		}
+	},
 	highlightNode: function(id, noshowtooltip) {
 		id = id.toString();
 		if (! id) { return; }
