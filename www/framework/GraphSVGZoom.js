@@ -67,6 +67,7 @@ GraphSVGZoom.prototype = {
 		this.zoom_delta = .8;
 		this.current_zoom = 1;
 		this.previous_zoom = 1;
+		this.zoom_point = null;
 		if (this.zoomSlider) { 
 			this.zoomSlider.setValue(this.current_zoom);
 		}
@@ -279,6 +280,9 @@ GraphSVGZoom.prototype = {
 		if (d < 0 || d > this.zoomlevels) {
 			return;
 		}
+		if (p) { 
+			this.zoom_point = p;
+		}
 		this.zoomSlider.setValue(d);
 	},
 	SVGzoom: function(d) { 
@@ -288,13 +292,16 @@ GraphSVGZoom.prototype = {
 		var delta = 0.3333333333333333;
 		var z = Math.pow(1 + this.zoom_delta, delta);
 		var g = $("graph0");
-		if (! p) { 
-			var p = this.root.createSVGPoint();
+		var center = '';
+		if (! this.zoom_point) { 
+			center = this.root.createSVGPoint();
 			var dimensions = $(this.GraphSVG.Framework.graphdiv).getDimensions();
-			p.x = this.center.x;
-			p.y = this.center.y;
+			center.x = this.center.x;
+			center.y = this.center.y;
+		} else { 
+			center = this.zoom_point;
 		}
-		p = p.matrixTransform(g.getCTM().inverse());
+		p = center.matrixTransform(g.getCTM().inverse());
 		z = Math.pow(z, zoom_amount);
 		var k = this.root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
 		this.setCTM(g, g.getCTM().multiply(k));
@@ -303,6 +310,7 @@ GraphSVGZoom.prototype = {
 			this.stateTf = $('graph0').getCTM().inverse();
 		}
 		this.stateTf = this.stateTf.multiply(k.inverse());
+		this.zoom_point = null;
 
 	},
 	zoomControlsHTML: "\
