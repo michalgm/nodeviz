@@ -109,12 +109,7 @@ GraphSVGZoom.prototype = {
 		this.zoomSlider = new Control.Slider('zoomHandle', 'zoomSlider', {values: values, range: $R(this.zoomlevels,0), sliderValue: defaultValue,
 			onChange: function(value) { 
 				if(this.current_zoom != value) { 
-					this.zoom(value);
-				}
-			}.bind(this),
-			onSlide: function(value) {
-				if(this.current_zoom != value) { 
-					this.zoom(value);
+					this.SVGzoom(value);
 				}
 			}.bind(this),
 		});
@@ -145,7 +140,7 @@ GraphSVGZoom.prototype = {
 
 		element.setAttribute("transform", s);
 		$('fgraph0').setAttribute("transform", s);
-		this.zoomSlider.setValue(this.current_zoom);
+		//this.zoomSlider.setValue(this.current_zoom);
 		$('image').removeClassName('zoom_'+this.previous_zoom);
 		$('svg_overlay').removeClassName('zoom_'+this.previous_zoom);
 		$('image').addClassName('zoom_'+this.current_zoom);
@@ -241,26 +236,12 @@ GraphSVGZoom.prototype = {
 			return;
 		}
 		var g = $('graph0');
-		//g.style.setProperty('display', 'none', "");
-		//g.hide();
 
-		//if(evt.target.tagName == "svg" || 1) {
-			// Pan mode
-			this.state = 'pan';
+		this.state = 'pan';
 
-			this.stateTf = g.getCTM().inverse();
+		this.stateTf = g.getCTM().inverse();
 
-			this.stateOrigin = this.getEventPoint(evt).matrixTransform(this.stateTf);
-		//} else {
-			// Move mode
-		//	state = 'move';
-
-		//	stateTarget = evt.target;
-
-		//	stateTf = g.getCTM().inverse();
-
-		//	stateOrigin = getEventPoint(evt).matrixTransform(stateTf);
-		//}
+		this.stateOrigin = this.getEventPoint(evt).matrixTransform(this.stateTf);
 	},
 
 /**
@@ -280,30 +261,33 @@ GraphSVGZoom.prototype = {
 		if(this.state == 'pan' || this.state == 'move') {
 			$('graph0').style.removeProperty('display');
 			// Quit pan mode
-			this.state = '';
 		}
+		this.state = '';
 	},
 	zoom: function(d, p) {
-		this.previous_zoom = this.current_zoom;
 		if (d == 'in') { 
-			d = ++this.current_zoom;
+			d = this.current_zoom+ 1;
 		} else if (d == 'out') { 
-			d = --this.current_zoom;
+			d = this.current_zoom- 1;
 		} else if (d == 'reset') {
-			this.current_zoom = 1;
+			d=1;
+			//this.current_zoom = 1;
+			this.zoomSlider.setValue(1);
 			this.setCTM($('graph0'), this.resetsvg);
 			return;
 		}
 		if (d < 0 || d > this.zoomlevels) {
 			return;
 		}
+		this.zoomSlider.setValue(d);
+	},
+	SVGzoom: function(d) { 
+		this.previous_zoom = this.current_zoom;
 		this.current_zoom = d;
 		var zoom_amount = d - this.previous_zoom;
-
 		var delta = 0.3333333333333333;
 		var z = Math.pow(1 + this.zoom_delta, delta);
 		var g = $("graph0");
-		//var p = {'x': ($('svg_overlay').childNodes[0].getBBox().width/2), 'y':($('svg_overlay').childNodes[0].getBBox().height/2)};
 		if (! p) { 
 			var p = this.root.createSVGPoint();
 			var dimensions = $(this.GraphSVG.Framework.graphdiv).getDimensions();
@@ -319,8 +303,8 @@ GraphSVGZoom.prototype = {
 			this.stateTf = $('graph0').getCTM().inverse();
 		}
 		this.stateTf = this.stateTf.multiply(k.inverse());
-	},
 
+	},
 	zoomControlsHTML: "\
 		<div id='zoomcontrols'>\
 			<span id='zoomin' class='zoomin' alt='Zoom In' title='Zoom In'>[+]</span>\
