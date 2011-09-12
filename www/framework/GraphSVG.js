@@ -17,7 +17,7 @@ var GraphSVG = Class.create(GraphImage, {
 		var overlay = responseData.overlay;
 		overlay = overlay.replace("<div id='svg_overlay' style='display: none'>", '');
 		overlay = overlay.replace("</div>", '');
-
+		overlay = overlay.replace(/<svg width=\"[\d\.]+px\" height=\"[\d\.]+px\"/, "<svg width=\""+this.graphDimensions.width+"\" height=\""+this.graphDimensions.height+"\"");
 		//parse the SVG into a new document
 		var dsvg = new DOMParser();
 		dsvg.async = false;
