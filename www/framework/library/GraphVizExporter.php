@@ -186,7 +186,7 @@ class GraphVizExporter {
 			fwrite($origdot, $dotString);
 			fclose($origdot);
 		}
-		$logdir = $framework_config['log_path'];
+		$logdir = $framework_config['framework_path'].'/'.$framework_config['log_path'];
 		if (! is_dir($logdir) || ! is_writable($logdir) || (is_file("$logdir/graphviz.log") && ! is_writable("$logdir/graphviz.log"))) {
 			trigger_error("Unable to write log to log directory '$logdir'", E_USER_ERROR);
 		}
