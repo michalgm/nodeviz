@@ -11,6 +11,7 @@ var GraphSVG = Class.create(GraphImage, {
 		$$('.edge', '#svg', '#graphs', '#svgscreen').each(function(e) { Element.stopObserving(e); });
 	},
 	render: function($super, responseData) { 
+		//console.time('renderSVG');
 		$super();
 		var image = responseData.image;
 		var overlay = responseData.overlay;
@@ -49,6 +50,7 @@ var GraphSVG = Class.create(GraphImage, {
 		//apply the initial filter - this should probably by handled in GraphSVGZoom, but where?
 		$('image').addClassName('zoom_'+this.GraphSVGZoom.current_zoom);
 		$('svg_overlay').addClassName('zoom_'+this.GraphSVGZoom.current_zoom);
+		//console.timeEnd('renderSVG');
 	},
 	setupListeners: function($super) {
 		$super();

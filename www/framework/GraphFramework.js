@@ -154,10 +154,10 @@ GraphFramework.prototype = {
 				var responseData = this.checkResponse(response);
 				if (responseData) {
 					this.data = responseData.graph.data;
-				//	console.time('render');
+					//console.time('render');
 					$H(this.renderers).values().invoke('render', responseData);
 					//this.renderers.GraphImage.renderGraph(data.img, data.overlay);
-				//	console.timeEnd('render');
+					////console.timeEnd('render');
 				//	console.timeEnd('load');
 				}
 			}.bind(this)

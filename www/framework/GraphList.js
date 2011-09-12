@@ -20,6 +20,7 @@ GraphList.prototype = {
 
 	},
 	render: function(responseData) {
+		//console.time('renderList');
 		var data = this.Framework.data;
 		this.nodeLists = new Hash();
 		$(this.listdiv).insert({ top: new Element('ul', {'id': 'list_menu'}) });
@@ -28,30 +29,34 @@ GraphList.prototype = {
 			$('list_menu').insert({ bottom: new Element('li', {'id': nodetype+'_menu'}).update(nodetype)});
 			$(this.listdiv).insert({ bottom: new Element('div', {'id': nodetype+'_list_container', 'class': 'nodelist_container'}) });
 			$(nodetype+'_list_container').insert({top: new Element('div', {'id': nodetype+'_list_header', 'class': 'nodelist_header'}).update('<span class="node_type_label">'+nodetype+' Nodes</span>')});
-			$(nodetype+'_list_container').insert({ bottom: new Element('ul', {'id': nodetype+'_list', 'class': 'nodelist'}) });
 
 			var search = ' <label for="'+nodetype+'_search">Search</label> <input class="node_search" id="'+nodetype+'_search" autocomplete="off" size="20" type="text" value="" /> <div class="autocomplete node_search_list" id="'+nodetype+'_search_list" style="display:none"></div>';
 			$(nodetype+'_list_header').insert({bottom: new Element('div', {'id': nodetype+'_search_container', 'class': 'node_search_container'}).update(search)});
-
+			var nodelist = new Element('ul', {'id': nodetype+'_list', 'class': 'nodelist'});
 			Event.observe($(nodetype+'_menu'), 'click', function(e) { this.displayList(nodetype); }.bind(this));
 			$H(data.nodetypesindex[nodetype]).values().each( function(nodeid) {
 				var node = data.nodes[nodeid];
 				if (node['Name']) { 
 					this.nodeLists[nodetype].set(node['Name'], nodeid);
 				}
-				$(nodetype+'_list').insert({ bottom: new Element('li', {'id': 'list_'+nodeid}) });
-				$('list_'+nodeid).update(this.listNodeEntry(node));
-				$('list_'+nodeid).insert({ bottom: new Element('div', {'id': nodeid+'_sublists', 'class': 'sublists_container'}) });
-				Event.observe($('list_'+nodeid), 'mouseover', function(e) { this.highlightNode(nodeid, 1); }.bind(this.Framework));
-				Event.observe($('list_'+nodeid), 'mouseout', function(e) { this.unhighlightNode(nodeid); }.bind(this.Framework));
-				Event.observe($('list_'+nodeid), 'click', function(e) { this.selectNode(nodeid); }.bind(this.Framework));
-				Event.observe($(nodeid+'_sublists'), 'click', function(e) { e.stop(); }.bind(this.Framework));
-				Event.observe($(nodeid+'_sublists'), 'mouseover', function(e) { e.stop(); }.bind(this.Framework));
+				nodelist_entry = new Element('li', {'id': 'list_'+nodeid});
+				nodelist_entry.update(this.listNodeEntry(node));
+				Event.observe(nodelist_entry, 'mouseover', function(e) { this.highlightNode(nodeid, 1); }.bind(this.Framework));
+				Event.observe(nodelist_entry, 'mouseout', function(e) { this.unhighlightNode(nodeid); }.bind(this.Framework));
+				Event.observe(nodelist_entry, 'click', function(e) { this.selectNode(nodeid); }.bind(this.Framework));
+				nodelist.insert({ bottom: nodelist_entry});
+
+				//setup sub lists
+				var sublists= new Element('div', {'id': nodeid+'_sublists', 'class': 'sublists_container'});
 				$H(data.edgetypes).keys().each( function(edgetype) {
-					this.setupSubLists(node, edgetype, 'from'); 
-					this.setupSubLists(node, edgetype, 'to'); 
+					this.setupSubLists(node, edgetype, 'from', sublists); 
+					this.setupSubLists(node, edgetype, 'to', sublists); 
 				}, this);
+				Event.observe(sublists, 'click', function(e) { e.stop(); }.bind(this.Framework));
+				Event.observe(sublists, 'mouseover', function(e) { e.stop(); }.bind(this.Framework));
+				nodelist.insert({ bottom: sublists});
 			}, this);
+			$(nodetype+'_list_container').insert({ bottom: nodelist });
 			if (this.nodeLists[nodetype].keys()[0]) { 
 				new Autocompleter.Local(nodetype+'_search', nodetype+'_search_list', this.nodeLists[nodetype].keys(), {
 					'fullSearch': true, 
@@ -65,6 +70,7 @@ GraphList.prototype = {
 			}
 		}, this);
 		this.displayList(data.nodetypes[0]);
+		console.timeEnd('renderList');
 	},
 	displayList: function(nodetype) { 
 		oldnodetype = this.Framework.current['nodetype'];
@@ -76,7 +82,7 @@ GraphList.prototype = {
 		$(nodetype+'_menu').addClassName('selected');
 		this.Framework.current['nodetype'] = nodetype;
 	},
-	setupSubLists: function(node, edgetype, direction) { 
+	setupSubLists: function(node, edgetype, direction, sublists) { 
 		var data = this.Framework.data;
 		var dirindex = direction == 'from' ? 0 : 1; 
 		var otherdir = direction == 'from' ? 'to' : 'from';
@@ -85,9 +91,10 @@ GraphList.prototype = {
 		var nodediv = 'list_'+nodeid;
 		if (data.edgetypes[edgetype][dirindex] == nodetype) { 
 			var nodes = [];
-			$H(data.edgetypesindex[edgetype]).values().each( function(edgeid) { 
+			$H(node.relatedNodes).each( function(rnode) {
+				var edgeid = rnode[1][0];
 				var edge = data.edges[edgeid];
-				if (edge[direction+'Id'] == nodeid) { 
+				if (edge['type'] == edgetype && edge[direction+'Id'] == nodeid) { 
 					var snode = data.nodes[data.edges[edgeid][otherdir+'Id']];
 					nodes.push(snode);
 				}
@@ -95,16 +102,19 @@ GraphList.prototype = {
 			if (nodes.size() >= 1) {
 				var sublistdiv = nodediv+'_'+edgetype+'_'+direction;
 				var classes = edgetype+'_list '+direction+'_list';
-				$(nodeid+'_sublists').insert({ bottom: new Element('ul', {'id': sublistdiv,'class':classes}) });
+				var elem = new Element('ul', {'id': sublistdiv,'class':classes});
 				
-				$(sublistdiv).insert({ bottom: new Element('span', {'id': sublistdiv+'_header','class': 'node_type_label'}).update(edgetype+' '+direction+' Nodes') });
+				elem.insert({ bottom: new Element('span', {'id': sublistdiv+'_header','class': 'node_type_label'}).update(edgetype+' '+direction+' Nodes') });
 				nodes.each(function(snode) {
-					$(sublistdiv).insert({ bottom: new Element('li', {'id': sublistdiv+'_'+snode.id}) });
-					$(sublistdiv+'_'+snode.id).update(this.listSubNodeEntry(snode, node, edgetype, direction));
-					Event.observe($(sublistdiv+'_'+snode.id), 'mouseover', function(e) { this.highlightNode(snode.id, 1); }.bind(this.Framework));
-					Event.observe($(sublistdiv+'_'+snode.id), 'mouseout', function(e) { this.unhighlightNode(snode.id); }.bind(this.Framework));
-					Event.observe($(sublistdiv+'_'+snode.id), 'click', function(e) { this.selectNode(snode.id); }.bind(this.Framework));
+					var subelem = new Element('li', {'id': sublistdiv+'_'+snode.id});
+
+					subelem.update(this.listSubNodeEntry(snode, node, edgetype, direction));
+					Event.observe(subelem, 'mouseover', function(e) { this.highlightNode(snode.id, 1); }.bind(this.Framework));
+					Event.observe(subelem, 'mouseout', function(e) { this.unhighlightNode(snode.id); }.bind(this.Framework));
+					Event.observe(subelem, 'click', function(e) { this.selectNode(snode.id); }.bind(this.Framework));
+					elem.insert({ bottom: subelem });
 				}, this);
+				sublists.insert({ bottom: elem });
 			}	
 		}
 	},
