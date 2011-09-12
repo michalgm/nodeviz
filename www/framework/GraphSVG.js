@@ -12,11 +12,11 @@ var GraphSVG = Class.create(GraphImage, {
 	},
 	render: function($super, responseData) { 
 		$super();
-		var image = responseData.img;
+		var image = responseData.image;
 		var overlay = responseData.overlay;
 		overlay = overlay.replace("<div id='svg_overlay' style='display: none'>", '');
 		overlay = overlay.replace("</div>", '');
-		
+		overlay = overlay.replace(/<svg width=\"[\d\.]+px\" height=\"[\d\.]+px\"/, "<svg width=\""+this.graphDimensions.width+"\" height=\""+this.graphDimensions.height+"\"");
 		//parse the SVG into a new document
 		var dsvg = new DOMParser();
 		dsvg.async = false;
@@ -37,39 +37,13 @@ var GraphSVG = Class.create(GraphImage, {
 		$('images').insert(new Element('div', {'id': 'svg_overlay'}));
 		$('svg_overlay').appendChild($('svg_overlay').ownerDocument.importNode(svgdoc.firstChild, true));
 
-		$('image').show();
 
 		$('svg_overlay').style.setProperty('position','absolute', '');
-		//$('svg_overlay').clonePosition($('image'));
 		$('svg_overlay').style.setProperty('top','0px', '');
 		$('svgscreen').style.setProperty('cursor','move', 'important');
 		$('graph0').style.setProperty('opacity', '1', '');
 		$('svg_overlay').style.setProperty('visibility', 'visible', '');
-		//var left = Math.round((parseInt($('graphs').getStyle('width')) - $('svg_overlay').childNodes[0].getAttribute('width').replace('px', ''))/2);
-		//$('svg_overlay').style.setProperty('left',left+'px' , '');
 		$('svg_overlay').style.setProperty('display', 'block','');
-		$('svg_overlay').childNodes[0].setAttribute('width', $('images').getWidth());
-		$('image').childNodes[0].setAttribute('width', $('images').getWidth());
-		$('svg_overlay').childNodes[0].setAttribute('height', $('images').getHeight());
-		$('image').childNodes[0].setAttribute('height', $('images').getHeight());
-
-			/*
-		//Tag and hide second level nodes and edges
-		$H(graphviz).keys().each(function(n) { 
-			if (!graphviz[n]['fromId'] && graphviz[n]['cash'] < 10000) {
-				$(graphviz[n]['id']).setAttribute('class', 'node leveltwo');
-				$('f'+graphviz[n]['id']).setAttribute('class', 'node leveltwo');
-				$H(nodelookup[graphviz[n]['id']]['edges']).keys().each(function(e) {
-					if (graphviz[e]) { 
-						$(e).setAttribute('class', 'edge leveltwo');
-						$('f'+e).setAttribute('class', 'edge leveltwo');
-					}
-				});
-			}
-		});
-			*/
-		//$('graphs').style.height = $('svg_overlay').childNodes[0].getAttribute('height');
-		//$('svg_overlay').clonePosition($('image'), {'setLeft': true});
 		this.setupListeners();
 
 		//apply the initial filter - this should probably by handled in GraphSVGZoom, but where?
@@ -273,7 +247,7 @@ var GraphSVG = Class.create(GraphImage, {
   		node_center.x = box.width /2 + box.x;
 		node_center.y = box.height /2 + box.y;
 
-		center = this.GraphSVGZoom.calculateCenter();
+		var center = this.GraphSVGZoom.calculateCenter();
 		//$('images').insert(new Element('div', {'id': 'centertest', 'style': 'position: absolute; opacity: .2; background: pink; z-index: 1000; top: 0px; left: 0px; width:'+center.x+'px; height: '+center.y+'px;'}));
 		//convert from dom pixels to svg units
 		center = center.matrixTransform(this.GraphSVGZoom.stateTf);
