@@ -27,10 +27,10 @@ var GraphSVG = Class.create(GraphImage, {
 		$('image').appendChild($('image').ownerDocument.importNode(svgdoc.firstChild, true));
 
 		//reset all the ids for the under-image
-		$('svgscreen').setAttribute('id', 'fsvgscreen');
+		$('svgscreen').setAttribute('id', 'underlay_svgscreen');
 		$A($('images').getElementsByTagName('g')).each( function(g) { 
 			var id = $(g).getAttribute('id');
-			$(g).setAttribute('id', 'f'+id);
+			$(g).setAttribute('id', 'underlay_'+id);
 		});
 
 		//insert the svg image again as the overlay
@@ -81,18 +81,17 @@ var GraphSVG = Class.create(GraphImage, {
 		Event.observe($('svgscreen'),'click', this.Framework.unselectNode.bind(this.Framework));
 		Event.observe($('svg_overlay'), 'mousemove', this.mousemove.bind(this));
 		Event.observe($('graphs'), 'mousemove', this.mousemove.bind(this));
-		$$('.node').each( function(n) {
-			if (n.id[0] == 'f') { return; }
+		$$('#svg_overlay .node').each( function(n) {
 			var nodeid = n.id;
 			var node = this.Framework.data.nodes[n.id]
 			if (node['zoom']) { 
 				this.addClassName($(nodeid), 'zoom_'+node['zoom']);
-				this.addClassName($('f'+nodeid), 'zoom_'+node['zoom']);
+				this.addClassName($('underlay_'+nodeid), 'zoom_'+node['zoom']);
 			}
 			if (node['class']) { 
 				node['class'].split(' ').each( function(c) { 
 					this.addClassName($(nodeid), c);	
-					this.addClassName($('f'+nodeid), c);	
+					this.addClassName($('underlay_'+nodeid), c);	
 				}, this);
 			}
 			if (n.childNodes[1]) {
@@ -101,18 +100,17 @@ var GraphSVG = Class.create(GraphImage, {
 				Event.observe(n,'click', function(e) { eval(node.onClick); }.bind(this));
 			}
 		}, this);
-		$$('.edge').each( function(n) {
-			if (n.id[0] == 'f') { return; }
+		$$('#svg_overlay .edge').each( function(n) {
 			var edgeid = n.id;
 			var edge = this.Framework.data.edges[edgeid];
 			if (edge['zoom']) { 
 				this.addClassName($(edgeid), 'zoom_'+edge['zoom']);
-				this.addClassName($('f'+edgeid), 'zoom_'+edge['zoom']);
+				this.addClassName($('underlay_'+edgeid), 'zoom_'+edge['zoom']);
 			}
 			if (edge['class']) { 
 				edge['class'].split(' ').each( function(c) { 
 					this.addClassName($(edgeid), c);	
-					this.addClassName($('f'+edgeid), c);	
+					this.addClassName($('underlay_'+edgeid), c);	
 				}, this);
 			}
 			Event.observe(n,'mouseover', function(eventObject) { eval(edge.onMouseover); }.bind(this));
@@ -214,44 +212,81 @@ var GraphSVG = Class.create(GraphImage, {
 		this.hideSVGElement(id);
 		this.unhighlightNode(id);
 	},
-  hasClassName: function(element, className) {
-    var elementClassName = element.getAttribute('class');
-    return (elementClassName.length > 0 && (elementClassName == className ||
-      new RegExp("(^|\\s)" + className + "(\\s|$)").test(elementClassName)));
-  },
+	hasClassName: function(element, className) {
+		var elementClassName = element.getAttribute('class');
+		return (elementClassName.length > 0 && (elementClassName == className ||
+		new RegExp("(^|\\s)" + className + "(\\s|$)").test(elementClassName)));
+	},
 
-  addClassName: function(element, className) {
-    var elementClassName = element.getAttribute('class');
-    if (!this.hasClassName(element, className))
-      elementClassName += (elementClassName ? ' ' : '') + className;
-	element.setAttribute('class', elementClassName);
-    return element;
-  },
+	addClassName: function(element, className) {
+		var elementClassName = element.getAttribute('class');
+		if (!this.hasClassName(element, className)) {
+			elementClassName += (elementClassName ? ' ' : '') + className;
+		}
+		element.setAttribute('class', elementClassName);
+		return element;
+	},
 
-  removeClassName: function(element, className) {
-	elementClassName = element.getAttribute('class');
-    elementClassName = elementClassName.replace(
-      new RegExp("(^|\\s+)" + className + "(\\s+|$)"), ' ').strip();
-	element.setAttribute('class', elementClassName);
-    return element;
-  },
-  
-  zoomToNode: function(id){
+	removeClassName: function(element, className) {
+		elementClassName = element.getAttribute('class');
+		elementClassName = elementClassName.replace(
+		new RegExp("(^|\\s+)" + className + "(\\s+|$)"), ' ').strip();
+		element.setAttribute('class', elementClassName);
+		return element;
+	},
+
+	zoomToNode: function(id, level) {
+		//Change graph zoom level, centered on center of a node
+	
   		//get the transform of the svg coords to screen coords
   		var ctm = $(id).getScreenCTM();
+	
   		//get bounding box for node 
   		var box = $(id).getBBox();
-  		var p = this.GraphSVGZoom.root.createSVGPoint();
-  		p.x = box.x;
-		p.y = box.y ;
+  		var svg_p = this.GraphSVGZoom.root.createSVGPoint();
+  		svg_p.x = box.width /2 + box.x;
+		svg_p.y = box.height /2  + box.y;
+
 		//use the transform to move the point to screen coords
-		p = p.matrixTransform(ctm);
+		dom_p = svg_p.matrixTransform(ctm);
 		//correct for differences in screen coords when page is scrolled
 		var offset = $('svg_overlay').viewportOffset();
-		p.x = p.x -offset[0];
-		p.y = p.y -offset[1];
-  		this.GraphSVGZoom.zoom('in',p);
-  }
+		dom_p.x = dom_p.x -offset[0];
+		dom_p.y = dom_p.y -offset[1];
 
+		//if no level was passed, default to 'in'
+		level = level != '' ? level : 'in'
+  		this.GraphSVGZoom.zoom(level,dom_p);
+	},
 
+	panToNode: function(id, zoom) {
+		//re-center graph on center of a node, and optionally change zoom level
+	
+  		//get the transform of the svg coords to screen coords
+  		var ctm = $(id).getScreenCTM();
+		var g = $('graph0');
+		this.GraphSVGZoom.stateTf = $('graph0').getCTM().inverse();
+
+  		//get bounding box for node 
+  		var box = $(id).getBBox();
+  		var node_center = this.GraphSVGZoom.root.createSVGPoint();
+  		node_center.x = box.width /2 + box.x;
+		node_center.y = box.height /2 + box.y;
+
+		center = this.GraphSVGZoom.calculateCenter();
+		//$('images').insert(new Element('div', {'id': 'centertest', 'style': 'position: absolute; opacity: .2; background: pink; z-index: 1000; top: 0px; left: 0px; width:'+center.x+'px; height: '+center.y+'px;'}));
+		//convert from dom pixels to svg units
+		center = center.matrixTransform(this.GraphSVGZoom.stateTf);
+
+		//now let's calculate the delta
+		var delta = this.GraphSVGZoom.root.createSVGPoint();
+		delta.x = (center.x - node_center.x);
+		delta.y = (center.y - node_center.y);
+
+		this.GraphSVGZoom.setCTM(g, $('graph0').getCTM().translate(delta.x, delta.y));
+
+		if (typeof(zoom) != 'undefined') {
+			this.zoomToNode(id, zoom);
+		}
+	},
 });

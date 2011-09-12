@@ -114,7 +114,7 @@ GraphSVGZoom.prototype = {
 				}
 			}.bind(this),
 		});
-		this.center = {'x': ($('svg_overlay').childNodes[0].getBBox().width/2), 'y':($('svg_overlay').childNodes[0].getBBox().height/2)};
+		this.center = this.calculateCenter();
 		this.resetsvg = $('graph0').getCTM();
 	},
 
@@ -140,7 +140,7 @@ GraphSVGZoom.prototype = {
 		var s = "matrix(" + matrix.a + "," + matrix.b + "," + matrix.c + "," + matrix.d + "," + matrix.e + "," + matrix.f + ")";
 
 		element.setAttribute("transform", s);
-		$('fgraph0').setAttribute("transform", s);
+		$('underlay_graph0').setAttribute("transform", s);
 		//this.zoomSlider.setValue(this.current_zoom);
 		$('image').removeClassName('zoom_'+this.previous_zoom);
 		$('svg_overlay').removeClassName('zoom_'+this.previous_zoom);
@@ -210,7 +210,6 @@ GraphSVGZoom.prototype = {
 		if(this.state == 'pan') {
 			// Pan mode
 			var p = this.getEventPoint(evt).matrixTransform(this.stateTf);
-
 			this.setCTM(g, this.stateTf.inverse().translate(p.x - this.stateOrigin.x, p.y - this.stateOrigin.y));
 		}
 		/* else if(state == 'move') {
@@ -312,6 +311,12 @@ GraphSVGZoom.prototype = {
 		this.stateTf = this.stateTf.multiply(k.inverse());
 		this.zoom_point = null;
 
+	},
+	calculateCenter: function() {
+  		var center = this.root.createSVGPoint();
+		center.x = $('svg_overlay').viewportOffset()[0] + ($('svg_overlay').getWidth() /2);
+		center.y = $('svg_overlay').viewportOffset()[1] + ($('svg_overlay').getHeight() /2);
+		return center;
 	},
 	zoomControlsHTML: "\
 		<div id='zoomcontrols'>\
