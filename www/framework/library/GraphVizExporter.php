@@ -211,7 +211,7 @@ class GraphVizExporter {
 		
 		$imap = GraphVizExporter::processImap($imap, $datapath, $graphname);
 		
-		$svg = GraphVizExporter::processSVG($svgFile, $datapath, $graphname);
+		$svg = GraphVizExporter::processSVG($svgFile, $datapath, $graph);
 
 		$graphData = GraphVizExporter::processGraphData($graph->data, $datapath, $graphname);
 		
@@ -279,9 +279,10 @@ class GraphVizExporter {
 		return $imap;
 	}
 
-	public static function processSVG($svgFile, $datapath, $graphname) {
+	public static function processSVG($svgFile, $datapath, $graph) {
 		global $old_graphviz;
 		global $framework_config;
+		$graphname = $graph->graphname();
 		#clean up the raw svg
 		$svg = file_get_contents($svgFile);
 		if ($old_graphviz) {
@@ -316,6 +317,16 @@ class GraphVizExporter {
 		$svg = preg_replace("/^<text/m", "<text class='zoom_7'", $svg);
 		$svg = preg_replace("/zoom_7' text-anchor=\"middle\"([^>]+ fill)/", "' text-anchor='end'$1", $svg);
 		$svg = preg_replace("/\.\.\/www\//", "", $svg);
+		//$tf = preg_match("/transform=\"scale(\([\-\.\d]+)\) rotate\(0\) translate\(([\-\.\d]+) ([\-\.\d]+)\)/", $svg);
+
+		#resize the svgscreen polygon to fill up the entire allotted graph viewable area
+		#(we need to convert coords from pixel values to scaled svg)
+		preg_match("/transform=\"scale\(([\d\.\-]+) ([\d\.\-]+)?\)/", $svg, $tf);
+		if(!$tf[2]) { $tf[2] = $tf[1]; }
+		$converted_width = $graph->width / $tf[1];
+		$converted_height = $graph->height / $tf[2];
+		$points = "0,0 0,-$converted_height $converted_width,-$converted_height $converted_width,0 0,0";
+		$svg = preg_replace('/(<polygon id=\'svgscreen\'.*?" points=)"([^"]+)"/', "$1\"$points\"", $svg);
 
 		#pull out all the node x values
 		/*
