@@ -31,7 +31,7 @@
 	#tables ul ul, #cotables ul ul {width:285px; overflow: hidden; }
 
 	.nodeselector { display: none; }
-	#candidateList .nodeselector, #companyList .nodeselector { display: inline; }
+
 
 	/* Node Search */
 	
@@ -46,38 +46,17 @@
 	.node_search_list li:nth-child(odd) {background:#eee;}
 	.node_search_list li.selected {background:#BA8D72;}
 
-	#candidateInfo, #companyInfo {clear:both; height:auto; margin:0;}
-	#candidateInfo ul, #companyInfo ul {height:615px; overflow:hidden; overflow-y:scroll;}
-	li.mini #candidateInfo ul, li.mini #companyInfo ul {height:auto;}
-	
-	#candidatedetailstable, #companydetailstable {clear:left;}
-	
-	li.sub {position:relative; height:auto; width:100%; padding:5px; background:#fff; overflow:hidden; cursor: pointer;}
-	li.sub.odd {background:#dfd;}
-	li.sub:hover {background-color:#cbd; }
-	li.sub img.portrait {display:block; float:left; height:16px; width:16px; margin:0 5px 0 0; border:1px solid #fff !important; -webkit-box-shadow:0 2px 2px rgba(0,0,0,0.25); -moz-box-shadow:0 2px 2px rgba(0,0,0,0.25);}
-	li.sub p.name {float:left; margin:0 10px 0 0; padding:0; width:150px; color:#333; line-height:18px; font-size:10px;}
-	li.sub p.contributions {float:left; margin:0 15px 0 0; padding:0; width:50px; font-size:12px; text-align:left;}
-	li.sub a.zoom, li.sub a.go {float:left; width:20px; text-indent:-9999px;}
 	
 	.norelationships {background-color:#EEEEEE;padding:5px;color:#999999;}
 	
-	li.sub.selected {height:auto;}
 	
 	#images {text-align:left;}
 
 
-	/*prop23*/
-	#candidateInfo, #companyInfo {clear:both; height:auto; margin:0;  background-color: white; padding: 0px 5px;}
-	#candidateInfo ul, #companyInfo ul {max-height:100px; overflow:hidden; overflow-y:auto; height: auto; clear: both; padding-bottom: 5px; }
-	.comheader a { margin-bottom: 5px;}
-	#tables, #cotables {height: auto;  -webkit-box-shadow:0 2px 2px rgba(0,0,0,0.25); -moz-box-shadow:0 2px 2px rgba(0,0,0,0.25); }
-	li.mini.selected { display:block }
-	li.mini {display:none;}
+
 
 	#lists {float: right; height:90%; width:30%; background:#B2B7A1; border-radius:0 0 10px 0;}
 	#graphs { width: 70%; height: 90%;}
-	/*.mini.selected .close { display: none; }*/
 
 	#zoomcontrols fieldset.slider {width: 126px;}
 	#zoomcontrols div.slider {position:relative; float:right; margin:3px; height:12px; width:90px; background:#999;}
