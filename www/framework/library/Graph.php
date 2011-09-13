@@ -77,7 +77,7 @@ class Graph {
 				}
 			}
 		}
-		
+
 		return $this;	
 	}
 
@@ -114,25 +114,7 @@ class Graph {
 			}
 		}
 
-		//Get rid of any isolated nodes if retainIsolates is set to 0
-		if (! isset($this->data['properties']['retainIsolates'])) {
-			foreach (array_keys($this->data['nodes']) as $id) {
-				$test = 0;
-				foreach (array_keys($this->data['edges']) as $edgeid) {
-					//if (! isset($this->data['edges'][$edgeid]['toId'])) { print_r($this->data['edges'][$edgeid]); print $edgeid;}
-					if ($this->data['edges'][$edgeid]['toId'] == $id || $this->data['edges'][$edgeid]['fromId'] == $id) { $test = 1; }
-				}
-				if (! $test) { 
-					//This node is not associated with any edges, so we remove it from the nodes and nodetypesindex arrays
-					$nodetype = $this->data['nodes'][$id]['type'];
-					unset($this->data['nodes'][$id]); 
-					$index = array_search($id, $this->data['nodetypesindex'][$nodetype]);
-					if ($index) {
-						unset($this->data['nodetypesindex'][$nodetype][$index]); 
-					}
-				}
-			}
-		}
+		$this->checkIsolates();
 
 		foreach ($this->data['nodetypes'] as $nodetype) {
 			$function =  "$nodetype"."_nodeProperties";
@@ -142,9 +124,12 @@ class Graph {
 					unset($this->data['nodes'][$node['id']]); //need to unset to inherit new order
 					$this->data['nodes'][$node['id']] = $node;
 					$this->data['nodes'][$node['id']]['type'] = $nodetype;
+					$this->data['nodes'][$node['id']]['relatedNodes'] = array();
 				}
 			}
 		}
+
+		$this->checkIsolates();
 
 		foreach (array_keys($this->data['edgetypes']) as $edgetype) {
 			$function =  "$edgetype"."_edgeProperties";
@@ -157,6 +142,9 @@ class Graph {
 				}
 			}
 		}
+
+		$this->checkIsolates();
+	
 		//Populate the related nodes fields for each node by stepping through the edges
 		foreach ($this->data['edges'] as $edge) {
 			if (! $edge['toId']) { print 'none!'; print_r($edge); } 
@@ -258,4 +246,28 @@ class Graph {
 		if ($debug) { $this->data['queries'][$name] = $query; }	
 	}
 
+	function checkIsolates() {
+		//Get rid of any isolated nodes if retainIsolates is set to 0
+		if (isset($this->data['properties']['removeIsolates'])) {
+			foreach (array_keys($this->data['nodes']) as $id) {
+				$has_edges = 0;
+				foreach (array_keys($this->data['edges']) as $edgeid) {
+					//if (! isset($this->data['edges'][$edgeid]['toId'])) { print_r($this->data['edges'][$edgeid]); print $edgeid;}
+					if ($this->data['edges'][$edgeid]['toId'] == $id || $this->data['edges'][$edgeid]['fromId'] == $id) { 
+						$has_edges = 1; 
+						continue;
+					}
+				}
+				if (! $has_edges) { 
+					//This node is not associated with any edges, so we remove it from the nodes and nodetypesindex arrays
+					$nodetype = $this->data['nodes'][$id]['type'];
+					unset($this->data['nodes'][$id]); 
+					$index = array_search($id, $this->data['nodetypesindex'][$nodetype]);
+					if ($index) {
+						unset($this->data['nodetypesindex'][$nodetype][$index]); 
+					}
+				}
+			}
+		}
+	}
 }
