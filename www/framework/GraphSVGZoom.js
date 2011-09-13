@@ -311,8 +311,8 @@ GraphSVGZoom.prototype = {
 	},
 	calculateCenter: function() {
   		var center = this.root.createSVGPoint();
-		center.x = $('svg_overlay').cumulativeOffset()[0] + ($('svg_overlay').getWidth() /2);
-		center.y = $('svg_overlay').cumulativeOffset()[1] + ($('svg_overlay').getHeight() /2);
+		center.x = $('svg_overlay').positionedOffset()[0] + ($('svg_overlay').getWidth() /2);
+		center.y = $('svg_overlay').positionedOffset()[1] + ($('svg_overlay').getHeight() /2);
 		return center;
 	},
 	zoomControlsHTML: "\
