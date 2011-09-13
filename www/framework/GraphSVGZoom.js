@@ -293,10 +293,7 @@ GraphSVGZoom.prototype = {
 		var g = $("graph0");
 		var center = '';
 		if (! this.zoom_point) { 
-			center = this.root.createSVGPoint();
-			var dimensions = $(this.GraphSVG.Framework.graphdiv).getDimensions();
-			center.x = this.center.x;
-			center.y = this.center.y;
+			center = this.calculateCenter();
 		} else { 
 			center = this.zoom_point;
 		}
@@ -314,8 +311,8 @@ GraphSVGZoom.prototype = {
 	},
 	calculateCenter: function() {
   		var center = this.root.createSVGPoint();
-		center.x = $('svg_overlay').viewportOffset()[0] + ($('svg_overlay').getWidth() /2);
-		center.y = $('svg_overlay').viewportOffset()[1] + ($('svg_overlay').getHeight() /2);
+		center.x = $('svg_overlay').cumulativeOffset()[0] + ($('svg_overlay').getWidth() /2);
+		center.y = $('svg_overlay').cumulativeOffset()[1] + ($('svg_overlay').getHeight() /2);
 		return center;
 	},
 	zoomControlsHTML: "\
