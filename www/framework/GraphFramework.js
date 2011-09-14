@@ -157,6 +157,9 @@ GraphFramework.prototype = {
 					//console.time('render');
 					$H(this.renderers).values().invoke('render', responseData);
 					//this.renderers.GraphImage.renderGraph(data.img, data.overlay);
+					if (this.graphLoaded) {
+						this.graphLoaded();
+					}
 					////console.timeEnd('render');
 				//	console.timeEnd('load');
 				}
