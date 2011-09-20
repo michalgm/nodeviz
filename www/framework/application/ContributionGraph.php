@@ -32,7 +32,9 @@ class ContributionGraph extends Graph {
 			'maxSize' => array('companies' => '15', 'org2org' =>'250','orgOwnOrg' =>'4'),
 			'sitecode' => 'prop23',
 			'prop' => '23',
-			'candidateFilterIndex' => 0
+			'candidateFilterIndex' => 0,
+			'removeIsolates' => 1,
+			'log' => 0
 		);
 		// special properties for controling layout software
 		//BROKEN, USE GV PARAMS
