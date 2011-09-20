@@ -33,7 +33,7 @@ class Graph {
 	//Defines the graph's name if it isn't already set, then returns it
 	function graphname() {
 		if (! $this->name) { 
-			$this->name = crc32(serialize($this));
+			$this->name = crc32(serialize($this->data['properties']));
 			//set the name
 		}
 		return $this->name;
@@ -174,6 +174,12 @@ class Graph {
 		$graph = &$this->data;
 		$maxSize = $graph['properties']['maxSize'][$type];
 		$minSize = $graph['properties']['minSize'][$type];
+		if (isset($graph['properties']['log'])) {
+			$log = $graph['properties']['log'];
+		} else {
+			$log = 0;
+		}
+
 		$scale = pow($maxSize,2) - pow($minSize,2);  //the range we actually want
 		$vals = array();
 		
@@ -183,14 +189,26 @@ class Graph {
 				$shape = $array[key($array)]['shape'];
 				//load all the cash into an array
 				foreach($array as $node) { $vals[] =  $node[$key]; }
-				$diff = max($vals) - min($vals);  //figure out the data range
+
 				$min = min($vals);
+				$max = max($vals);
+				$adj_min = $min + abs($min)+1;
+				$adj_max = $max + abs($min)+1;
+				if ($log) {
+					$diff = log($adj_max, $log) - log($adj_min, $log);  //figure out the data range
+				} else {
+					$diff = $max - $min;  //figure out the data range
+				}
 				foreach(array_keys($array) as $id) {
 					if ($diff == 0) {  // if all nodes are the same size, use max
 						$array[$id]['size']	= $maxSize;
 					} else {
-						 $normed = ($array[$id][$key] - $min) / $diff; //normalize it to the range 0-1
-						 $area = ($normed * $scale) + pow($minSize,2);  //adjust to value we want
+						if ($log) { 
+							$normed = (log($array[$id][$key]+abs($min)+1, $log) - log($adj_min, $log)) / $diff; //normalize it to the range 0-1
+						} else {
+							$normed = ($array[$id][$key] - $min) / $diff; //normalize it to the range 0-1
+						}
+						$area = ($normed * $scale) + pow($minSize,2);  //adjust to value we want
 						 //now calculate appropriate with from area depending on shape
 						if ($shape == 'circle') { 
 							$size = sqrt(abs($area)/pi())*2;  //get radius and multiple by 2 for diameter
@@ -198,6 +216,7 @@ class Graph {
 							$size = sqrt(abs($area));
 						}
 						//$factor = $amount/$diff;
+						$array[$id]['normed']	= $normed ;
 						$array[$id]['size']	= $size ;
 					}
 				}
@@ -270,4 +289,21 @@ class Graph {
 			}
 		}
 	}
+
+	function getNodesByType($type) {
+		$nodes = array();
+		foreach($this->data['nodetypesindex'][$type] as $id) {
+			$nodes[$id] = $this->data['nodes'][$id];
+		}
+		return $nodes;	
+	}
+
+	function getEdgesByType($type) {
+		$edges = array();
+		foreach($this->data['edgetypesindex'][$type] as $id) {
+			$edges[$id] = $this->data['edges'][$id];
+		}
+		return $edges;	
+	}
+
 }
