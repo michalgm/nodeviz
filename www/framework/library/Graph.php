@@ -182,59 +182,54 @@ class Graph {
 
 		$vals = array();
 		
-		if (isset($graph['nodetypesindex'][$type])) {	
-			reset($array);
-			if (key($array)) { 
+		//if (isset($graph['nodetypesindex'][$type])) {	
+		reset($array);
+		if (key($array)) { 
+			if(isset($graph['nodetypesindex'][$type])) {
 				$shape = $array[key($array)]['shape'];
-				if ($shape == 'circle') { 
-					$scale = pow($maxSize,2)*pi() - pow($minSize,2)*pi();  //the range we actually want
-				} else {
-					$scale = pow($maxSize,2) - pow($minSize,2);  //the range we actually want
-				}
-				//load all the cash into an array
-				foreach($array as $node) { $vals[] =  $node[$key]; }
-
-				$min = min($vals);
-				$max = max($vals);
-				$adj_min = $min + abs($min)+1;
-				$adj_max = $max + abs($min)+1;
-				if ($log) {
-					$diff = log($adj_max) - log($adj_min);  //figure out the data range
-				} else {
-					$diff = $max - $min;  //figure out the data range
-				}
-				foreach(array_keys($array) as $id) {
-					if ($diff == 0) {  // if all nodes are the same size, use max
-						$array[$id]['size']	= $maxSize;
-					} else {
-						if ($log) { 
-							$normed = (log($array[$id][$key]+abs($min)+1) - log($adj_min)) / $diff; //normalize it to the range 0-1
-						} else {
-							$normed = ($array[$id][$key] - $min) / $diff; //normalize it to the range 0-1
-						}
-						 //now calculate appropriate with from area depending on shape
-						if ($shape == 'circle') { 
-							$area = ($normed * $scale) + pow($minSize,2)*pi();  //adjust to value we want
-							$size = sqrt(abs($area)/pi())*2;  //get radius and multiple by 2 for diameter
-						} else {
-							$area = ($normed * $scale) + pow($minSize,2);  //adjust to value we want
-							$size = sqrt(abs($area));
-						}
-						//$factor = $amount/$diff;
-						$array[$id]['size']	= $size ;
-					}
-				}
+			} else {
+				$shape = 'edge';
 			}
-		} else if ($graph['edgetypesindex'][$type]) {
+			if ($shape == 'edge') {
+				$scale = $maxSize - $minSize;  //the range we actually want
+			} else if ($shape == 'circle') { 
+				$scale = pow($maxSize,2)*pi() - pow($minSize,2)*pi();  //the range we actually want
+			} else {
+				$scale = pow($maxSize,2) - pow($minSize,2);  //the range we actually want
+			}
+			//load all the cash into an array
 			foreach($array as $node) { $vals[] =  $node[$key]; }
-			$diff = max($vals) - min($vals);
+
+			$min = min($vals);
+			$max = max($vals);
+			$adj_min = $min + abs($min)+1;
+			$adj_max = $max + abs($min)+1;
+			if ($log) {
+				$diff = log($adj_max) - log($adj_min);  //figure out the data range
+			} else {
+				$diff = $max - $min;  //figure out the data range
+			}
 			foreach(array_keys($array) as $id) {
-				if ($diff == 0) {
+				if ($diff == 0) {  // if all nodes are the same size, use max
 					$array[$id]['size']	= $maxSize;
 				} else {
-					$amount = $array[$id][$key] - min($vals);
-					$factor = $amount/$diff;
-					$array[$id]['size'] = ($factor * ($maxSize - $minSize)) + $minSize;	
+					if ($log) { 
+						$normed = (log($array[$id][$key]+abs($min)+1) - log($adj_min)) / $diff; //normalize it to the range 0-1
+					} else {
+						$normed = ($array[$id][$key] - $min) / $diff; //normalize it to the range 0-1
+					}
+					 //now calculate appropriate with from area depending on shape
+					if ($shape == 'edge') { 
+						$size = ($normed * $scale) + $minSize;  //adjust to value we want
+					} else if ($shape == 'circle') { 
+						$area = ($normed * $scale) + pow($minSize,2)*pi();  //adjust to value we want
+						$size = sqrt(abs($area)/pi())*2;  //get radius and multiple by 2 for diameter
+					} else {
+						$area = ($normed * $scale) + pow($minSize,2);  //adjust to value we want
+						$size = sqrt(abs($area));
+					}
+					//$factor = $amount/$diff;
+					$array[$id]['size']	= $size ;
 				}
 			}
 		}
