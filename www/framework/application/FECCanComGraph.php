@@ -42,7 +42,8 @@ class FECCanComGraph extends Graph {
 			//sets the scaling of the elements in the gui
 			'minSize' => array('candidates' => '.25', 'companies' => '.25', 'com2can' =>'1'),
 			'maxSize' => array('candidates' => '3', 'companies' => '3', 'com2can' =>'80'),
-			'sitecode' => 'carbon'
+			'sitecode' => 'carbon',
+			'log'=>0
 		);
 		// special properties for controling layout software
 		//BROKEN, USE GV PARAMS
