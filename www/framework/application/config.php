@@ -1,5 +1,4 @@
 <?php
-include_once("utils.php");
 include_once("oc_utils.php");
 include_once("dbaccess.php");
 /*
