@@ -174,19 +174,23 @@ class Graph {
 		$graph = &$this->data;
 		$maxSize = $graph['properties']['maxSize'][$type];
 		$minSize = $graph['properties']['minSize'][$type];
-		if (isset($graph['properties']['log'])) {
-			$log = $graph['properties']['log'];
+		if (isset($graph['properties']['log_scaling'])) {
+			$log = $graph['properties']['log_scaling'];
 		} else {
 			$log = 0;
 		}
 
-		$scale = pow($maxSize,2) - pow($minSize,2);  //the range we actually want
 		$vals = array();
 		
 		if (isset($graph['nodetypesindex'][$type])) {	
 			reset($array);
 			if (key($array)) { 
 				$shape = $array[key($array)]['shape'];
+				if ($shape == 'circle') { 
+					$scale = pow($maxSize,2)*pi() - pow($minSize,2)*pi();  //the range we actually want
+				} else {
+					$scale = pow($maxSize,2) - pow($minSize,2);  //the range we actually want
+				}
 				//load all the cash into an array
 				foreach($array as $node) { $vals[] =  $node[$key]; }
 
@@ -195,7 +199,7 @@ class Graph {
 				$adj_min = $min + abs($min)+1;
 				$adj_max = $max + abs($min)+1;
 				if ($log) {
-					$diff = log($adj_max, $log) - log($adj_min, $log);  //figure out the data range
+					$diff = log($adj_max) - log($adj_min);  //figure out the data range
 				} else {
 					$diff = $max - $min;  //figure out the data range
 				}
@@ -204,19 +208,19 @@ class Graph {
 						$array[$id]['size']	= $maxSize;
 					} else {
 						if ($log) { 
-							$normed = (log($array[$id][$key]+abs($min)+1, $log) - log($adj_min, $log)) / $diff; //normalize it to the range 0-1
+							$normed = (log($array[$id][$key]+abs($min)+1) - log($adj_min)) / $diff; //normalize it to the range 0-1
 						} else {
 							$normed = ($array[$id][$key] - $min) / $diff; //normalize it to the range 0-1
 						}
-						$area = ($normed * $scale) + pow($minSize,2);  //adjust to value we want
 						 //now calculate appropriate with from area depending on shape
 						if ($shape == 'circle') { 
+							$area = ($normed * $scale) + pow($minSize,2)*pi();  //adjust to value we want
 							$size = sqrt(abs($area)/pi())*2;  //get radius and multiple by 2 for diameter
 						} else {
+							$area = ($normed * $scale) + pow($minSize,2);  //adjust to value we want
 							$size = sqrt(abs($area));
 						}
 						//$factor = $amount/$diff;
-						$array[$id]['normed']	= $normed ;
 						$array[$id]['size']	= $size ;
 					}
 				}
