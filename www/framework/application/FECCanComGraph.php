@@ -28,9 +28,6 @@ class FECCanComGraph extends Graph {
 			'electionyear' => '00',
 			'congress_num' => '110',
 			'racecode' => 'S',
-			//'minCandidateAmount' =>'-99999999',
-			//'minCompanyAmount' => '-99999999',
-			//'minContribAmount' => '-99999999',
 			'minCandidateAmount' =>'122750',
 			'minCompanyAmount' => '31600',
 			'minContribAmount' => '2500',
@@ -52,7 +49,7 @@ class FECCanComGraph extends Graph {
 		$this->data['graphvizProperties'] = array(
 			'graph'=> array(
 				'bgcolor'=>'#FFFFFF',
-#				'size' => '6.52,6.52!',
+				//'size' => '6.52,6.52!'
 			),
 			'node'=> array('label'=> ' ', 'imagescale'=>'true','fixedsize'=>1, 'style'=> 'setlinewidth(7), filled', 'regular'=>'true'),
 			'edge'=>array('len'=>8, 'arrowhead'=>'none', 'color'=>'#66666666')
@@ -66,14 +63,12 @@ class FECCanComGraph extends Graph {
 
 	function candidates_fetchNodes() {
 		$graph = &$this->data;
-		$precheck = "";
 		if ($graph['properties']['candidateids']) {
-			$results = array();
 			foreach (explode(',', $graph['properties']['candidateids']) as $id) { 
-				$results[$id] = Array();
-				$results[$id]['id'] = $id;
+				$graph['nodes']['candidates'][$id] = Array();
+				$graph['nodes']['candidates'][$id]['id'] = $id;
 			}
-			return $results;
+			return $graph;
 		}
 		$congress_num = $graph['properties']['congress_num'];
 		$racecode = $graph['properties']['racecode'];
@@ -82,21 +77,16 @@ class FECCanComGraph extends Graph {
 			$racecode_filter = 'and '.$this->racecode_filter_values[$racecode];
 		}
 		$minCandidateAmount = $graph['properties']['minCandidateAmount'];
-		$allcandidates = " join congressmembers d on a.candidateid = d.fec_id and a.congress_num = d.congress_num ";
-		if (is_numeric($congress_num)) { 
+		$candidates = "congressmembers ";
+		$congress = "a.congress_num = c.congress_num and ";
+		if (is_numeric($congress_num) || $congress_num == 'pre') { 
+			$congress_num = $congress_num == 'pre' ? 1 : $congress_num;
 			$congress = "a.congress_num = '$congress_num' and c.congress_num = '$congress_num' and "; 
-		} else {
-			if ($congress_num == 'pre' && $graph['properties']['companyids'] ) {
-				$precheck = " left join congressmembers b on c.candidateid = b.fec_id and c.congress_num = b.congress_num ";
-				$congress = " c.companyid = '".$graph['properties']['companyids']."' and b.fec_id is null and ";
-			} else { 
-				$congress = "a.congress_num = c.congress_num and";
-			}
-		}
-		if ($graph['properties']['allcandidates'] == 1 || $racecode == 'P') { $allcandidates = ""; }
+		} 
+		if ($graph['properties']['allcandidates'] == 1 || $racecode == 'P') { $candidates = "pres_candidates"; }
 		if ($graph['properties']['sitecode'] != 'carbon') { $sitecode = " and sitecode = '".$graph['properties']['sitecode']."' "; } else { $sitecode = ""; }
 
-		$query ="select a.CandidateID as id from candidates a join contributions c on a.CandidateID = c.CandidateID $precheck $allcandidates where $congress c.congress_num is not null $racecode_filter $sitecode group by a.CandidateID having sum(amount) >= $minCandidateAmount order by sum(amount) desc";
+		$query ="select a.crpcandid as id from $candidates a join contributions c on a.crpcandid = c.recipient_id where $congress c.congress_num is not null $racecode_filter $sitecode group by a.crpcandid having sum(amount) >= $minCandidateAmount order by sum(amount) desc, a.crpcandid";
 		$this->addquery('candidates', $query, $graph);
 
 		$result = dbLookupArray($query);
@@ -118,27 +108,20 @@ class FECCanComGraph extends Graph {
 		$racecode = $graph['properties']['racecode'];
 		$racecode_filter = $this->racecode_filter_values[$racecode];
 		$minCompanyAmount = $graph['properties']['minCompanyAmount'];
-		$allcandidates = " join congressmembers d on a.candidateid = d.fec_id and a.congress_num = d.congress_num ";
 		$limit = "";
 		$sitecode = "";
+		$candidates = "congressmembers ";
 		if ($graph['properties']['sitecode'] != 'carbon') { $sitecode = " and sitecode = '".$graph['properties']['sitecode']."' "; }
-		$congress = "";
-		if (is_numeric($congress_num)) { 
+		$congress = "a.congress_num = c.congress_num and ";
+		if (is_numeric($congress_num) || $congress_num == 'pre') { 
+			$congress_num = $congress_num == 'pre' ? 1 : $congress_num;
 			$congress = "a.congress_num = '$congress_num' and c.congress_num = '$congress_num' and "; 
-		} else if ($congress_num == 'pre') {
-			if ($graph['properties']['candidateids']) { 
-				$cnumquery = "select a.congress_num from contributions a left join congressmembers b on candidateid = b.fec_id and a.congress_num = b.congress_num where b.congress_num is null and a.congress_num is not null and a.CandidateID = '".$graph['properties']['candidateids']."' $sitecode group by a.congress_num";
-				$congress_nums = arrayValuesToInString(fetchCol($cnumquery));
-				$congress = " a.congress_num in($congress_nums) and";
-			}
-		}
-		if ($graph['properties']['allcandidates'] || $racecode == 'P' || isset($graph['properties']['candidateids'][0])) { $allcandidates = ""; }
-		$query ="select CompanyID as id from contributions a join candidates c use index(CandidateID) on a.CandidateID = c.CandidateID $allcandidates where $congress $racecode_filter and a.congress_num is not null $sitecode group by a.COmpanyID having sum(amount) >= $minCompanyAmount order by sum(amount) desc";
+		} 
+		if ($graph['properties']['allcandidates'] == 1 || $racecode == 'P') { $candidates = "pres_candidates"; }
+		$query ="select CompanyID as id from contributions a join $candidates c on a.recipient_id = c.crpcandid where $congress $racecode_filter and a.congress_num is not null $sitecode group by a.COmpanyID having sum(amount) >= $minCompanyAmount order by sum(amount) desc, CompanyID";
 		$this->addquery('companies', $query, $graph);
 		$result = dbLookupArray($query);
-		//$result['S6OR00094'] = array();
-		//$result['S6OR00094']['id'] = 'S6OR00094';
-		#$graph['nodes']['companies'] = $result;
+		//$graph['nodes']['companies'] = $result;
 		return $result;
 	}
 
@@ -167,15 +150,10 @@ class FECCanComGraph extends Graph {
 			$breakdown = ", format(sum(if(sitecode='coal', amount, 0)), 0) as coalcash, format(sum(if(sitecode='oil', amount, 0)),0) as oilcash ";
 		}
 
-		$congress = "";
-		if (is_numeric($congress_num)) { 
+		$congress = "a.congress_num = c.congress_num and ";
+		if (is_numeric($congress_num) || $congress_num == 'pre') { 
+			$congress_num = $congress_num == 'pre' ? 1 : $congress_num;
 			$congress = "a.congress_num = '$congress_num' and c.congress_num = '$congress_num' and "; 
-		} else if ($congress_num == 'pre') {
-			if ($graph['properties']['candidateids']) { 
-				$cnumquery = "select a.congress_num from contributions a left join congressmembers b on candidateid = b.fec_id and a.congress_num = b.congress_num where b.congress_num is null and a.congress_num is not null and a.CandidateID = '".$graph['properties']['candidateids']."' $sitecode group by a.congress_num";
-				$congress_nums = arrayValuesToInString(fetchCol($cnumquery));
-				$congress = " c.congress_num in($congress_nums) and";
-			}
 		} 
 		if ($graph['properties']['companyids']) {
 			$company_ids = " and c.Companyid in (".arrayToInString($graph['nodes']['companies']).") ";
@@ -185,11 +163,14 @@ class FECCanComGraph extends Graph {
 		if ($graph['properties']['candidateLimit']) { $limit = " limit ".$graph['properties']['candidateLimit']; }
 		$idlist = arrayToInString($graph['nodetypesindex']['candidates']);
 		if ($graph['properties']['allcandidates'] || $racecode == 'P') { 
-			$cantable = "select CandidateID, CandidateName, substr(PartyDesignation1,1,1) as PartyDesignation1, currentdistrict, campaignstate, congress_num from candidates a where a.CandidateID in ($idlist) ";
+			$cantable = "select crpcandid as CandidateID, CandidateName, substr(PartyDesignation1,1,1) as PartyDesignation1, currentdistrict, campaignstate, congress_num from pres_candidates a where a.crpcandid in ($idlist) ";
 		} else { 
-			$cantable = "select fec_id as candidateid, concat(lastname, ', ', firstname) as CandidateName, party as PartyDesignation1, district as currentdistrict, state_abbreviation as campaignstate, congress_num from congressmembers a where fec_id in ($idlist)";
+			$cantable = "select crpcandid as candidateid, concat(lastname, ', ', firstname) as CandidateName, party as PartyDesignation1, district as currentdistrict, state_abbreviation as campaignstate, congress_num from congressmembers a where crpcandid in ($idlist)";
 		}
-		$query ="select a.CandidateID as id,  CandidateName as Name, PartyDesignation1, sum(Amount) as cash, format(sum(Amount),0) as nicecash ,max(Amount+0) as max, min(Amount+0) as min, currentdistrict, campaignstate, if(d.congress_num = $current_congress, 1, 0) as current_member $breakdown from ($cantable) a join contributions c on a.CandidateID = c.CandidateID left join (select fec_id, max(congress_num) as congress_num from congressmembers group by fec_id) d on d.fec_id = a.CandidateID where $congress c.congress_num is not null $racecode_filter $company_ids $sitecode group by a.CandidateID order by cash desc $limit";
+		if (! is_numeric($congress_num) ) {
+			$cantable .= ' group by CandidateID, congress_num ';
+		}
+		$query ="select a.CandidateID as id,  CandidateName as Name, PartyDesignation1, sum(Amount) as cash, format(sum(Amount),0) as nicecash ,max(Amount+0) as max, min(Amount+0) as min, currentdistrict, campaignstate, if(d.congress_num = $current_congress, 1, 0) as current_member $breakdown from ($cantable) a join contributions c on a.CandidateID = c.recipient_id left join (select crpcandid, max(congress_num) as congress_num from congressmembers group by crpcandid) d on d.crpcandid = a.CandidateID where $congress c.congress_num is not null $racecode_filter $company_ids $sitecode group by a.CandidateID order by cash desc, a.CandidateID $limit";
 		$this->addquery('candidates_props', $query, $graph);
 		$nodes = dbLookupArray($query);
 		#$graph['nodes']['candidates'] = $nodes;
@@ -238,25 +219,26 @@ class FECCanComGraph extends Graph {
 			$breakdown = ", format(sum(if(sitecode='coal', amount, 0)), 0) as coalcash, format(sum(if(sitecode='oil', amount, 0)),0) as oilcash ";
 		}
 
+		$congressmembers = "congressmembers";
+		if ($racecode == 'P') { 
+			$congressmembers = "pres_candidates";
+		}
 		if (is_numeric($congress_num)) { 
 			$congress = "a.congress_num = '$congress_num' and c.congress_num = '$congress_num' and "; 
-		} else if ($congress_num == 'total') {
-			$congress = "a.congress_num = c.congress_num and";
-		} else if ($congress_num == 'pre') {
-			if ($graph['properties']['candidateids']) { 
-				$cnumquery = "select a.congress_num from contributions a left join congressmembers b on candidateid = b.fec_id and a.congress_num = b.congress_num where b.congress_num is null and a.congress_num is not null and a.CandidateID = '".$graph['properties']['candidateids']."' $sitecode group by a.congress_num";
-				$congress_nums = arrayValuesToInString(fetchCol($cnumquery));
-				$congress = " a.congress_num = c.congress_num and a.congress_num in($congress_nums) and";
-			} else { $congress = "a.congress_num = c.congress_num and"; }
+		} else {
+			$congress = " a.congress_num = c.congress_num and ";
+		}
+		if ($congress_num == 'pre') { 
+			$congress .= " a.congress_num = 1 and ";
 		}
 		if ($graph['properties']['candidateids']) {
-			$candidate_ids = " and a.CandidateID in (".arrayToInString($graph['nodes']['candidates']).") ";
+			$candidate_ids = " and a.recipient_id in (".arrayToInString($graph['nodes']['candidates']).") ";
 		} else { 
 			$candidate_ids = "";
 		}
 		if ($graph['properties']['companyLimit']) { $limit = " limit ".$graph['properties']['companyLimit']; }
 		
-		$query ="select CompanyID as id,b.Name , sum(Amount) as cash, format(sum(Amount),0) as nicecash, max(0 + Amount) as max, min(0 + Amount) as min, image_name as image, if(oil_related < coal_related, 'coal', 'oil') as sitecode $breakdown from contributions a join companies b on a.CompanyID = b.id join candidates c on a.CandidateID = c.CandidateID where $congress a.congress_num is not null and a.CompanyID in ($company_ids) $candidate_ids $racecode_filter $sitecode group by a.COmpanyID order by cash desc $limit";
+		$query ="select CompanyID as id,b.Name , sum(Amount) as cash, format(sum(Amount),0) as nicecash, max(0 + Amount) as max, min(0 + Amount) as min, image_name as image, if(oil_related < coal_related, 'coal', 'oil') as sitecode $breakdown from contributions a join companies b on a.CompanyID = b.id join $congressmembers c on a.recipient_id = c.crpcandid where $congress a.congress_num is not null and a.CompanyID in ($company_ids) $candidate_ids $racecode_filter $sitecode group by a.COmpanyID order by cash desc, CompanyID $limit";
 		$this->addquery('companies_props', $query,$graph);
 		$nodes = dbLookupArray($query);
 		#$graph['nodes']['companies'] = $nodes;
@@ -296,19 +278,13 @@ class FECCanComGraph extends Graph {
 		$limit = "";
 		$sitecode = "";
 		$congress = "";
-		$precheck = "";
 		if ($graph['properties']['sitecode'] != 'carbon') { $sitecode = " and sitecode = '".$graph['properties']['sitecode']."' "; }
-		if ($congress_num == 'pre') {
-			if ($graph['properties']['candidateids']) { 
-				$cnumquery = "select a.congress_num from contributions a left join congressmembers b on candidateid = b.fec_id and a.congress_num = b.congress_num where b.congress_num is null and a.congress_num is not null and a.CandidateID = '".$graph['properties']['candidateids']."' $sitecode group by a.congress_num";
-				$congress_nums = arrayValuesToInString(fetchCol($cnumquery));
-				$congress = " a.congress_num in($congress_nums) and";
-			} else { 
-				$precheck = " left join congressmembers b on candidateid = b.fec_id and a.congress_num = b.congress_num ";
-				$congress = " b.fec_id is null and "; 
-			}
-		} else if (is_numeric($congress_num)) { $congress = "  a.congress_num  = '$congress_num' and"; }
-		$query ="select concat(a.CompanyID, '_', a.CandidateId) as id, a.CandidateID as toId, a.CompanyID as fromId, group_concat(concat(\"'\", a.crp_key, \"'\")) as ContribIDs from contributions a  $precheck where a.CandidateID in ($candidateIds) and a.CompanyID in ($companyIds) and a.congress_num is not null and $congress amount >= $minContribAmount $sitecode group by concat(a.CandidateID, a.CompanyID) order by a.CandidateId, CompanyID desc";
+		if (is_numeric($congress_num)) { 
+			$congress = "  a.congress_num  = '$congress_num' and"; 
+		} elseif ($congress_num == 'pre') {
+			$congress = " a.congress_num = 1 and "; 
+		}
+		$query ="select concat(a.CompanyID, '_', a.recipient_id) as id, a.recipient_id as toId, a.CompanyID as fromId, group_concat(concat(\"'\", a.crp_key, \"'\")) as ContribIDs from contributions a where a.recipient_id in ($candidateIds) and a.CompanyID in ($companyIds) and a.congress_num is not null and $congress amount >= $minContribAmount $sitecode group by concat(a.recipient_id, a.CompanyID) order by a.recipient_id, CompanyID desc";
 
 		// Darrell:  recommend put the abs() around amount in the query above so that returned contributions also show up on the website.
 		//	$query ="select concat(a.CompanyID, '_', a.CandidateId) as id, a.CandidateID as toId, a.CompanyID as fromId, group_concat(concat(\"'\", a.crp_key, \"'\")) as ContribIDs from contributions a  where a.CandidateID in ($candidateIds) and a.CompanyID in ($companyIds) and a.congress_num is not null and $congress abs(amount) >= $minContribAmount group by concat(a.CandidateID, a.CompanyID) order by a.CandidateId, CompanyID desc";
@@ -320,12 +296,12 @@ class FECCanComGraph extends Graph {
 
 	function com2can_edgeProperties() {
 		$graph = &$this->data;
+		global $debug;
 		$congress_num = $graph['properties']['congress_num'];
 		$candidateIds = arrayToInString($graph['nodetypesindex']['candidates']);
 		$companyIds = arrayToInString($graph['nodetypesindex']['companies']);
 		$sitecode = "";
 		$congress = "";
-		$precheck = "";
 		$breakdown = "";
 
 		if ($graph['properties']['sitecode'] != 'carbon') { 
@@ -333,19 +309,23 @@ class FECCanComGraph extends Graph {
 		} else { 
 			$breakdown = ", sum(if(a.sitecode='coal', amount, 0)) as coalcash, sum(if(a.sitecode='oil', amount, 0)) as oilcash ";
 		}
+		if (is_numeric($congress_num)) { 
+			$congress = "  a.congress_num  = '$congress_num' and"; 
+		} elseif ($congress_num == 'pre') {
+			$congress = " a.congress_num = 1 and "; 
+		}
 
-		if ($congress_num == 'pre') {
-			if ($graph['properties']['candidateids']) { 
-				$cnumquery = "select a.congress_num from contributions a left join congressmembers b on candidateid = b.fec_id and a.congress_num = b.congress_num where b.congress_num is null and a.congress_num is not null and a.CandidateID = '".$graph['properties']['candidateids']."' $sitecode group by a.congress_num";
-				$congress_nums = arrayValuesToInString(fetchCol($cnumquery));
-				$congress = " a.congress_num in($congress_nums) and";
-			} else { 
-				$precheck = " left join congressmembers b on candidateid = b.fec_id and a.congress_num = b.congress_num ";
-				$congress = " b.fec_id is null and "; 
-			}
-		} else if (is_numeric($congress_num)) { $congress = "  a.congress_num  = '$congress_num' and"; }
+		$racecode = $graph['properties']['racecode'];
+		$racecode_filter = "";
+		if (isset($this->racecode_filter_values[$racecode])) { 
+			$racecode_filter = 'and '.$this->racecode_filter_values[$racecode];
+		}
 
-		$query ="select concat(a.CompanyID, '_', a.CandidateId) as id, sum(Amount) as cash, format(sum(Amount), 0) as nicecash $breakdown from contributions a $precheck where $congress a.congress_num is not null and a.CandidateID in ($candidateIds) and a.CompanyID in ($companyIds) $sitecode group by concat(a.CandidateID, a.CompanyID)  order by cash desc, a.CandidateId, CompanyID desc";
+		#This will limit the edges returned by the query - useful for debugging, but redundant and possible slower
+		$edgelimits = $debug ? " and concat(a.CompanyID, '_', a.recipient_id) in ($edgeIds) " : "";
+
+		#We don't apply a filter here because we want the values to be the total values, not the filtered values
+		$query ="select concat(a.CompanyID, '_', a.recipient_id) as id, sum(Amount) as cash, format(sum(Amount), 0) as nicecash $breakdown from contributions a where $congress a.congress_num is not null and a.recipient_id in ($candidateIds) and a.CompanyID in ($companyIds) $edgelimits $racecode_filter $sitecode group by concat(a.recipient_id, a.CompanyID)  order by cash desc, a.recipient_id, CompanyID desc";
 		$this->addquery('com2can_props', $query, $graph);
 		$edgeprops = dbLookupArray($query);
 		$edges = array();
@@ -434,7 +414,8 @@ class FECCanComGraph extends Graph {
 		$output = "";
 		$output .= canInfoHeader($id)."<a href='#' onclick=\"toggleDisplay('tables'); return false;\">Show contributions</a> ";
 		//use a differnt url if it is a prez candidate
-		if (substr($id,0,1) != 'P'){
+		//if (substr($id,0,1) != 'P'){
+		if ($_GET['racecode'] != 'P'){
 			$output .= " <a class='email_button' href='http://priceofoil.org/action/'>Send Email</a>"; 
 			//echo " | <a href ='voteTables.php?chamber=".substr($id,0,1) ."#$id'>Voting profile</a></div> ";
 		} else {
@@ -497,6 +478,23 @@ class FECCanComGraph extends Graph {
 			$props['minContribAmount'] = $opts['minContribAmount'][$props['contribFilterIndex']];
 			$props['minCompanyAmount'] = $opts['minCompanyAmount'][$props['companyFilterIndex']];
 			$props['minCandidateAmount'] = $opts['minCandidateAmount'][$props['candidateFilterIndex']];
+		}
+	}
+
+	function postProcessGraph() {
+		global $edgestore_tag;
+		return;
+		#$edgestore_tag = date('Y-m-d H:i');
+		if($edgestore_tag != '') { 
+			$edgetypes = $this->data['edges'];
+			$name = $this->graphname();
+			foreach(array_keys($edgetypes) as $edgetype) {
+				foreach(array_keys($this->data['edges'][$edgetype]) as $edgeid) {
+					$edge = $this->data['edges'][$edgetype][$edgeid];
+					$setstring = "tag='$edgestore_tag', graphname='$name', type='$edgetype', toid='$edge[toId]', fromid='$edge[fromId]', value=$edge[cash]";
+					dbwrite("insert into edgestore set $setstring on duplicate key update $setstring" );
+				}
+			}
 		}
 	}
 }
