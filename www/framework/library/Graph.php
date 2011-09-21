@@ -48,7 +48,9 @@ class Graph {
 		//Override defaults with input values if they exist
 		foreach( array_keys($this->data['properties']) as $key) {
 			if(isset($request_parameters[$key])) {
-				$this->data['properties'][$key]  = dbEscape($request_parameters[$key]);
+				//We can't call dbEscape - ain't part of framework - so be careful!
+				//$this->data['properties'][$key]  = dbEscape($request_parameters[$key]);
+				$this->data['properties'][$key]  = $request_parameters[$key];
 			}
 		}	
 		if (isset($request_parameters['graphWidth'])) {
@@ -193,13 +195,22 @@ class Graph {
 			if ($shape == 'edge') {
 				$scale = $maxSize - $minSize;  //the range we actually want
 			} else if ($shape == 'circle') { 
+				//we need to comvert sizes from diameter to radius
+				$maxSize = $maxSize/2;
+				$minSize = $minSize/2;
 				$scale = pow($maxSize,2)*pi() - pow($minSize,2)*pi();  //the range we actually want
 			} else {
 				$scale = pow($maxSize,2) - pow($minSize,2);  //the range we actually want
 			}
 			//load all the cash into an array
 			foreach($array as $node) { $vals[] =  $node[$key]; }
-
+			//This code was for reseting values < 0 to zero
+			/*foreach($array as $node) { 
+				if ($node[$key] > 0) { 
+					$vals[] =  $node[$key];
+				} else { $vals[] = 0; }
+		   	}
+			*/
 			$min = min($vals);
 			$max = max($vals);
 			$adj_min = $min + abs($min)+1;
@@ -213,10 +224,13 @@ class Graph {
 				if ($diff == 0) {  // if all nodes are the same size, use max
 					$array[$id]['size']	= $maxSize;
 				} else {
+					$value = $array[$id][$key];
+					//This code was for reseting values < 0 to zero
+					//if ($value <= $min) { $normed = 0; } 
 					if ($log) { 
-						$normed = (log($array[$id][$key]+abs($min)+1) - log($adj_min)) / $diff; //normalize it to the range 0-1
+						$normed = (log($value+abs($min)+1) - log($adj_min)) / $diff; //normalize it to the range 0-1
 					} else {
-						$normed = ($array[$id][$key] - $min) / $diff; //normalize it to the range 0-1
+						$normed = ($value - $min) / $diff; //normalize it to the range 0-1
 					}
 					 //now calculate appropriate with from area depending on shape
 					if ($shape == 'edge') { 
@@ -228,14 +242,26 @@ class Graph {
 						$area = ($normed * $scale) + pow($minSize,2);  //adjust to value we want
 						$size = sqrt(abs($area));
 					}
-					//$factor = $amount/$diff;
 					$array[$id]['size']	= $size ;
 				}
 			}
 		}
+
+		//reorder the values for debugging
+		$array = $this->subval_sort($array, $key);
 		return $array;
 	}
-	
+
+	function subval_sort($a,$subkey) {
+		foreach($a as $k=>$v) {
+			$b[$k] = strtolower($v[$subkey]);
+		}
+		asort($b);
+		foreach($b as $key=>$val) {
+			$c[] = $a[$key];
+		}
+		return $c;
+	}	
 
 	//returns the node array corresponding to an id
 	function lookupNodeID($id) {
