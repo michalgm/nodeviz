@@ -43,7 +43,8 @@ class FECCanComGraph extends Graph {
 			'minSize' => array('candidates' => '.25', 'companies' => '.25', 'com2can' =>'1'),
 			'maxSize' => array('candidates' => '3', 'companies' => '3', 'com2can' =>'80'),
 			'sitecode' => 'carbon',
-			'log'=>0
+			'log_scaling'=>0,
+			'removeIsolates'=>1,
 		);
 		// special properties for controling layout software
 		//BROKEN, USE GV PARAMS
@@ -192,8 +193,6 @@ class FECCanComGraph extends Graph {
 			$node['image'] = $image;
 			$node['image'] = 'images/carbon_round.png';
 			$node['type'] = 'Can';
-			$node['zoom'] = rand(0,8);
-			$node['class'] = 'oompa';
 		}
 		$nodes = $this->scaleSizes($nodes, 'candidates', 'cash');
 		return $nodes;
