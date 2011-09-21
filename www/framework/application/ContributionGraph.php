@@ -34,7 +34,7 @@ class ContributionGraph extends Graph {
 			'prop' => '23',
 			'candidateFilterIndex' => 0,
 			'removeIsolates' => 1,
-			'log' => 0
+			'log_scaling' => 0
 		);
 		// special properties for controling layout software
 		//BROKEN, USE GV PARAMS
