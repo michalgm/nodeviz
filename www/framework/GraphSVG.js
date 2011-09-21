@@ -442,7 +442,7 @@ var GraphSVG = Class.create(GraphImage, {
 
 		this.state = 'pan';
 		evt.target.style.cursor = 'move';
-
+		$('svgscreen').style.cursor = 'move';
 		this.stateTf = g.getCTM().inverse();
 
 		this.stateOrigin = this.getEventPoint(evt).matrixTransform(this.stateTf);
