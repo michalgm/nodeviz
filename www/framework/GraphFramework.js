@@ -167,11 +167,10 @@ GraphFramework.prototype = {
 		});
 		this.requests[this.requests.length+1] = request;
 	},
-	zoomPanToNode: function(id,level) {
+	panToNode: function(id,level) {
 		//zooms graph if in svg mode
 		if (this.useSVG ==1) {
-			this.renderers['GraphImage'].zoomToNode(id,level);
-			this.renderers['GraphImage'].panToNode(id);
+			this.renderers['GraphImage'].panToNode(id, level);
 		}
 	},
 	highlightNode: function(id, noshowtooltip) {
