@@ -63,9 +63,8 @@ var GraphSVG = Class.create(GraphImage, {
 		$('svg_overlay').style.setProperty('display', 'block','');
 		this.setupListeners();
 
-		//apply the initial filter - this should probably by handled in GraphSVGZoom, but where?
-		$('image').addClassName('zoom_'+this.current_zoom);
-		$('svg_overlay').addClassName('zoom_'+this.current_zoom);
+		//apply the initial filter
+		this.setZoomFilters();
 		//console.timeEnd('renderSVG');
 	},
 	setupListeners: function($super) {
@@ -239,6 +238,8 @@ var GraphSVG = Class.create(GraphImage, {
 
 	zoomToNode: function(id, level) {
 		//Change graph zoom level, centered on center of a node
+
+		if(!$(id)) { return; } //should this throw an error?
 	
   		//get the transform of the svg coords to screen coords
   		var ctm = $(id).getScreenCTM();
@@ -263,6 +264,8 @@ var GraphSVG = Class.create(GraphImage, {
 
 	panToNode: function(id, zoom) {
 		//re-center graph on center of a node, and optionally change zoom level
+
+		if(!$(id)) { return; } //should this throw an error?
 	
   		//get the transform of the svg coords to screen coords
   		var ctm = $(id).getScreenCTM();
@@ -285,11 +288,14 @@ var GraphSVG = Class.create(GraphImage, {
 		delta.x = (center.x - node_center.x);
 		delta.y = (center.y - node_center.y);
 
-		this.setCTM(g, $('graph0').getCTM().translate(delta.x, delta.y));
-
-		if (typeof(zoom) != 'undefined') {
-			this.zoomToNode(id, zoom);
-		}
+		new Effect.Translate($('underlay_graph0'), {x: delta.x, y: delta.y});
+		new Effect.Translate($('graph0'), {x: delta.x, y: delta.y, afterFinish: function() {
+				if (typeof(zoom) != 'undefined') {
+					this.zoomToNode(id, zoom);
+				}
+			}.bind(this)
+		});
+		//this.setCTM(g, $('graph0').getCTM().translate(delta.x, delta.y));
 	},
 	setupZoomListeners: function(root){
 		this.root = root;
@@ -353,6 +359,13 @@ var GraphSVG = Class.create(GraphImage, {
 		element.setAttribute("transform", s);
 		$('underlay_graph0').setAttribute("transform", s);
 		//this.zoomSlider.setValue(this.current_zoom);
+		this.setZoomFilters();
+	},
+	
+/**
+ * Resets the zoom filters
+ */
+	setZoomFilters: function() {
 		$('image').removeClassName('zoom_'+this.previous_zoom);
 		$('svg_overlay').removeClassName('zoom_'+this.previous_zoom);
 		$('image').addClassName('zoom_'+this.current_zoom);
@@ -505,13 +518,17 @@ var GraphSVG = Class.create(GraphImage, {
 		}
 		p = center.matrixTransform(g.getCTM().inverse());
 		z = Math.pow(z, zoom_amount);
-		var k = this.root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
-		this.setCTM(g, g.getCTM().multiply(k));
-
-		if(! this.stateTf) { 
-			this.stateTf = $('graph0').getCTM().inverse();
-		}
-		this.stateTf = this.stateTf.multiply(k.inverse());
+		//var k = this.root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
+		new Effect.AnimateZoom($('graph0'), {point: p, zoom: z, queue: {'position': 'end', 'scope': 'zoom'}, duration: .5, afterFinish: function() {
+				this.setZoomFilters();
+			}.bind(this)
+		});
+		//new Effect.AnimateZoom($('underlay_graph0'), {point: p, zoom: z});
+		//this.setCTM(g, g.getCTM().multiply(k));
+		//if(! this.stateTf) { 
+			//this.stateTf = $('graph0').getCTM().inverse();
+		//}
+		//this.stateTf = this.stateTf.multiply(k.inverse());
 		this.zoom_point = null;
 
 	},

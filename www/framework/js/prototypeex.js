@@ -141,3 +141,64 @@ Element.addMethods();
 Field = Form.Element;
 $F = Form.Element.Methods.getValue;
 
+
+
+Effect.Translate = Class.create(Effect.Base, {
+  initialize: function(element) {
+    this.element = $(element);
+    if (!this.element) throw(Effect._elementDoesNotExistError);
+    var options = Object.extend({
+      x:    0,
+      y:    0,
+	  ctm: this.element.getCTM(),
+    }, arguments[1] || { });
+    this.start(options);
+  },
+  setup: function() {
+	var matrix = this.options.ctm;
+	var trans_matrix = matrix.translate(this.options.x, this.options.y);
+    this.originalLeft = (matrix.e || '0');
+    this.originalTop  = (matrix.f || '0');
+	this.options.x = trans_matrix.e - this.originalLeft;
+	this.options.y = trans_matrix.f - this.originalTop;
+  },
+  update: function(position) {
+	var matrix = this.options.ctm;
+	matrix.e = this.options.x*position+ this.originalLeft;
+	matrix.f = this.options.y*position + this.originalTop;
+	var s = "matrix(" + matrix.a + "," + matrix.b + "," + matrix.c + "," + matrix.d + "," + matrix.e + "," + matrix.f + ")";
+	this.element.setAttribute('transform', s);
+  }
+});
+
+
+Effect.AnimateZoom = Class.create(Effect.Base, {
+  initialize: function(element) {
+    this.element = $(element);
+    if (!this.element) throw(Effect._elementDoesNotExistError);
+    var options = Object.extend({
+      zoom:    0,
+	  point:	0,
+	  ctm: this.element.getCTM(),
+    }, arguments[1] || { });
+    this.start(options);
+  },
+  setup: function() {
+	//var matrix = this.options.ctm;
+	//var trans_matrix = matrix.translate(this.options.x, this.options.y);
+	//this.orig_zoom = matrix.a;
+	//this.zoom_level = this.options.zoomctm.a - this.orig_zoom;
+	this.options.zoom = this.options.zoom - 1;
+  this.matrix = this.element.getCTM();
+  },
+  update: function(position) {
+	var k = this.element.ownerSVGElement.createSVGMatrix().translate(this.options.point.x, this.options.point.y).scale(1 + (this.options.zoom*position)).translate(-this.options.point.x, -this.options.point.y);
+	//console.log(this.options.zoom*position);
+	var matrix = this.matrix.multiply(k);
+	var s = "matrix(" + matrix.a + "," + matrix.b + "," + matrix.c + "," + matrix.d + "," + matrix.e + "," + matrix.f + ")";
+	this.element.setAttribute('transform', s);
+	$('underlay_graph0').setAttribute('transform', s);
+  }
+});
+
+
