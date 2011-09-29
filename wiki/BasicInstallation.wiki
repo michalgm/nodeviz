@@ -1,0 +1,22 @@
+#how to get a 'hello world' graph working
+
+= Basic Installation =
+
+== Requirements ==
+
+To get nodeviz to work, you'll shell access to a web server.  
+PHP 5+
+
+== Install Graphviz ==
+Version ? 
+Recent versions of Ubuntu have GraphViz pre-installed. Otherwise follow instructions at http://www.graphviz.org/Download.php
+
+== Checkout or download the Framework code ==
+
+follow the instructions on the [http://code.google.com/p/nodeviz/source/checkout source] or [http://code.google.com/p/nodeviz/downloads/list downloads page of the nodeviz google code site.
+
+== Set permissions ==
+
+== Edit config.php ==
+
+== load index page! ==
