@@ -22,7 +22,7 @@ NodeViz has two main parts:
 
   * Networks can be rendered as both graphs and lists, with synchronized interaction between them. 
 
-  * Networks can be cached on the server to avoid repeating the expensive network layout process
+  * Networks can be cached on the server to avoid repeating the expensive network layout process.
 
   * A structured template for assembling a network from an arbitrary data source (usually a database).
 
