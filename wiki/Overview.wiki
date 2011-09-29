@@ -1,0 +1,38 @@
+#summary Overview and introduction to the nodeviz project
+
+= Introduction =
+
+NodeViz was created because we wanted to be able to embed interactive network diagrams on a web page.  Projects like GraphViz offer partial solutions for rendering networks in web-friendly formats, but don't do much to help with the interaction. After writing a few sites with custom code to build networks from a database display them, we've tried to bundle some of the functionality. 
+
+
+= Details =
+
+NodeViz has two main parts:
+  * Server-side code in PHP which can handle requests, assemble an appropriate network based on parameters, and render it using GraphViz
+
+  * Client-side code in JavaScript which can request a graph from the server, insert an SVG (or JPEG) image of the graph into the DOM, render the graph data as a list, and handle selecting and zooming events.
+
+
+
+= Features =
+
+  * The network is embedded in the page as SVG, and is part of the web page DOM. This means that it can be styled using CSS!
+
+  * Graceful degradation to non-SVG browsers. When you view with IE 7 or 8 (which cannot display inline SVG, the network image is displayed as an image with an imagemap and events should still work.
+
+  * Networks can be rendered as both graphs and lists, with synchronized interaction between them. 
+
+  * Networks can be cached on the server to avoid repeating the expensive network layout process
+
+  * A structured template for assembling a network from an arbitrary data source (usually a database).
+
+  * AJAX callbacks for sending the client additional data associated with nodes or edges. 
+
+= Dependencies = 
+
+  * GraphViz open source graph drawing package http://graphviz.org
+  * Scriptaculous JS library http://script.aculo.us/
+  * Prototype JS library http://www.prototypejs.org/
+
+= What NodeViz does not do = 
+  * Network analysis (try Gephi, the R network library, Pajek, etc)
