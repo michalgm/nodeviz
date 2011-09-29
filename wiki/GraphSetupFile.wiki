@@ -6,6 +6,20 @@ NodeViz uses a custom Graph object to store and manipulate the network data whic
 
 Note: we've structured the order of the graph construction in this way to facilitate our most common use case: pulling the data for the graph out of a set of tables in a database.
 
+The basic idea is:
+  # Define a graph object with some meta properties, includeing the types of nodes and edges
+  # Repeat for each node type: 
+    * Call a function to get a list of the ids so that we know what they are and how many, add to graph array
+    * Call a function that, given the list of ids, fills in sets of properties for each id on the graph array. Also do any processing to scale or format values, etc.
+  # Repeat for each edge type:
+    * Call a function to get a list of edge ids and add them to the graph array.
+    * Call a function that, given a list of edge ids, fills in sets of properties for each edge.
+  # Do some state checking, index construction, etc. 
+  # Pass the graph on to the rest of the framework to do what is needed with it. 
+
+
+
+
 == Functions in the GraphSetupFile ==
 
 Generally the best way to create a new GraphSetupFile is to copy a [http://code.google.com/p/nodeviz/source/browse/www/framework/application/DemoGraph.php demo file] and modify it.  Below is an outline of the main functions and what they do. All of the properties are defined as a nested set of associative arrays. 
@@ -19,7 +33,7 @@ This method is called at the beginning of graph construction and should define a
   * *properties* defines the graph-level properties. The arrays of values stored  'minSize' and 'maxSize' will control the relative sizes of nodes in the rendered network.
   * *graphvizProperties* An array of GraphViz graph-level properties that will impact how GraphViz renders the network.  The properties and their acceptable values are defined in the GraphViz attribute [http://http://www.graphviz.org/content/attrs documentation].
 
-The *nodetypes* and *edgetypes* arrays actually define the names of the sets of methods that will be used to construct the nodes and edges. NodeViz expects to find a <nodetype>_fetchNodes() and <nodetype>_fetchNodeProperties function for each node type and a <edgetype>_fedgeEdges() and <edgetype>_fetchEdgeProperties() function for each edge type.  For example, if your graph defines:
+The *nodetypes* and *edgetypes* arrays actually define the names of the sets of methods that will be used to construct the nodes and edges. NodeViz expects to find a {{{<nodetype>_fetchNodes()}}} and {{{<nodetype>_fetchNodeProperties}}} function for each node type and a {{{<edgetype>_fedgeEdges()}}} and {{{<edgetype>_fetchEdgeProperties()}}} function for each edge type.  For example, if your graph defines:
 {{{
 $this->data['nodetypes'] = array('animals', 'foods');
 }}}
