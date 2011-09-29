@@ -8,7 +8,7 @@ Note: we've structured the order of the graph construction in this way to facili
 
 == Functions in the GraphSetupFile ==
 
-Generally the best way to create a new GraphSetupFile is to copy one of the demos and modify it.  Below is an outline of the main functions and what they do. All of the properties are defined as a nested set of associative arrays. 
+Generally the best way to create a new GraphSetupFile is to copy a [http://code.google.com/p/nodeviz/source/browse/www/framework/application/DemoGraph.php demo file] and modify it.  Below is an outline of the main functions and what they do. All of the properties are defined as a nested set of associative arrays. 
 
 {{{ 
 __construct()
