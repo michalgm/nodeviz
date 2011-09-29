@@ -4,7 +4,7 @@
 
 == Requirements ==
 
-To get nodeviz to work, you'll shell access to a web server.  
+To get NodeViz to work, you'll shell access to a web server.  
 PHP 5+
 
 == Install Graphviz ==
@@ -13,7 +13,7 @@ Recent versions of Ubuntu have GraphViz pre-installed. Otherwise follow instruct
 
 == Checkout or download the Framework code ==
 
-follow the instructions on the [http://code.google.com/p/nodeviz/source/checkout source] or [http://code.google.com/p/nodeviz/downloads/list downloads page of the nodeviz google code site.
+follow the instructions on the [http://code.google.com/p/nodeviz/source/checkout Source] or [http://code.google.com/p/nodeviz/downloads/list Downloads] page of the NodeViz google code site.
 
 == Set permissions ==
 
