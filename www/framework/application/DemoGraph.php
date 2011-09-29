@@ -79,7 +79,7 @@ class DemoGraph extends Graph {
 			$node['fillcolor'] = 'pink';
 			$node['value'] = rand(0, 20);
 			$node['tooltip'] = $animals[$aid]." (".$node['value'].")";
-			$node['onClick'] = "this.Framework.selectNode('".$node['id']."');";
+			$node['onClick'] = "this.Framework.selectNode('".$node['id']."'); this.Framework.panToNode('".$node['id']."');";
 			$node['onMouseover'] = "this.Framework.highlightNode('".$node['id']."');";
 		}
 		$nodes = $this->scaleSizes($nodes, 'animals', 'value');
@@ -97,7 +97,7 @@ class DemoGraph extends Graph {
 			$node['color'] = 'black';
 			$node['fillcolor'] = "#ccccff";
 			$node['value'] = rand(0, 20);
-			$node['onClick'] = "this.Framework.selectNode('".$node['id']."');";
+			$node['onClick'] = "this.Framework.selectNode('".$node['id']."'); this.Framework.panToNode('".$node['id']."');";
 			$node['onMouseover'] = "this.Framework.highlightNode('".$node['id']."');";
 		}
 		$nodes = $this->scaleSizes($nodes, 'foods', 'value');

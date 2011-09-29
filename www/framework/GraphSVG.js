@@ -328,12 +328,17 @@ var GraphSVG = Class.create(GraphImage, {
 		this.zoomSlider = new Control.Slider('zoomHandle', 'zoomSlider', {values: values, range: $R(this.zoomlevels,0), sliderValue: defaultValue,
 			onChange: function(value) { 
 				if(this.current_zoom != value) { 
-					this.SVGzoom(value);
+					if (this.zoom_event) { 
+						window.clearTimeout(this.zoom_event);
+					}
+					var do_zoom = function() {
+						this.SVGzoom(value);
+					}.bind(this);
+					this.zoom_event = do_zoom.delay(.2);
 				}
 			}.bind(this),
 		});
 		this.center = this.calculateCenter();
-		this.resetsvg = $('graph0').getCTM();
 	},
 /**
  * Instance an SVGPoint object with given event coordinates.
@@ -366,10 +371,10 @@ var GraphSVG = Class.create(GraphImage, {
  * Resets the zoom filters
  */
 	setZoomFilters: function() {
-		$('image').removeClassName('zoom_'+this.previous_zoom);
-		$('svg_overlay').removeClassName('zoom_'+this.previous_zoom);
-		$('image').addClassName('zoom_'+this.current_zoom);
-		$('svg_overlay').addClassName('zoom_'+this.current_zoom);
+		//$('image').removeClassName('zoom_'+this.previous_zoom);
+		//$('svg_overlay').removeClassName('zoom_'+this.previous_zoom);
+		$('image').className = 'zoom_'+this.zoomSlider.value;
+		$('svg_overlay').className = 'zoom_'+this.zoomSlider.value;
 	},
 
 /**
@@ -485,14 +490,11 @@ var GraphSVG = Class.create(GraphImage, {
 	},
 	zoom: function(d, p) {
 		if (d == 'in') { 
-			d = this.current_zoom+ 1;
+			d = this.zoomSlider.value+ 1;
 		} else if (d == 'out') { 
-			d = this.current_zoom- 1;
+			d = this.zoomSlider.value- 1;
 		} else if (d == 'reset') {
-			d=1;
-			//this.current_zoom = 1;
-			this.zoomSlider.setValue(1);
-			this.setCTM($('graph0'), this.resetsvg);
+			this.Framework.panToNode('graph0', 1);
 			return;
 		}
 		if (d < 0 || d > this.zoomlevels) {
