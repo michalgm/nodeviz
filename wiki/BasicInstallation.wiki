@@ -1,4 +1,4 @@
-gra#how to get a 'hello world' graph working
+#how to get a 'hello world' graph working
 
 = Basic Installation =
 
