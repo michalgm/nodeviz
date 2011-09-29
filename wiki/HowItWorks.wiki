@@ -1,4 +1,4 @@
-#an outline of the process of fetching a graph
+# an outline of the process of fetching a graph
 
 = Overview of process =
 
@@ -22,4 +22,3 @@ When a webpage is going to display a graph using the framework, it goes through 
 
 
 = A more detailed explanation =
-
