@@ -18,3 +18,22 @@ This method is called at the beginning of graph construction and should define a
   * *edgetypes*  names the 'classes' of edges, and which types of nodes they will connect
   * *properties* defines the graph-level properties. The arrays of values stored  'minSize' and 'maxSize' will control the relative sizes of nodes in the rendered network.
   * *graphvizProperties* An array of GraphViz graph-level properties that will impact how GraphViz renders the network.  The properties and their acceptable values are defined in the GraphViz attribute [http://http://www.graphviz.org/content/attrs documentation].
+
+The *nodetypes* and *edgetypes* arrays actually define the names of the sets of methods that will be used to construct the nodes and edges. NodeViz expects to find a <nodetype>_fetchNodes() and <nodetype>_fetchNodeProperties function for each node type and a <edgetype>_fedgeEdges() and <edgetype>_fetchEdgeProperties() function for each edge type.  For example, if your graph defines:
+{{{
+$this->data['nodetypes'] = array('animals', 'foods');
+}}}
+then it expects to find functions named:
+{{{
+function animals_fetchNodes(){
+}
+
+function animals_fetchNodeProperties(){
+}
+
+function foods_fetchNodes(){
+}
+
+function foods_fetchNodeProperties(){
+}
+}}}
