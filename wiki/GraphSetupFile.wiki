@@ -1,0 +1,20 @@
+#explanation of how the networks are defined
+
+= Loading data into a graph =
+
+NodeViz uses a custom Graph object to store and manipulate the network data which will be passed to the client. Usually the best way to create a new type of network is to create a new class which extends the Graph.php class and sets all the network properties appropriately.  When NodeViz attempts to build the specific type of graph, it will expect to find a certain set of functions which will return necessary data about the graph.  
+
+Note: we've structured the order of the graph construction in this way to facilitate our most common use case: pulling the data for the graph out of a set of tables in a database.
+
+== Functions in the GraphSetupFile ==
+
+Generally the best way to create a new GraphSetupFile is to copy one of the demos and modify it.  Below is an outline of the main functions and what they do. All of the properties are defined as a nested set of associative arrays. 
+
+{{{ 
+__construct()
+}}}
+This method is called at the beginning of graph construction and should define any graph-level properties and "meta" information about the network being constructed -- such as the parameters that define the graph.  Essential elements include"
+  * *nodetypes*  defines the names of the various "classes" of nodes that will be included in the network. (i.e. a [http://http://en.wikipedia.org/wiki/Bipartite_graph bi-partite] network will have more than one node type)
+  * *edgetypes*  names the 'classes' of edges, and which types of nodes they will connect
+  * *properties* defines the graph-level properties. The arrays of values stored  'minSize' and 'maxSize' will control the relative sizes of nodes in the rendered network.
+  * *graphvizProperties* An array of GraphViz graph-level properties that will impact how GraphViz renders the network.  The properties and their acceptable values are defined in the GraphViz attribute [http://http://www.graphviz.org/content/attrs documentation].
