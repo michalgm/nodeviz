@@ -28,6 +28,8 @@ NodeViz has two main parts:
 
   * AJAX callbacks for sending the client additional data associated with nodes or edges. 
 
+  * Supports multiple node types (i.e 'classes') and edge types for constructing multi-partite graphs and handling interaction and list construction appropriately.
+
 = Dependencies = 
 
   * GraphViz open source graph drawing package http://graphviz.org
