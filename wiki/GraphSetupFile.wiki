@@ -63,7 +63,12 @@ function animal_to_food_fetchEdges(){
 
 The array returned by the {{{_fetchEdges()}}} function is a bit more complicated than the nodes case. Each element of the array needs to include an *id* for referencing the edge, as well as a *fromId* and *toId* values giving the ids of the nodes that will be linked by the edge.
 
+QUESTION: DOES THE ID HAVE TO BE IN 'A_B' FORMAT FOR THE JS TO WORK?
 
+So for example
+{{{
+$edges[42] = array('id'=>'edge327','fromId'=>'horse','toId'=>'hay');
+}}
 {{{
 function foods_fetchNodeProperties(){
 }
@@ -73,4 +78,26 @@ function animals_fetchNodeProperties(){
 
 }}}
 
- and a {{{<edgetype>_fedgeEdges()}}} and {{{<edgetype>_fetchEdgeProperties()}}} function for each edge type.  
+ and a {{{<edgetype>_fedgeEdges()}}} and {{{<edgetype>_fetchEdgeProperties()}}} function for each edge type. 
+
+
+The main reason for going through this seeming convoluted construction process is to make it easy to deal with the case where we want to pull sets of relation from a database using SQL commands.  So we can do things along the lines of
+
+{{{
+function myNode_fetchNodes(){
+  //a query to get node ids
+  $query = "SELECT node_id as id FROM myNodes;";
+
+  //code to execute query and convert results to an array
+}
+
+function myNode_fetchNodeProperties($nodes){
+  //a query to get properties for our set of nodes
+  
+  //use a handy function to convert the array of nodes into a string for an SQL in statement..
+  $ids = arrayToInString($nodes);
+  $query = "SELECT name AS label, age, cash AS SIZE from myNodes where node_id in $ids";
+  //code to execute query and convert results to an array
+}
+
+}}} 
