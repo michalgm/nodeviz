@@ -68,7 +68,7 @@ QUESTION: DOES THE ID HAVE TO BE IN 'A_B' FORMAT FOR THE JS TO WORK?
 So for example
 {{{
 $edges[42] = array('id'=>'edge327','fromId'=>'horse','toId'=>'hay');
-}}
+}}}
 {{{
 function foods_fetchNodeProperties(){
 }
