@@ -67,21 +67,50 @@ QUESTION: DOES THE ID HAVE TO BE IN 'A_B' FORMAT FOR THE JS TO WORK?
 
 So for example
 {{{
-$edges[42] = array('id'=>'edge327','fromId'=>'horse','toId'=>'hay');
+$edges['edge327'] = array('id'=>'edge327','fromId'=>'horse','toId'=>'hay');
 }}}
 
 == Adding Properties to Graph Elements ==
 
+Although a graph with just nodes and edges defined should work, it won't be very interesting.  Probably you want to add properties to your graph to control the color and shape of nodes and edges, as well as adding some JavaScript methods to trigger interaction events.
+
+Just like for the fetch methods, you can define `<node_type>_fetchNodeProperties()`functions for each node type to add properties.
+
 {{{
-function foods_fetchNodeProperties(){
+
+//define a method to add properties to the 'foods' node type
+function foods_fetchNodeProperties($nodes){
+  //loop over the list of nodes to add properties
+  foreach ($nodes as &$node) {
+    $node['tooltip'] = $foods[$fid];
+    $node['label'] = $foods[$fid];
+    $node['shape'] = 'box';
+    $node['color'] = 'black';
+    $node['fillcolor'] = "#CCCCFF";
+
+    //add some javascript interaction using framework methods
+    $node['onClick'] = "this.Framework.selectNode('".$node['id']."'); this.Framework.panToNode('".$node['id']."');";
+    $node['onMouseover'] = "this.Framework.highlightNode('".$node['id']."');";
+  }
 }
 
 function animals_fetchNodeProperties(){
+  //do a similar thing for another node tip
 }
 
 }}}
 
- and a {{{<edgetype>_fedgeEdges()}}} and {{{<edgetype>_fetchEdgeProperties()}}} function for each edge type. 
+All of the GraphViz properties to control node rendering should work.
+
+Edge properties are added in a similar way.
+
+ and a {{{<edgetype>_fedgeEdges()}}} and {{{<edgetype>_fetchEdgeProperties()}}} function for each edge type.
+
+== Useful Utility Methods ==
+
+`scaleSizes()`
+
+ 
 
 == More Optional Methods ==
 
