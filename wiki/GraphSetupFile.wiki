@@ -33,21 +33,44 @@ This method is called at the beginning of graph construction and should define a
   * *properties* defines the graph-level properties. The arrays of values stored  'minSize' and 'maxSize' will control the relative sizes of nodes in the rendered network.
   * *graphvizProperties* An array of GraphViz graph-level properties that will impact how GraphViz renders the network.  The properties and their acceptable values are defined in the GraphViz attribute [http://http://www.graphviz.org/content/attrs documentation].
 
-The *nodetypes* and *edgetypes* arrays actually define the names of the sets of methods that will be used to construct the nodes and edges. NodeViz expects to find a {{{<nodetype>_fetchNodes()}}} and {{{<nodetype>_fetchNodeProperties}}} function for each node type and a {{{<edgetype>_fedgeEdges()}}} and {{{<edgetype>_fetchEdgeProperties()}}} function for each edge type.  For example, if your graph defines:
+The *nodetypes* and *edgetypes* arrays actually define the names of the sets of methods that will be used to construct the nodes and edges. NodeViz expects to find a {{{<nodetype>_fetchNodes()}}} and {{{<nodetype>_fetchNodeProperties}}} function for each node typeFor example, if your graph defines:
 {{{
 $this->data['nodetypes'] = array('animals', 'foods');
 }}}
 then it expects to find functions named:
 {{{
 function animals_fetchNodes(){
+  //return an array of node ids
+}
+
+function foods_fetchNodes(){
+  //return an array of node ids
+}
+}}}
+
+These methods must return an array of unique node id values.  When there are multiple node types, it is important that the sets of ids don't overlap between the types. 
+
+Not surprisingly NodeViz will also look for a {{{<edgetype>_fetchEdges()}}} function to define the relations in the network. For example if an edgetype was defined to link animal and food nodes by:
+{{{
+$this->data['edgetypes'] = array( 'animal_to_food' => array('animals', 'foods'));
+}}}
+
+Then there should be a function:
+{{{
+function animal_to_food_fetchEdges(){
+}
+}}}
+
+The array returned by the {{{_fetchEdges()}}} function is a bit more complicated than the nodes case. Each element of the array needs to include an *id* for referencing the edge, as well as a *fromId* and *toId* values giving the ids of the nodes that will be linked by the edge.
+
+
+{{{
+function foods_fetchNodeProperties(){
 }
 
 function animals_fetchNodeProperties(){
 }
 
-function foods_fetchNodes(){
-}
-
-function foods_fetchNodeProperties(){
-}
 }}}
+
+ and a {{{<edgetype>_fedgeEdges()}}} and {{{<edgetype>_fetchEdgeProperties()}}} function for each edge type.  
