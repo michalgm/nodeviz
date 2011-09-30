@@ -36,6 +36,7 @@ NodeViz has two main parts:
 
 = Dependencies = 
 
+  * PHP
   * GraphViz open source graph drawing package http://graphviz.org
   * Scriptaculous JS library http://script.aculo.us/
   * Prototype JS library http://www.prototypejs.org/
