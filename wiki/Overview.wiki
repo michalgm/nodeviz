@@ -32,7 +32,7 @@ NodeViz has two main parts:
 
   * Supports multiple node types (i.e 'classes') and edge types for constructing multi-partite graphs and handling interaction and list construction appropriately.
 
-  * Zooming and panning the network in the browser, including zoomToNode methods.
+  * Zooming and panning the network in the browser, including zoomToNode methods. Can also apply zoomLevel classes to elements to selectively hide and reveal as zoom levels change. 
 
 = Dependencies = 
 
