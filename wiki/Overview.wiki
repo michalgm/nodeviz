@@ -40,7 +40,8 @@ NodeViz has two main parts:
 
 = What NodeViz does not do = 
   * Network analysis (try Gephi, the R network library, Pajek, etc)
-  * Its not the simplest way to throw up a basic network image on the web. You might want to try some of these alternatives:
+  * Its not the simplest way to throw up a basic network image on the web. Depending on your use case, you might want to checkout some of these alternatives:
     * [http://thejit.org/demos/ Javascript Infoviz Toolkit]
     * [http://code.google.com/apis/chart/image/docs/gallery/graphviz.html Google Charts GraphViz]
+    * [http://mbostock.github.com/d3/ex/force.html d3]
     * or some of the alternatives listed on this [http://skyeome.net/projects/networkChart/comparison.html example page]
