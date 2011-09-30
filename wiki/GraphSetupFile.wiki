@@ -69,6 +69,9 @@ So for example
 {{{
 $edges[42] = array('id'=>'edge327','fromId'=>'horse','toId'=>'hay');
 }}}
+
+== Adding Properties to Graph Elements ==
+
 {{{
 function foods_fetchNodeProperties(){
 }
@@ -80,6 +83,18 @@ function animals_fetchNodeProperties(){
 
  and a {{{<edgetype>_fedgeEdges()}}} and {{{<edgetype>_fetchEdgeProperties()}}} function for each edge type. 
 
+== More Optional Methods ==
+
+`graphName()`
+
+AJAX callback methods?
+
+Graph Pre-processing
+
+Graph Post-processing
+
+
+== The Method to This Madness ==
 
 The main reason for going through this seeming convoluted construction process is to make it easy to deal with the case where we want to pull sets of relation from a database using SQL commands.  So we can do things along the lines of
 
@@ -94,10 +109,16 @@ function myNode_fetchNodes(){
 function myNode_fetchNodeProperties($nodes){
   //a query to get properties for our set of nodes
   
-  //use a handy function to convert the array of nodes into a string for an SQL in statement..
-  $ids = arrayToInString($nodes);
-  $query = "SELECT name AS label, age, cash AS SIZE from myNodes where node_id in $ids";
+  //we use a handy function to convert the array of nodes into a string for an SQL in statement..
+  $node_ids = arrayToInString($nodes);
+  $query = "SELECT name AS label, age, cash AS size FROM myNodes WHERE node_id IN $node_ids";
   //code to execute query and convert results to an array
+}
+
+function myEdge_fetchEdges($nodes){
+  //a query to find only the set of edges between the selected nodes
+  $node_ids = arrayToInString($nodes);
+  $query = "SELECT FROM relationships WHERE partner_a IN $node_ids AND partner_b IN $node_ids";
 }
 
 }}} 
