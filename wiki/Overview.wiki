@@ -4,6 +4,8 @@
 
 NodeViz was created because we wanted to be able to embed interactive network diagrams on a web page.  Projects like GraphViz offer partial solutions for rendering networks in web-friendly formats, but don't do much to help with the interaction. After writing a few sites with custom code to build networks from a database display them, we've tried to bundle some of the functionality. 
 
+We are also usually dealing with situations where the network we are displaying is a subset of huge pile of relations stored in multiple tables in a database. This project is structured to simplify the process of converting the SQL queries into a network. 
+
 
 = Details =
 
