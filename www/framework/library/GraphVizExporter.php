@@ -72,11 +72,14 @@ class GraphVizExporter {
 
 		//for each node
 		foreach ($graph->data['nodes'] as $node){
-			if(! isset($node['size'])) { print_r($node); }
+			//We should probably log a warning if it has no size
+			//if(! isset($node['size'])) { print_r($node); }
 			//format the the string.  
 			$dot .= "\"".$node['id'].'" ['; //id of node
 			//write out properties
-			$dot .= 'width="'.$node['size'].'" ';
+			if (isset($node['size'])) { 
+				$dot .= 'width="'.$node['size'].'" ';
+			}
 			$dot .= 'href="a" ';
 			if (! isset($node['target'])) { $node['target'] = $node['id']; }
 			if (isset($node['label'])) { $dot .= 'label="'.$node['label'].'" '; }
@@ -105,9 +108,11 @@ class GraphVizExporter {
 		foreach($graph->data['edges'] as $edge ){
 			//format the string
 			$dot .= '"'.$edge['fromId'].'" -> "'.$edge['toId']."\" [".
-			'href="a" '.
-			'weight="'.GraphVizExporter::getWeightGV($edge['weight']).'" ';
-			if($edge['size']) {
+			'href="a" ';
+			if (isset($edge['weight'])) {
+				$dot .= 'weight="'.GraphVizExporter::getWeightGV($edge['weight']).'" ';
+			}
+			if(isset($edge['size'])) {
 				$dot .= 'style="setlinewidth('.$edge['size'].')" ';
 				if (isset($edge['arrowhead']) && $edge['arrowhead'] != 'none' && $GV_PARAMS['edge']['arrowhead'] != 'none') { 
 					$dot .= 'arrowsize="'. ($edge['size']*5).'" ';

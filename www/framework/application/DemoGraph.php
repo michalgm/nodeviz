@@ -48,7 +48,7 @@ class DemoGraph extends Graph {
 
 	function animals_fetchNodes() {
 		global $animals;
-		$graph = &$this->data;
+		$graph = $this->data;
 		$nodes = array();
 		foreach (array_rand($animals, $graph['properties']['nodeNum']) as $index) {
 			$id = 'animal_'.$index;
@@ -59,7 +59,7 @@ class DemoGraph extends Graph {
 
 	function foods_fetchNodes() {
 		global $foods;
-		$graph = &$this->data;
+		$graph = $this->data;
 		$nodes = array();
 		foreach (array_rand($foods, $graph['properties']['nodeNum']) as $index) {
 			$id = 'food_'.$index;
@@ -68,9 +68,8 @@ class DemoGraph extends Graph {
 		return $nodes;
 	}
 
-	function animals_nodeProperties() {
+	function animals_nodeProperties($nodes) {
 		global $animals;
-		$nodes = $this->getNodesByType('animals');
 		foreach ($nodes as &$node) {
 			$aid = str_replace('animal_', '', $node['id']);
 			$node['label'] = $animals[$aid];
@@ -86,9 +85,8 @@ class DemoGraph extends Graph {
 		return $nodes;	
 	}
 
-	function foods_nodeProperties() {
+	function foods_nodeProperties($nodes) {
 		global $foods;
-		$nodes = $this->getNodesByType('foods');
 		foreach ($nodes as &$node) {
 			$fid = str_replace('food_', '', $node['id']);
 			$node['tooltip'] = $foods[$fid];
@@ -105,7 +103,7 @@ class DemoGraph extends Graph {
 	}
 
 	function animal_to_food_fetchEdges() {
-		$graph = &$this->data;
+		$graph = $this->data;
 		$animals = $graph['nodetypesindex']['animals'];
 		$foods = $graph['nodetypesindex']['foods'];
 		$nodes = $graph['nodes'];
@@ -125,10 +123,9 @@ class DemoGraph extends Graph {
 		return $edges;
 	}
 
-	function animal_to_food_edgeProperties() {
+	function animal_to_food_edgeProperties($edges) {
 		global $animals;
 		global $foods;
-		$edges = $this->getEdgesByType('animal_to_food');
 		foreach ($edges as &$edge) {
 			$fid = str_replace('food_', '', $edge['toId']);
 			$aid = str_replace('animal_', '', $edge['fromId']);

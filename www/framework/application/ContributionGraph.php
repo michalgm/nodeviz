@@ -59,7 +59,7 @@ class ContributionGraph extends Graph {
 	**/
 
 	function companies_fetchNodes() {
-		$graph = &$this->data;
+		$graph = $this->data;
 		$precheck = "";
 		$minOrgAmount = $graph['properties']['minOrgAmount'];
 	
@@ -82,7 +82,7 @@ class ContributionGraph extends Graph {
 	}
 	
 	function labels_nodeProperties() {
-		$graph = &$this->data;
+		$graph = $this->data;
 		$propView = $graph['properties']['prop'];
 		$nodes = array();
 		if ($propView ==23){
@@ -148,7 +148,7 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 	}
 	
 	function labels_fetchEdges(){
-		$graph = &$this->data;
+		$graph = $this->data;
 		//$graph['edges']['labels']['coalLabel'] = array();
 		$propView = $graph['properties']['prop'];
 
@@ -211,7 +211,7 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 	**/
 	
 	function companies_nodeProperties() {
-		$graph = &$this->data;
+		$graph = $this->data;
 		global $company_images;
 		global $current_congress;
 		$racecode_filter = "";
@@ -272,7 +272,7 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 	//Need to add a 'fromID' and 'toID' property to each edge
 	function org2org_fetchEdges() {
 		dbwrite("SET group_concat_max_len := @@max_allowed_packet");
-		$graph = &$this->data;
+		$graph = $this->data;
 		$orgIds = arrayToInString($graph['nodetypesindex']['companies']);
 		$minContribAmount = $graph['properties']['minContribAmount'];
 		
@@ -294,7 +294,7 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 	
 	function orgOwnOrg_fetchEdges() {
 		dbwrite("SET group_concat_max_len := @@max_allowed_packet");
-		$graph = &$this->data;
+		$graph = $this->data;
 		//decide which edges to include based on which view
 		$propView = $graph['properties']['prop'];
 		$view = "and (view in ('prop_23','both') or view is null)";
@@ -313,7 +313,7 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 	}
 
 function org2org_edgeProperties() {
-		$graph = &$this->data;
+		$graph = $this->data;
 		$orgIds = arrayToInString($graph['nodetypesindex']['companies']);
 		$sitecode = "";
 		$congress = "";

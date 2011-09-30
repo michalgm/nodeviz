@@ -121,13 +121,15 @@ class Graph {
 		foreach ($this->data['nodetypes'] as $nodetype) {
 			$function =  "$nodetype"."_nodeProperties";
 			if(method_exists($this, $function)) {
-				$nodes = $this->$function();
+				$existing_nodes = $this->getNodesByType($nodetype);
+				$nodes = $this->$function($existing_nodes);
+				foreach (array_keys($existing_nodes) as $nodeid) { unset($this->data['nodes'][$nodeid]); }
 				foreach ($nodes as $node) {
-					unset($this->data['nodes'][$node['id']]); //need to unset to inherit new order
 					$this->data['nodes'][$node['id']] = $node;
 					$this->data['nodes'][$node['id']]['type'] = $nodetype;
 					$this->data['nodes'][$node['id']]['relatedNodes'] = array();
 				}
+				$this->data['nodetypesindex'][$nodetype] = array_keys($nodes);
 			}
 		}
 
@@ -136,14 +138,17 @@ class Graph {
 		foreach (array_keys($this->data['edgetypes']) as $edgetype) {
 			$function =  "$edgetype"."_edgeProperties";
 			if(method_exists($this, $function)) {
-				$edges = $this->$function();
+				$existing_edges = $this->getEdgesByType($edgetype);
+				$edges = $this->$function($existing_edges);
+				foreach (array_keys($existing_edges) as $edgeid) { unset($this->data['edges'][$edgeid]); }
 				foreach ($edges as $edge) {
-					unset($this->data['edges'][$edge['id']]); //need to unset to inherit new order
 					$this->data['edges'][$edge['id']] = $edge;
 					$this->data['edges'][$edge['id']]['type'] = $edgetype;
 				}
+				//$this->data['edgetypesindex'][$edgetype] = array_keys($edges);
 			}
 		}
+		//should we check for edges linking to non-existant nodes?
 
 		$this->checkIsolates();
 	
@@ -173,7 +178,7 @@ class Graph {
 
 	//Sets 'size' property to scaled value: takes graph object, entity type, and key of entity to use for scaled values
 	function scaleSizes($array, $type, $key){
-		$graph = &$this->data;
+		$graph = $this->data;
 		$maxSize = $graph['properties']['maxSize'][$type];
 		$minSize = $graph['properties']['minSize'][$type];
 		if (isset($graph['properties']['log_scaling'])) {
@@ -258,7 +263,7 @@ class Graph {
 		}
 		asort($b);
 		foreach($b as $key=>$val) {
-			$c[] = $a[$key];
+			$c[$key] = $a[$key];
 		}
 		return $c;
 	}	

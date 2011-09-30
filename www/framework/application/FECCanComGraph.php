@@ -64,13 +64,14 @@ class FECCanComGraph extends Graph {
 	**/
 
 	function candidates_fetchNodes() {
-		$graph = &$this->data;
+		$graph = $this->data;
 		if ($graph['properties']['candidateids']) {
+			$nodes =  Array();
 			foreach (explode(',', $graph['properties']['candidateids']) as $id) { 
-				$graph['nodes']['candidates'][$id] = Array();
-				$graph['nodes']['candidates'][$id]['id'] = $id;
+				$nodes[$id] = Array();
+				$nodes[$id]['id'] = $id;
 			}
-			return $graph;
+			return $nodes;
 		}
 		$congress_num = $graph['properties']['congress_num'];
 		$racecode = $graph['properties']['racecode'];
@@ -97,7 +98,7 @@ class FECCanComGraph extends Graph {
 	}
 
 	function companies_fetchNodes() {
-		$graph = &$this->data;
+		$graph = $this->data;
 		if ($graph['properties']['companyids']) {
 			$results = array();
 			foreach (explode(',', $graph['properties']['companyids']) as $id) { 
@@ -133,7 +134,7 @@ class FECCanComGraph extends Graph {
 	It sets the properties of the nodes of that type. 
 	**/
 	function candidates_nodeProperties() {
-		$graph = &$this->data;
+		$graph = $this->data;
 		global $candidate_images;
 		global $current_congress;
 
@@ -199,7 +200,7 @@ class FECCanComGraph extends Graph {
 	}
 
 	function companies_nodeProperties() {
-		$graph = &$this->data;
+		$graph = $this->data;
 		global $company_images;
 		global $current_congress;
 		$congress_num = $graph['properties']['congress_num'];
@@ -270,7 +271,7 @@ class FECCanComGraph extends Graph {
 	//Need to add a 'fromID' and 'toID' property to each edge
 	function com2can_fetchEdges() {
 		dbwrite("SET group_concat_max_len := @@max_allowed_packet");
-		$graph = &$this->data;
+		$graph = $this->data;
 		$congress_num = $graph['properties']['congress_num'];
 		$candidateIds = arrayToInString($graph['nodetypesindex']['candidates']);
 		$companyIds = arrayToInString($graph['nodetypesindex']['companies']);
@@ -295,7 +296,7 @@ class FECCanComGraph extends Graph {
 	}
 
 	function com2can_edgeProperties() {
-		$graph = &$this->data;
+		$graph = $this->data;
 		global $debug;
 		$congress_num = $graph['properties']['congress_num'];
 		$candidateIds = arrayToInString($graph['nodetypesindex']['candidates']);
@@ -333,7 +334,7 @@ class FECCanComGraph extends Graph {
 		foreach($graph['edgetypesindex']['com2can'] as $key) {
 		   	$edge = $graph['edges'][$key];
 			if(! array_key_exists($edge['id'], $edgeprops)) { 
-				unset($graph['edges'][$key]); 
+				//unset($graph['edges'][$key]); 
 				continue;
 			}
 			$edge['onClick'] = "this.Framework.selectEdge('".$edge['id']."');";
@@ -357,7 +358,7 @@ class FECCanComGraph extends Graph {
 
 	function graphname() {
 		if (! $this->name) { 
-			$graph = &$this->data;
+			$graph = $this->data;
 			global $datapath;
 			$props = $graph['properties'];
 			$localdatapath = "$datapath$props[sitecode]";
