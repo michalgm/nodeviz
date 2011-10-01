@@ -202,6 +202,7 @@ Effect.Translate = Class.create(Effect.Base, {
 	matrix.f = this.options.y*position + this.originalTop;
 	var s = "matrix(" + matrix.a + "," + matrix.b + "," + matrix.c + "," + matrix.d + "," + matrix.e + "," + matrix.f + ")";
 	this.element.setAttribute('transform', s);
+	$('underlay_'+this.element.id).setAttribute('transform', s);
   }
 });
 
@@ -231,7 +232,7 @@ Effect.AnimateZoom = Class.create(Effect.Base, {
 	var matrix = this.matrix.multiply(k);
 	var s = "matrix(" + matrix.a + "," + matrix.b + "," + matrix.c + "," + matrix.d + "," + matrix.e + "," + matrix.f + ")";
 	this.element.setAttribute('transform', s);
-	$('underlay_graph0').setAttribute('transform', s);
+	$('underlay_'+this.element.id).setAttribute('transform', s);
   }
 });
 

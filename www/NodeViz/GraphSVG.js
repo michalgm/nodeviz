@@ -289,7 +289,6 @@ var GraphSVG = Class.create(GraphImage, {
 		delta.x = (center.x - node_center.x);
 		delta.y = (center.y - node_center.y);
 
-		new Effect.Translate($('underlay_graph0'), {x: delta.x, y: delta.y});
 		new Effect.Translate($('graph0'), {x: delta.x, y: delta.y, afterFinish: function() {
 				if (typeof(zoom) != 'undefined') {
 					this.zoomToNode(id, zoom);
