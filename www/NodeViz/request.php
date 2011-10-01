@@ -7,30 +7,29 @@ Called by html frontend via HTTP RPC. Returns HTML and javascript strings to be 
 ************************************************************/
 header('Content-type: application/json');
 set_error_handler('handleError');
-require_once("FrameworkUtils.php");
-set_include_path($framework_config['library_path'].PATH_SEPARATOR.$framework_config['application_path']);
-#chdir($framework_config['web_path']);
+require_once("NodeVizUtils.php");
+set_include_path($nodeViz_config['library_path'].PATH_SEPARATOR.$nodeViz_config['application_path']);
+#chdir($nodeViz_config['web_path']);
 #reinterpret_paths();
 
-$framework_config['debug'] = 1;
+$nodeViz_config['debug'] = 1;
 #sleep(3);
 
 $response = array('statusCode'=>7, 'statusString'=>'No data was returned');
 
 if (isset($_REQUEST['setupfile'])) { 
 	$setupfile = $_REQUEST['setupfile'];
-} elseif (isset($framework_config['default_setupfile'])) { 
-	$setupfile = $framework_config['default_setupfile'];
+} elseif (isset($nodeViz_config['default_setupfile'])) { 
+	$setupfile = $nodeViz_config['default_setupfile'];
 } else { trigger_error("No Setupfile defined.", E_USER_ERROR); }
 
-if (isset($framework_config['setupfiles']["$setupfile.php"])) {
-	if(file_exists($framework_config['application_path']."$setupfile.php")) { ;
-		include_once($framework_config['application_path']."$setupfile.php");
+if (isset($nodeViz_config['setupfiles']["$setupfile.php"])) {
+	if(file_exists($nodeViz_config['application_path']."$setupfile.php")) { ;
+		include_once($nodeViz_config['application_path']."$setupfile.php");
 	} else { trigger_error("Setup file '$setupfile' does not exist", E_USER_ERROR); }
-	#include_once('../framework/'.$_REQUEST['setupfile']); 
 } else { trigger_error("Invalid setup file: $setupfile", E_USER_ERROR); }
 
-$datapath = $framework_config['framework_path'].'/'.$framework_config['cache_path'];
+$datapath = $nodeViz_config['nodeViz_path'].'/'.$nodeViz_config['cache_path'];
 
 $graph = new $setupfile();
 
@@ -64,8 +63,8 @@ function setResponse($statusCode, $statusString, $data="") {
 }
 
 function handleError($errno, $errstr, $errfile, $errline) {
-	global $framework_config;
-	$details = $framework_config['debug'] ? " ($errfile - line $errline)" : "";
+	global $nodeViz_config;
+	$details = $nodeViz_config['debug'] ? " ($errfile - line $errline)" : "";
 	setResponse($errno, "$errstr$details");
 	return true;
 }

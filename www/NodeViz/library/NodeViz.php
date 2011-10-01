@@ -1,8 +1,8 @@
 <?php
 
-#The Graph class should be a superclass that defines the abstract graph data structure and functions relating to elements of the graph data.
+#The NodeViz class should be a superclass that defines the abstract graph data structure and functions relating to elements of the graph data.
 
-class Graph {
+class NodeViz {
 
 	var $data;
 	var $name;
@@ -154,6 +154,11 @@ class Graph {
 	
 		//Populate the related nodes fields for each node by stepping through the edges
 		foreach ($this->data['edges'] as $edge) {
+			//delete edges linking to non-existent nodes;
+			if (! isset($this->data['nodes'][$edge['toId']]) || ! isset($this->data['nodes'][$edge['fromId']])) {
+				unset($this->data['edges'][$edge['id']]);
+				continue;
+			}
 			if (! $edge['toId']) { print 'none!'; print_r($edge); } 
 			if ($this->data['nodes'][$edge['toId']]) {
 				$this->data['nodes'][$edge['toId']]['relatedNodes'][$edge['fromId']][] = $edge['id'];

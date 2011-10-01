@@ -1,6 +1,6 @@
 <?php
-$framework_config = array(
-	'framework_path' => getcwd(),
+$nodeViz_config= array(
+	'nodeViz_path' => getcwd(),
 	'web_path' => '../',
 	'application_path' => './application/',
 	'library_path' => './library/',
@@ -20,14 +20,14 @@ if (php_sapi_name() != 'cli') {
 //config.php will allow you to override any set globals 
 if(file_exists('config.php')) { 
 	include_once("config.php"); 
-} elseif(file_exists($framework_config['application_path'].'/config.php')) { 
-	include_once($framework_config['application_path']."/config.php"); 
+} elseif(file_exists($nodeViz_config['application_path'].'/config.php')) { 
+	include_once($nodeViz_config['application_path']."/config.php"); 
 }
 
 function reinterpret_paths() {
-	global $framework_config;
+	global $nodeViz_config;
 	foreach(array('application_path', 'log_path', 'cache_path') as $path) {
-		$framework_config[$path] = preg_replace("|^$framework_config[web_path]|", '', $framework_config[$path]) ;
+		$nodeViz_config[$path] = preg_replace("|^$nodeViz_config[web_path]|", '', $nodeViz_config[$path]) ;
 	}
 }
 
@@ -47,8 +47,8 @@ function setupHeaders() {
 
 //writelog: writes string out to logfile
 function writelog($string) {
-	global $framework_config, $logfile;
-	$logdir = $framework_config['framework_path']."/".$framework_config['log_path'];
+	global $nodeViz_config, $logfile;
+	$logdir = $nodeViz_config['nodeViz_path']."/".$nodeViz_config['log_path'];
 	if (!$logfile) {  //open logfile if it isn't open
 		$logfilename = "$logdir/".basename($_SERVER['PHP_SELF']).".log";
 		$logfile= fopen($logfilename, 'a'); 

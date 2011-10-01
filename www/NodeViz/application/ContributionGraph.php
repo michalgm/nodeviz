@@ -1,10 +1,10 @@
 <?php
 include_once('config.php');
-include_once('Graph.php');
+include_once('NodeViz.php');
 /*
 creates the graph data structure that will be used to pass data among components.  Structure must not change
 */
-class ContributionGraph extends Graph { 
+class ContributionGraph extends NodeViz { 
 
 	function __construct() {
 		parent::__construct();

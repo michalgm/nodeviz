@@ -167,7 +167,7 @@ class GraphVizExporter {
 	}
 
 	public static function generateGraphFiles($graph, $datapath, $format) {
-		global $framework_config;
+		global $nodeViz_config;
 
 		$graphname = $graph->graphname();
 		$dotString = GraphVizExporter::createDot($graph);
@@ -183,7 +183,7 @@ class GraphVizExporter {
 		$imageFile = "$datapath/$graphname.png";
 		$dotFile = "$datapath/$graphname.dot";
 		$svgFile = "$datapath/$graphname.svg.raw";
-		if ($framework_config['debug']) { 
+		if ($nodeViz_config['debug']) { 
 			$nicegraphfile = fopen("$datapath/$graphname.nicegraph", "w");
 			fwrite($nicegraphfile, print_r($graph, 1));
 			fclose($nicegraphfile);
@@ -191,7 +191,7 @@ class GraphVizExporter {
 			fwrite($origdot, $dotString);
 			fclose($origdot);
 		}
-		$logdir = $framework_config['framework_path'].'/'.$framework_config['log_path'];
+		$logdir = $nodeViz_config['nodeViz_path'].'/'.$nodeViz_config['log_path'];
 		if (! is_dir($logdir) || ! is_writable($logdir) || (is_file("$logdir/graphviz.log") && ! is_writable("$logdir/graphviz.log"))) {
 			trigger_error("Unable to write log to log directory '$logdir'", E_USER_ERROR);
 		}
@@ -202,14 +202,14 @@ class GraphVizExporter {
 		);
 
 		//use neato to generate and save image file, and generate imap file to STDOUT
-		chdir($framework_config['web_path']);
+		chdir($nodeViz_config['web_path']);
 		$process = proc_open("neato -vvv $layoutEngine -Tsvg -o $svgFile -Tdot -o $dotFile -Tpng -o $imageFile -Tcmapx ", $descriptorspec, $pipes);
 		fwrite($pipes[0], $dotString);
 		fclose($pipes[0]);
 		$imap =  stream_get_contents($pipes[1]); //store imap file
 		fclose($pipes[1]);
 		$result = proc_close($process);
-		chdir($framework_config['framework_path']);
+		chdir($nodeViz_config['nodeViz_path']);
 		if($result) { 
 			trigger_error("GraphViz interpreter failed - returned $result", E_USER_ERROR);
 		}
@@ -222,9 +222,9 @@ class GraphVizExporter {
 		
 		if ($format != 'png') { 
 			#system("convert -quality 92 $datapath$graphname.png $datapath$graphname.$format");
-			chdir($framework_config['web_path']);
+			chdir($nodeViz_config['web_path']);
 			system("grep -v levelfour $datapath$graphname.svg | convert -quality 92 svg:- $datapath$graphname.$format");
-			chdir($framework_config['framework_path']);
+			chdir($nodeViz_config['nodeViz_path']);
 			unlink("$datapath$graphname.png");
 		}
 		
@@ -241,20 +241,20 @@ class GraphVizExporter {
 	}
 
 	public static function generateGraphvizOutput($graph, $datapath, $format, $returnsvg = 0) {
-		global $framework_config;
+		global $nodeViz_config;
 		$graphname = $graph->graphname();
 		$imageFile = "$datapath$graphname.$format";
 		$dotFile = "$datapath$graphname.dot";
 		$svgFile = "$datapath$graphname.svg";
  
-		$cache = $framework_config['cache'];
-		if (! is_dir($framework_config['cache_path']) || ! is_readable($framework_config['cache_path'])) {
-			trigger_error("Unable to read cache to cache directory '".$framework_config['cache_path']."'", E_USER_ERROR);
+		$cache = $nodeViz_config['cache'];
+		if (! is_dir($nodeViz_config['cache_path']) || ! is_readable($nodeViz_config['cache_path'])) {
+			trigger_error("Unable to read cache to cache directory '".$nodeViz_config['cache_path']."'", E_USER_ERROR);
 		}
 		$output = "";
 		if ($cache != 1) {
-			if (! is_writable($framework_config['cache_path'])) {
-				trigger_error("Unable to write cache to cache directory '".$framework_config['cache_path']."'", E_USER_ERROR);
+			if (! is_writable($nodeViz_config['cache_path'])) {
+				trigger_error("Unable to write cache to cache directory '".$nodeViz_config['cache_path']."'", E_USER_ERROR);
 			}
 			list($imap, $svg) = GraphVizExporter::generateGraphFiles($graph, $datapath, $format);
 		} else {
@@ -267,7 +267,7 @@ class GraphVizExporter {
 		} else {
 			$overlay = $imap;
 		}
-		$path = preg_replace("|^".$framework_config['web_path']."|", "", $framework_config['cache_path']);
+		$path = preg_replace("|^".$nodeViz_config['web_path']."|", "", $nodeViz_config['cache_path']);
 		$image = "$path$graphname.$format";
 		$dot = "$path$graphname.dot";
 		return array('image'=>$image, 'graph'=>$graph, 'overlay'=>$overlay, 'dot'=>$dot);
@@ -286,7 +286,7 @@ class GraphVizExporter {
 
 	public static function processSVG($svgFile, $datapath, $graph) {
 		global $old_graphviz;
-		global $framework_config;
+		global $nodeViz_config;
 		$graphname = $graph->graphname();
 		#clean up the raw svg
 		$svg = file_get_contents($svgFile);
@@ -307,7 +307,7 @@ class GraphVizExporter {
 			$svg = preg_replace("/id=\"graph1/", "id=\"graph0", $svg);
 			//$svg = preg_replace("/<g id=\"graph0/", "<script xlink:href=\"svgpan.js\"/> <g id=\"graph0", $svg);
 			$svg = preg_replace("/viewBox=\"[^\"]*\"/", "", $svg);
-			$svg = preg_replace("/<ellipse fill=\"#.*/", "", $svg);
+			//$svg = preg_replace("/<ellipse fill=\"#.*/", "", $svg);
 			//rescale the svg
 		#	preg_match("/transform=\"scale\(([\.\d]+)/", $svg, $matches);
 		#	$newscale = substr($matches[1]/(96/72), 0, 8);
@@ -354,7 +354,7 @@ class GraphVizExporter {
 		fclose($svgout);
 	
 		#delete the raw svg
-		if (! $framework_config['debug']) { unlink($svgFile); }
+		if (! $nodeViz_config['debug']) { unlink($svgFile); }
 		return $svg;
 	}
 

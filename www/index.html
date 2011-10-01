@@ -3,24 +3,24 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>!Page Title!</title>
-	<link rel="stylesheet" type="text/css" href="framework/style.css"/>
+	<link rel="stylesheet" type="text/css" href="NodeViz/style.css"/>
 
-	<script type="text/javascript" src="framework/js/prototype.js" ></script>
-	<script type="text/javascript" src="framework/js/effects.js" ></script>
-	<script type="text/javascript" src="framework/js/slider.js" ></script>
-	<script type="text/javascript" src="framework/js/controls.js" ></script>
-	<script type="text/javascript" src="framework/js/prototypeex.js" ></script>
+	<script type="text/javascript" src="NodeViz/js/prototype.js" ></script>
+	<script type="text/javascript" src="NodeViz/js/effects.js" ></script>
+	<script type="text/javascript" src="NodeViz/js/slider.js" ></script>
+	<script type="text/javascript" src="NodeViz/js/controls.js" ></script>
+	<script type="text/javascript" src="NodeViz/js/prototypeex.js" ></script>
 
-	<script type="text/javascript" src="framework/GraphFramework.js" ></script>
-	<script type="text/javascript" src="framework/GraphImage.js" ></script>
-	<script type="text/javascript" src="framework/GraphList.js" ></script>
-	<script type="text/javascript" src="framework/GraphRaster.js" ></script>
-	<script type="text/javascript" src="framework/GraphSVG.js" ></script>
+	<script type="text/javascript" src="NodeViz/NodeViz.js" ></script>
+	<script type="text/javascript" src="NodeViz/GraphImage.js" ></script>
+	<script type="text/javascript" src="NodeViz/GraphList.js" ></script>
+	<script type="text/javascript" src="NodeViz/GraphRaster.js" ></script>
+	<script type="text/javascript" src="NodeViz/GraphSVG.js" ></script>
 	<script type="text/javascript">
 	//<![CDATA[
 		function initGraph() {
-			gf = new GraphFramework({graphdiv: 'graphs', listdiv:'lists', scrollList: 1});
-			//gf = new GraphFramework({graphdiv: 'graphs', listdiv:'lists', scrollList: 1, useSVG: 0});
+			gf = new NodeViz({graphdiv: 'graphs', listdiv:'lists', scrollList: 1});
+			//gf = new NodeViz({graphdiv: 'graphs', listdiv:'lists', scrollList: 1, useSVG: 0});
 		}	
 	//]]>	
 	</script>
@@ -32,6 +32,7 @@
 		<input name='setupfile' type='radio' value='DemoGraph' checked='1'/> DemoGraph
 		<input name='setupfile' type='radio' value='FECCanComGraph' /> FECCanComGraph
 		<input name='setupfile' type='radio' value='ContributionGraph' /> ContributionGraph
+		<input name='setupfile' type='radio' value='Unfluence' /> Unfluence
 		Logarithmic scaling: <input name='log_scaling' type='checkbox' value='2'>
 	</form>	
 		

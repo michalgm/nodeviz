@@ -1,7 +1,7 @@
 var GraphSVG = Class.create(GraphImage, {
-	initialize: function($super, framework) {
-		$super(framework);
-		if (this.Framework.useSVG != 1 ) { return; } 
+	initialize: function($super, NodeViz) {
+		$super(NodeViz);
+		if (this.NodeViz.useSVG != 1 ) { return; } 
 		//this.GraphSVGZoom = new GraphSVGZoom(this);
 		$(this.graphdiv).innerHTML += this.zoomControlsHTML;
 	},
@@ -69,12 +69,12 @@ var GraphSVG = Class.create(GraphImage, {
 	},
 	setupListeners: function($super) {
 		$super();
-		Event.observe($('svgscreen'),'click', this.Framework.unselectNode.bind(this.Framework));
+		Event.observe($('svgscreen'),'click', this.NodeViz.unselectNode.bind(this.NodeViz));
 		Event.observe($('svg_overlay'), 'mousemove', this.mousemove.bind(this));
 		Event.observe($('graphs'), 'mousemove', this.mousemove.bind(this));
 		$$('#svg_overlay .node').each( function(n) {
 			var nodeid = n.id;
-			var node = this.Framework.data.nodes[n.id]
+			var node = this.NodeViz.data.nodes[n.id]
 			if (node['zoom']) { 
 				this.addClassName($(nodeid), 'zoom_'+node['zoom']);
 				this.addClassName($('underlay_'+nodeid), 'zoom_'+node['zoom']);
@@ -87,7 +87,7 @@ var GraphSVG = Class.create(GraphImage, {
 			}
 			if (n.childNodes[1]) {
 				Event.observe(n,'mouseover', function(e) { eval(node.onMouseover); }.bind(this));
-				Event.observe(n,'mouseout', function(e) { this.Framework.unhighlightNode(n.id); }.bind(this));
+				Event.observe(n,'mouseout', function(e) { this.NodeViz.unhighlightNode(n.id); }.bind(this));
 				Event.observe(n,'mouseup', function(e) { 
 					var origin = this.getEventPoint(e).matrixTransform(this.stateTf);
 					if (this.stateOrigin.x == origin.x && this.stateOrigin.y == origin.y) {
@@ -98,7 +98,7 @@ var GraphSVG = Class.create(GraphImage, {
 		}, this);
 		$$('#svg_overlay .edge').each( function(n) {
 			var edgeid = n.id;
-			var edge = this.Framework.data.edges[edgeid];
+			var edge = this.NodeViz.data.edges[edgeid];
 			if (edge['zoom']) { 
 				this.addClassName($(edgeid), 'zoom_'+edge['zoom']);
 				this.addClassName($('underlay_'+edgeid), 'zoom_'+edge['zoom']);
@@ -123,9 +123,9 @@ var GraphSVG = Class.create(GraphImage, {
 	},
 	highlightNode: function($super, id, text, noshowtooltip) {
 		$super(id, text, noshowtooltip);
-		var node = $(id).childNodes[3];
+		var node = $(id).childElements().reverse()[0]
 		node.setAttribute('class', 'nhighlight');
-		if (this.Framework.current['network']) { 
+		if (this.NodeViz.current['network']) { 
 			//$(id).parentNode.appendChild($(id));
 		}
 		this.showSVGElement(id);
@@ -133,11 +133,11 @@ var GraphSVG = Class.create(GraphImage, {
 
 	unhighlightNode: function($super, id) {
 		$super(id);
-		var framework = this.Framework;
-		if (! framework.useSVG) { return; }
+		var NodeViz = this.NodeViz;
+		if (! NodeViz.useSVG) { return; }
 		var node = $(id);
-		node.childNodes[3].removeAttribute('class');
-		if (framework.current['network'] == id || (framework.data.nodes[framework.current['network']] && framework.data.nodes[framework.current['network']]['relatedNodes'][id])) {
+		node.childElements().reverse()[0].removeAttribute('class');
+		if (NodeViz.current['network'] == id || (NodeViz.data.nodes[NodeViz.current['network']] && NodeViz.data.nodes[NodeViz.current['network']]['relatedNodes'][id])) {
 			return;
 		} else {
 			this.hideSVGElement(node);
@@ -147,15 +147,15 @@ var GraphSVG = Class.create(GraphImage, {
 	showNetwork: function(id) {
 		var node = $(id);
 		if (! node) { return; }
-		if (this.Framework.current['network'] == node.id) { 
+		if (this.NodeViz.current['network'] == node.id) { 
 			this.hideNetwork();
 			this.highlightNode(node.id);
 			return;
 		}
-		if (this.Framework.current['edge']) { 
+		if (this.NodeViz.current['edge']) { 
 			this.hideEdge(1);
 		}
-		if (this.Framework.current['network']) { 
+		if (this.NodeViz.current['network']) { 
 			this.hideNetwork(1);
 		}
 		if ($('image').getOpacity() == 1) {
@@ -168,7 +168,7 @@ var GraphSVG = Class.create(GraphImage, {
 		$H(nodelookup[node.id]['lnodes']).keys().each(function(e) {
 			this.showSVGElement(e);
 		}, this);
-		this.Framework.current['network'] = node.id	
+		this.NodeViz.current['network'] = node.id	
 	},
 
 	showSVGElement: function(e) {
@@ -189,10 +189,10 @@ var GraphSVG = Class.create(GraphImage, {
 		if ($('image').getOpacity() == 1) {
 			new Effect.Opacity('image', { from: 1, to: .3, duration: .5});
 		}
-		$H(this.Framework.data.nodes[id].relatedNodes).keys().each(function(e) {
+		$H(this.NodeViz.data.nodes[id].relatedNodes).keys().each(function(e) {
 			this.showSVGElement(e);
 			this.addClassName($(e), 'oselected');
-			$H(this.Framework.data.nodes[id].relatedNodes[e]).values().each( function(edge) { 
+			$H(this.NodeViz.data.nodes[id].relatedNodes[e]).values().each( function(edge) { 
 				this.showSVGElement(edge);
 			}, this);
 		}, this);
@@ -203,10 +203,10 @@ var GraphSVG = Class.create(GraphImage, {
 			new Effect.Opacity('image', { from: .3, to: 1, duration: .3});
 		}
 		this.removeClassName($(id), 'selected');
-		$H(this.Framework.data.nodes[id].relatedNodes).keys().each(function(e) {
+		$H(this.NodeViz.data.nodes[id].relatedNodes).keys().each(function(e) {
 			this.hideSVGElement(e);
 			this.removeClassName($(e), 'oselected');
-			$H(this.Framework.data.nodes[id].relatedNodes[e]).values().each( function(edge) { 
+			$H(this.NodeViz.data.nodes[id].relatedNodes[e]).values().each( function(edge) { 
 				this.hideSVGElement(edge);
 			}, this);
 		}, this);
@@ -477,7 +477,7 @@ var GraphSVG = Class.create(GraphImage, {
 
 		var origin = this.getEventPoint(evt).matrixTransform(this.stateTf);
 		if (this.stateOrigin.x == origin.x && this.stateOrigin.y == origin.y && (evt.target.id == 'svgscreen' || evt.target.tagName == 'svg_overlay' || evt.target.tagName == 'svg')) { 
-			this.Framework.unselectNode(1);
+			this.NodeViz.unselectNode(1);
 		}
 
 		if(this.state == 'pan') {
@@ -494,7 +494,7 @@ var GraphSVG = Class.create(GraphImage, {
 		} else if (d == 'out') { 
 			d = this.zoomSlider.value- 1;
 		} else if (d == 'reset') {
-			this.Framework.panToNode('graph0', 1);
+			this.NodeViz.panToNode('graph0', 1);
 			return;
 		}
 		if (d < 0 || d > this.zoomlevels) {

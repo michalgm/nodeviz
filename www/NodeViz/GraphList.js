@@ -3,12 +3,12 @@ var GraphList = Class.create();
 
 GraphList.prototype = {
 
-	initialize: function(framework) {
-		this.Framework = framework;
-		this.listdiv = this.Framework.listdiv;
+	initialize: function(NodeViz) {
+		this.NodeViz = NodeViz;
+		this.listdiv = this.NodeViz.listdiv;
 	},
 	reset: function() { 
-		var data = this.Framework.data;
+		var data = this.NodeViz.data;
 		var parent = '#'+this.listdiv;
 		//TODO - there may be a slightly more efficient way of finding these nodes - gm - 12/28/10
 		$$(parent+' li', parent+' div').each(function(e) { 
@@ -21,7 +21,7 @@ GraphList.prototype = {
 	},
 	render: function(responseData) {
 		//console.time('renderList');
-		var data = this.Framework.data;
+		var data = this.NodeViz.data;
 		this.nodeLists = new Hash();
 		$(this.listdiv).insert({ top: new Element('ul', {'id': 'list_menu'}) });
 		$H(data.nodetypes).values().each( function(nodetype) {
@@ -41,9 +41,9 @@ GraphList.prototype = {
 				}
 				nodelist_entry = new Element('li', {'id': 'list_'+nodeid});
 				nodelist_entry.update(this.listNodeEntry(node));
-				Event.observe(nodelist_entry, 'mouseover', function(e) { this.highlightNode(nodeid, 1); }.bind(this.Framework));
-				Event.observe(nodelist_entry, 'mouseout', function(e) { this.unhighlightNode(nodeid); }.bind(this.Framework));
-				Event.observe(nodelist_entry, 'click', function(e) { this.selectNode(nodeid); }.bind(this.Framework));
+				Event.observe(nodelist_entry, 'mouseover', function(e) { this.highlightNode(nodeid, 1); }.bind(this.NodeViz));
+				Event.observe(nodelist_entry, 'mouseout', function(e) { this.unhighlightNode(nodeid); }.bind(this.NodeViz));
+				Event.observe(nodelist_entry, 'click', function(e) { this.selectNode(nodeid); }.bind(this.NodeViz));
 				nodelist.insert({ bottom: nodelist_entry});
 
 				//setup sub lists
@@ -52,8 +52,8 @@ GraphList.prototype = {
 					this.setupSubLists(node, edgetype, 'from', sublists); 
 					this.setupSubLists(node, edgetype, 'to', sublists); 
 				}, this);
-				Event.observe(sublists, 'click', function(e) { e.stop(); }.bind(this.Framework));
-				Event.observe(sublists, 'mouseover', function(e) { e.stop(); }.bind(this.Framework));
+				Event.observe(sublists, 'click', function(e) { e.stop(); }.bind(this.NodeViz));
+				Event.observe(sublists, 'mouseover', function(e) { e.stop(); }.bind(this.NodeViz));
 				nodelist.insert({ bottom: sublists});
 			}, this);
 			$(nodetype+'_list_container').insert({ bottom: nodelist });
@@ -61,8 +61,8 @@ GraphList.prototype = {
 				new Autocompleter.Local(nodetype+'_search', nodetype+'_search_list', this.nodeLists[nodetype].keys(), {
 					'fullSearch': true, 
 					afterUpdateElement: function (t, l) {
-						if (t.value && this.nodeLists[this.Framework.current.nodetype].get(t.value)) { 
-							this.Framework.selectNode(this.nodeLists[this.Framework.current.nodetype].get(t.value));
+						if (t.value && this.nodeLists[this.NodeViz.current.nodetype].get(t.value)) { 
+							this.NodeViz.selectNode(this.nodeLists[this.NodeViz.current.nodetype].get(t.value));
 						}
 						t.value = '';
 					}.bind(this)
@@ -73,17 +73,17 @@ GraphList.prototype = {
 		console.timeEnd('renderList');
 	},
 	displayList: function(nodetype) { 
-		oldnodetype = this.Framework.current['nodetype'];
+		oldnodetype = this.NodeViz.current['nodetype'];
 		if(oldnodetype != '') { 
 			$(oldnodetype+'_list_container').removeClassName('selected');
 			$(oldnodetype+'_menu').removeClassName('selected');
 		}
 		$(nodetype+'_list_container').addClassName('selected');
 		$(nodetype+'_menu').addClassName('selected');
-		this.Framework.current['nodetype'] = nodetype;
+		this.NodeViz.current['nodetype'] = nodetype;
 	},
 	setupSubLists: function(node, edgetype, direction, sublists) { 
-		var data = this.Framework.data;
+		var data = this.NodeViz.data;
 		var dirindex = direction == 'from' ? 0 : 1; 
 		var otherdir = direction == 'from' ? 'to' : 'from';
 		var nodeid = node.id;
@@ -109,9 +109,9 @@ GraphList.prototype = {
 					var subelem = new Element('li', {'id': sublistdiv+'_'+snode.id});
 
 					subelem.update(this.listSubNodeEntry(snode, node, edgetype, direction));
-					Event.observe(subelem, 'mouseover', function(e) { this.highlightNode(snode.id, 1); }.bind(this.Framework));
-					Event.observe(subelem, 'mouseout', function(e) { this.unhighlightNode(snode.id); }.bind(this.Framework));
-					Event.observe(subelem, 'click', function(e) { this.selectNode(snode.id); }.bind(this.Framework));
+					Event.observe(subelem, 'mouseover', function(e) { this.highlightNode(snode.id, 1); }.bind(this.NodeViz));
+					Event.observe(subelem, 'mouseout', function(e) { this.unhighlightNode(snode.id); }.bind(this.NodeViz));
+					Event.observe(subelem, 'click', function(e) { this.selectNode(snode.id); }.bind(this.NodeViz));
 					elem.insert({ bottom: subelem });
 				}, this);
 				sublists.insert({ bottom: elem });
@@ -140,12 +140,12 @@ GraphList.prototype = {
 		return link+"<span class='"+node_class+"'>"+label+"</span>";
 	},
 	highlightNode: function (id) { 
-		var networkNode = this.Framework.data.nodes[this.Framework.current.network];
-		var highlightNode = this.Framework.data.nodes[id];
-		if(networkNode && networkNode.type != highlightNode.type && networkNode.type == this.Framework.current.nodetype) { 
-			var other_id = this.Framework.current.network;
+		var networkNode = this.NodeViz.data.nodes[this.NodeViz.current.network];
+		var highlightNode = this.NodeViz.data.nodes[id];
+		if(networkNode && networkNode.type != highlightNode.type && networkNode.type == this.NodeViz.current.nodetype) { 
+			var other_id = this.NodeViz.current.network;
 			$H(highlightNode.relatedNodes[other_id]).values().each( function(edgeid) { 
-				var edge = this.Framework.data.edges[edgeid];
+				var edge = this.NodeViz.data.edges[edgeid];
 				var type = edge.type;
 				var dir = edge.toId == id ? 'from' : 'to';
 				var subnodeid = 'list_'+other_id+'_'+type+'_'+dir+'_'+id;
@@ -156,12 +156,12 @@ GraphList.prototype = {
 		}
 	},
 	unhighlightNode: function (id) { 
-		var networkNode = this.Framework.data.nodes[this.Framework.current.network];
-		var highlightNode = this.Framework.data.nodes[id];
-		if(networkNode && networkNode.type != highlightNode.type && networkNode.type == this.Framework.current.nodetype) { 
-			var other_id = this.Framework.current.network;
+		var networkNode = this.NodeViz.data.nodes[this.NodeViz.current.network];
+		var highlightNode = this.NodeViz.data.nodes[id];
+		if(networkNode && networkNode.type != highlightNode.type && networkNode.type == this.NodeViz.current.nodetype) { 
+			var other_id = this.NodeViz.current.network;
 			$H(highlightNode.relatedNodes[other_id]).values().each( function(edgeid) { 
-				var edge = this.Framework.data.edges[edgeid];
+				var edge = this.NodeViz.data.edges[edgeid];
 				var type = edge.type;
 				var dir = edge.toId == id ? 'from' : 'to';
 				var subnodeid = 'list_'+other_id+'_'+type+'_'+dir+'_'+id;
@@ -172,11 +172,11 @@ GraphList.prototype = {
 		}
 	},
 	selectNode: function(id) { 
-		this.displayList(this.Framework.data.nodes[id].type);
+		this.displayList(this.NodeViz.data.nodes[id].type);
 		var elem = $('list_'+id);
 		elem.addClassName('selected');
 		$(id+'_sublists').setStyle({'display': 'block'});
-		if (this.Framework.scrollList) { 
+		if (this.NodeViz.scrollList) { 
 			elem.parentNode.scrollTop = elem.offsetTop;
 		}
 	},

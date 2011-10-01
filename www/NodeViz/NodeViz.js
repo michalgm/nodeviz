@@ -1,22 +1,22 @@
-var GraphFramework = Class.create();
+var NodeViz = Class.create();
 
-GraphFramework.prototype = {
+NodeViz.prototype = {
 	initialize: function(options) { 
 		this.timeOutLength = 100;
 		this.errordiv = 'error';
 		this.lightboxdiv = 'lightbox';
 		this.lightboxscreen = 'lightboxscreen';
 		this.optionsform = 'graphoptions';
-		this.frameworkPath = 'framework/';
+		this.NodeVizPath = 'nodeViz/';
 		Object.extend(this, options);
 		if (! this.prefix) { 
 
-			if (typeof(graphframeworkcounter) == 'undefined') { 
-				graphframeworkcounter = 1;
+			if (typeof(NodeVizCounter) == 'undefined') { 
+				NodeVizCounter = 1;
 			} else {
-				graphframeworkcounter++;
+				NodeVizCounter++;
 			}
-			this.prefix = 'graph'+graphframeworkcounter+'_';
+			this.prefix = 'graph'+NodeVizCounter+'_';
 		}
 		if (! $(this.errordiv)) { 
 			$(document.body).insert({ top: new Element('div', {'id': this.errordiv}) });
@@ -142,7 +142,7 @@ GraphFramework.prototype = {
 
 		var params = this.getGraphOptions();
 		//console.time('fetch');
-		var request = new Ajax.Request(this.frameworkPath+'request.php', {
+		var request = new Ajax.Request(this.NodeVizPath+'request.php', {
 			parameters: params,
 			timeOut: this.timeOutLength,
 			onLoading: function() { this.onLoading('images'); }.bind(this),
@@ -212,7 +212,7 @@ GraphFramework.prototype = {
 		var params = this.getGraphOptions();
 		params.action = 'displayEdge';
 		params.edgeid = id;
-		var request = new Ajax.Request(this.frameworkPath+'request.php', {
+		var request = new Ajax.Request(this.NodeVizPath+'request.php', {
 			parameters: params,
 			timeOut: this.timeOutLength,
 			onLoading: function() { this.onLoading(this.lightboxdiv+'contents'); }.bind(this),

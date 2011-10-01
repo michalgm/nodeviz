@@ -1,6 +1,6 @@
 var GraphRaster = Class.create(GraphImage, {
-	initialize: function($super, framework) {
-		$super(framework);
+	initialize: function($super, NodeViz) {
+		$super(NodeViz);
 		if (! $('highlight')) { 
 			$('graphs').insert({ top: new Element('div', {'id': 'highlight'}) });
 		}
@@ -9,7 +9,7 @@ var GraphRaster = Class.create(GraphImage, {
 	reset: function($super) {
 		$super();
 		if ($('G')) { 
-			var data = this.Framework.data;
+			var data = this.NodeViz.data;
 			$('G').descendants().each(function(a) { 
 				if (data.edges[a.id] || data.nodes[a.id]) { 
 					$(a).stopObserving();
@@ -26,17 +26,17 @@ var GraphRaster = Class.create(GraphImage, {
 		var map = " usemap='#G'";
 		$('images').update("<img id='image' "+map+" border='0' src='"+image+"' />"+overlay);
 		$('G').descendants().each(function(a) { 
-			if (this.Framework.data.edges[a.id]) { 
-				var edge = this.Framework.data.edges[a.id];
+			if (this.NodeViz.data.edges[a.id]) { 
+				var edge = this.NodeViz.data.edges[a.id];
 				Event.observe($(a), 'mouseout', this.hideTooltip.bind(this)); 
 				Event.observe($(a), 'mousemove', this.mousemove.bind(this));
 				if (edge.onMouseover != '') { Event.observe($(a), 'mouseover', function(e) { eval(edge.onMouseover); }.bind(this)); }
 				if (edge.onClick != '') { Event.observe($(a), 'click', function(e) { eval(edge.onClick); }.bind(this)); }
-			} else if (this.Framework.data.nodes[a.id]) { 
-				var node = this.Framework.data.nodes[a.id];
+			} else if (this.NodeViz.data.nodes[a.id]) { 
+				var node = this.NodeViz.data.nodes[a.id];
 				if (node.onMouseover != '') { Event.observe($(a), 'mouseover', function(e) { eval(node.onMouseover); }.bind(this)); }
 				if (node.onClick != '') { Event.observe($(a), 'click', function(e) { eval(node.onClick); }.bind(this)); }
-				//Event.observe($(a), 'mouseout', function(e) { this.Framework.unhighlightNode(a.id); }.bind(this)); 
+				//Event.observe($(a), 'mouseout', function(e) { this.NodeViz.unhighlightNode(a.id); }.bind(this)); 
 				var coords = $(a).getAttribute('coords').split(',');
 				if ($(a).getAttribute('shape') == 'circle') {
 					node['width'] = coords[2]*2;
@@ -57,19 +57,19 @@ var GraphRaster = Class.create(GraphImage, {
 	setupListeners: function($super) {
 		$super();
 		Event.observe($('highlight'), 'mousemove', this.mousemove.bind(this));
-		Event.observe($('highlight'), 'click', this.Framework.selectNode.bind(this.Framework));
-		//Event.observe($('highlightimg'), 'click', this.Framework.selectNode.bind(this.Framework));
+		Event.observe($('highlight'), 'click', this.NodeViz.selectNode.bind(this.NodeViz));
+		//Event.observe($('highlightimg'), 'click', this.NodeViz.selectNode.bind(this.NodeViz));
 		//Event.observe($('highlight'), 'mouseover', this.highlightNode);
-		Event.observe($('highlightimg'), 'mouseout', this.Framework.unhighlightNode.bind(this.Framework));
-		Event.observe($('highlight'), 'mouseout', this.Framework.unhighlightNode.bind(this.Framework));
+		Event.observe($('highlightimg'), 'mouseout', this.NodeViz.unhighlightNode.bind(this.NodeViz));
+		Event.observe($('highlight'), 'mouseout', this.NodeViz.unhighlightNode.bind(this.NodeViz));
 	},
 	highlightNode: function($super, id, text, noshowtooltip) {
 		$super(id, text, noshowtooltip);
-		var node = this.Framework.data.nodes[id];
+		var node = this.NodeViz.data.nodes[id];
 		$('highlight').style.width = parseFloat(node['width']) +2 +'px';
 		$('highlight').style.height = parseFloat(node['height']) +2 +'px';
-		$('highlight').style.top = parseFloat(node['posy']) -1 + this.Framework.offsetY + 'px';
-		$('highlight').style.left = parseFloat(node['posx']) -1 + this.Framework.offsetX + 'px';
+		$('highlight').style.top = parseFloat(node['posy']) -1 + this.NodeViz.offsetY + 'px';
+		$('highlight').style.left = parseFloat(node['posx']) -1 + this.NodeViz.offsetX + 'px';
 		$('highlight').style.visibility = 'visible';
 		if (node['shape'] != 'circle') { 
 			$('highlight').addClassName('selected');

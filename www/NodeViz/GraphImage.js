@@ -2,9 +2,9 @@
 var GraphImage = Class.create();
 
 GraphImage.prototype = {
-	initialize: function(framework) {
-		this.Framework = framework;
-		this.graphdiv = this.Framework.graphdiv;
+	initialize: function(NodeViz) {
+		this.NodeViz = NodeViz;
+		this.graphdiv = this.NodeViz.graphdiv;
 		if (! $('tooltip')) { 
 			$(document.body).insert({ top: new Element('div', {'id': 'tooltip'}) });
 		}
@@ -19,27 +19,27 @@ GraphImage.prototype = {
 	render: function(responseData) {
 	},
 	appendOptions: function() {
-		this.Framework.params.useSVG = this.Framework.useSVG;
-		this.Framework.params.graphWidth = this.graphDimensions.width;
-		this.Framework.params.graphHeight = this.graphDimensions.height;
+		this.NodeViz.params.useSVG = this.NodeViz.useSVG;
+		this.NodeViz.params.graphWidth = this.graphDimensions.width;
+		this.NodeViz.params.graphHeight = this.graphDimensions.height;
 	},
 	//Catches mousemove events
 	mousemove: function(e) {
 		if($('tooltip').style.visibility == 'visible') { 
 			var mousepos = { 'x': Event.pointerX(e), 'y': Event.pointerY(e) };
-			$('tooltip').setStyle({'top': (mousepos['y']- this.Framework.tooltipOffsetY - $('tooltip').getHeight()) + 'px', 'left': (mousepos['x']  - this.Framework.tooltipOffsetX) + 'px'});
+			$('tooltip').setStyle({'top': (mousepos['y']- this.NodeViz.tooltipOffsetY - $('tooltip').getHeight()) + 'px', 'left': (mousepos['x']  - this.NodeViz.tooltipOffsetX) + 'px'});
 		}
 	},
 	setupListeners: function() { 
 		Event.observe($('image'), 'mousemove', this.mousemove.bind(this));
 		Event.observe($('tooltip'), 'mousemove', this.mousemove.bind(this))
 		Event.observe($('tooltip'), 'mouseout', this.hideTooltip.bind(this));
-		Event.observe(window, 'resize', this.Framework.setOffsets.bind(this));
+		Event.observe(window, 'resize', this.NodeViz.setOffsets.bind(this));
 	},
 
 	showTooltip: function(label) {
-		if (! this.Framework.offsetY) { 
-			this.Framework.setOffsets();
+		if (! this.NodeViz.offsetY) { 
+			this.NodeViz.setOffsets();
 		}
 		tooltip = $('tooltip');
 		if(label) { 
@@ -55,7 +55,7 @@ GraphImage.prototype = {
 	highlightNode: function(id, noshowtooltip) {
 		if (! noshowtooltip) { 
 			id = id.toString();
-			this.showTooltip(this.Framework.data.nodes[id].tooltip); //Set the tooltip contents
+			this.showTooltip(this.NodeViz.data.nodes[id].tooltip); //Set the tooltip contents
 		}
 	},
 	unhighlightNode: function(id) { 
