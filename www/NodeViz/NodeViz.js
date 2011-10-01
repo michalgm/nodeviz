@@ -7,7 +7,7 @@ NodeViz.prototype = {
 		this.lightboxdiv = 'lightbox';
 		this.lightboxscreen = 'lightboxscreen';
 		this.optionsform = 'graphoptions';
-		this.NodeVizPath = 'nodeViz/';
+		this.NodeVizPath = 'NodeViz/';
 		Object.extend(this, options);
 		if (! this.prefix) { 
 

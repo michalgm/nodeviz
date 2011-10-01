@@ -179,11 +179,11 @@ class FECCanComGraph extends NodeViz {
 		#$graph['nodes']['candidates'] = $nodes;
 		foreach($nodes as &$node) {
 			$node['shape'] = 'box';
-			$node['onClick'] = "this.Framework.selectNode('".$node['id']."');";
+			$node['onClick'] = "this.NodeViz.selectNode('".$node['id']."');";
 			if ($node['campaignstate'] != '00' && $node['campaignstate'] != '') {
 				$state = "-$node[campaignstate]";
 			} else { $state = ""; }
-			$node['onMouseover'] = "this.Framework.highlightNode('".$node['id']."');";
+			$node['onMouseover'] = "this.NodeViz.highlightNode('".$node['id']."');";
 			$node['tooltip'] = safeLabel(niceName($node['Name'])." (".$node['PartyDesignation1'][0]."$state)").'<br/>$'.$node['nicecash'];
 			$node['FName'] = htmlspecialchars(niceName($node['Name']), ENT_QUOTES);
 			$node['Name'] = htmlspecialchars(niceName($node['Name'], 1), ENT_QUOTES);
@@ -245,8 +245,8 @@ class FECCanComGraph extends NodeViz {
 		#$graph['nodes']['companies'] = $nodes;
 		foreach($nodes as &$node) {
 			$node['shape'] = 'circle';
-			$node['onClick'] = "this.Framework.selectNode('".$node['id']."');";
-			$node['onMouseover'] = "this.Framework.highlightNode('".$node['id']."');";
+			$node['onClick'] = "this.NodeViz.selectNode('".$node['id']."');";
+			$node['onMouseover'] = "this.NodeViz.highlightNode('".$node['id']."');";
 			$node['tooltip'] = safeLabel($node['Name']).'<br/>$'.$node['nicecash'];
 			$node['color'] = lookupPartyColor($node['sitecode']);
 			//$node['fillcolor'] = 'white';
@@ -337,7 +337,7 @@ class FECCanComGraph extends NodeViz {
 				//unset($graph['edges'][$key]); 
 				continue;
 			}
-			$edge['onClick'] = "this.Framework.selectEdge('".$edge['id']."');";
+			$edge['onClick'] = "this.NodeViz.selectEdge('".$edge['id']."');";
 			$edge['cash'] = $edgeprops[$edge['id']]['cash'];   //get the appropriate ammount properties
 			$edge['nicecash'] = $edgeprops[$edge['id']]['nicecash']; 
 			$edge['tooltip'] = $edgeprops[$edge['id']]['nicecash']; 
