@@ -263,6 +263,7 @@ class NodeViz {
 	}
 
 	function subval_sort($a,$subkey) {
+		if (count($a) == 0) { return $a; }
 		foreach($a as $k=>$v) {
 			$b[$k] = strtolower($v[$subkey]);
 		}

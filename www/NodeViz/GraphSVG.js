@@ -123,7 +123,8 @@ var GraphSVG = Class.create(GraphImage, {
 	},
 	highlightNode: function($super, id, text, noshowtooltip) {
 		$super(id, text, noshowtooltip);
-		var node = $(id).childElements().reverse()[0]
+		var node;
+		var node = $A($(id).childNodes).detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; })
 		node.setAttribute('class', 'nhighlight');
 		if (this.NodeViz.current['network']) { 
 			//$(id).parentNode.appendChild($(id));
@@ -136,7 +137,7 @@ var GraphSVG = Class.create(GraphImage, {
 		var NodeViz = this.NodeViz;
 		if (! NodeViz.useSVG) { return; }
 		var node = $(id);
-		node.childElements().reverse()[0].removeAttribute('class');
+		$A($(id).childNodes).detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; }).removeAttribute('class');
 		if (NodeViz.current['network'] == id || (NodeViz.data.nodes[NodeViz.current['network']] && NodeViz.data.nodes[NodeViz.current['network']]['relatedNodes'][id])) {
 			return;
 		} else {
