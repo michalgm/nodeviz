@@ -140,8 +140,42 @@ Object.extend( Form.Element.Serializers, {
 Element.addMethods();
 Field = Form.Element;
 $F = Form.Element.Methods.getValue;
-
-
+var ext = {
+	getClassName: function(element) { 
+		className = element.className;
+		if (typeof className.baseVal === 'undefined') { 
+			return className;
+		} else {
+			return className.baseVal;
+		}
+	},
+	setClassName: function(element, className) {
+		if(typeof element.className.baseVal === 'undefined') {
+			element.className = className;
+		} else {
+			element.className.baseVal = className;
+		}
+		return element;
+	}
+}
+Element.addMethods(ext);
+//maybe this will make svg animation work?
+//copy(Element.Methods, SVGElement.prototype);
+//SVGElement.prototype.setStyle = Element.setStyle;
+//SVGElement.prototype.makePositioned = Element.makePositioned;
+//SVGElement.prototype.getStyle = Element.getStyle;
+hack_extend(Element.Methods, SVGElement.prototype);
+hack_extend(Effect.Methods, SVGElement.prototype);
+SVGElement.prototype.className = function() { this.getAttribute('class'); }
+function hack_extend(methods, destination) {
+    onlyIfAbsent = true;
+    for (var property in methods) {
+      var value = methods[property];
+      if (!Object.isFunction(value)) continue;
+      if (!onlyIfAbsent || !(property in destination))
+        destination[property] = value.methodize();
+    }
+}
 
 Effect.Translate = Class.create(Effect.Base, {
   initialize: function(element) {
