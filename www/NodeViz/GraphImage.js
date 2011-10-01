@@ -38,14 +38,14 @@ GraphImage.prototype = {
 	},
 
 	showTooltip: function(label) {
-		if (! this.NodeViz.offsetY) { 
-			this.NodeViz.setOffsets();
-		}
-		tooltip = $('tooltip');
-		if(label) { 
+		if(label != '') { 
+			if (! this.NodeViz.offsetY) { 
+				this.NodeViz.setOffsets();
+			}
+			tooltip = $('tooltip');
 			tooltip.innerHTML = label;
+			tooltip.style.visibility='visible'; //show the tooltip
 		}
-		tooltip.style.visibility='visible'; //show the tooltip
 	},
 
 	hideTooltip: function() { 
