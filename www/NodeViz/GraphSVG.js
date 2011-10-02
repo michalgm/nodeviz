@@ -122,7 +122,7 @@ var GraphSVG = Class.create(GraphImage, {
 		this.setupZoomListeners($('svg_overlay').childNodes[0]);
 	},
 	highlightNode: function($super, id, text, noshowtooltip) {
-		if (this.state != '') { console.log(this.state); return; }
+		if (this.state != '') { return; }
 		$super(id, text, noshowtooltip);
 		var node;
 		var node = $A($(id).childNodes).reverse().detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; })
