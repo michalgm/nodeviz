@@ -122,9 +122,10 @@ var GraphSVG = Class.create(GraphImage, {
 		this.setupZoomListeners($('svg_overlay').childNodes[0]);
 	},
 	highlightNode: function($super, id, text, noshowtooltip) {
+		if (this.state != '') { console.log(this.state); return; }
 		$super(id, text, noshowtooltip);
 		var node;
-		var node = $A($(id).childNodes).detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; })
+		var node = $A($(id).childNodes).reverse().detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; })
 		node.setAttribute('class', 'nhighlight');
 		if (this.NodeViz.current['network']) { 
 			//$(id).parentNode.appendChild($(id));
@@ -137,7 +138,7 @@ var GraphSVG = Class.create(GraphImage, {
 		var NodeViz = this.NodeViz;
 		if (! NodeViz.useSVG) { return; }
 		var node = $(id);
-		$A($(id).childNodes).detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; }).removeAttribute('class');
+		$A($(id).childNodes).reverse().detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; }).removeAttribute('class');
 		if (NodeViz.current['network'] == id || (NodeViz.data.nodes[NodeViz.current['network']] && NodeViz.data.nodes[NodeViz.current['network']]['relatedNodes'][id])) {
 			return;
 		} else {
@@ -308,7 +309,7 @@ var GraphSVG = Class.create(GraphImage, {
 		Event.observe(root, 'mouseup', function(e) { this.handleMouseUp(e); }.bind(this));
 		Event.stopObserving('svgscreen', 'click');
 		Event.observe($('svgscreen'), 'mouseup', function(e) { this.handleMouseUp(e); }.bind(this));
-		//Event.observe($('svg_overlasvg_overlay'), 'mouseout', function(e) { this.handleMouseUp(e); }.bind(this));
+		Event.observe($('images'), 'mouseleave', function(e) { this.handleMouseUp(e); }.bind(this));
 		Event.observe($('zoomin'), 'click', function(e) { this.zoom('in'); }.bind(this));
 		Event.observe($('zoomout'), 'click', function(e) { this.zoom('out'); }.bind(this));
 		Event.observe($('zoomreset'), 'click', function(e) { this.zoom('reset'); }.bind(this));

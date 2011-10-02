@@ -38,6 +38,7 @@ GraphImage.prototype = {
 	},
 
 	showTooltip: function(label) {
+		if (typeof(this.state) != 'undefined' && this.state !== '') { return; }
 		if(label != '') { 
 			if (! this.NodeViz.offsetY) { 
 				this.NodeViz.setOffsets();
