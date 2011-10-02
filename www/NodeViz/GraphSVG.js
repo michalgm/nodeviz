@@ -7,7 +7,7 @@ var GraphSVG = Class.create(GraphImage, {
 	},
 	reset: function($super) {
 		$super();
-		this.state = 'none';
+		this.state = '';
 		this.stateOrigin = '';
 		this.zoomlevels = 8;
 		this.zoom_delta = .8;
