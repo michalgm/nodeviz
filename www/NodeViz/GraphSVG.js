@@ -259,7 +259,7 @@ var GraphSVG = Class.create(GraphImage, {
 		dom_p.y = dom_p.y -offset[1];
 
 		//if no level was passed, default to 'in'
-		level = level != '' ? level : 'in'
+		level = level !== '' ? level : 'in';
   		this.zoom(level,dom_p);
 	},
 
