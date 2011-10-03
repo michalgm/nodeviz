@@ -9,7 +9,7 @@ The server needs to be running PHP 5 or greater.
 
 == Install Graphviz ==
 We have been using GraphViz version 2.26.23 .  
-Recent versions of Ubuntu have GraphViz pre-installed. Otherwise follow instructions at http://www.graphviz.org/Download.php  If you will be using a version of GraphViz earlier that 2.24, you will need to set the 'old_graphviz' flag in config.php
+Most linux distributions can install the "graphviz" package by running the package manager. Otherwise follow instructions at http://www.graphviz.org/Download.php  If you will be using a version of GraphViz earlier that 2.24, you will need to set the 'old_graphviz' flag in config.php.
 
 == Checkout or download the Framework code ==
 
