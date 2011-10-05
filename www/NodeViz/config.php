@@ -18,7 +18,7 @@ $nodeViz_config = array(
 	'old_graphviz' => 0, #Set this to 1 if graphviz version < 2.24
 
 	#setupfiles needs to be an associative array of the graph setup files your application will use. 
-	'setupfiles' => array('crpgraphSetup.php'=>1, 'voteGraphSetup.php'=>1,'committeeGraphSetup.php'=>1, 'FECCanComGraph.php'=>1, 'FoundationGraph.php'=>1, 'ContributionGraph.php'=>1, 'DemoGraph.php'=>1, 'Unfluence.php'=>1),
+	'setupfiles' => array('NVDocumentationGraph.php'=>1,'crpgraphSetup.php'=>1, 'voteGraphSetup.php'=>1,'committeeGraphSetup.php'=>1, 'FECCanComGraph.php'=>1, 'FoundationGraph.php'=>1, 'ContributionGraph.php'=>1, 'DemoGraph.php'=>1, 'Unfluence.php'=>1),
 )
 
 ?>
