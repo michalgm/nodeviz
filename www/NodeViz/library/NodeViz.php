@@ -23,6 +23,7 @@ class NodeViz {
 
 		$this->width = null;
 		$this->height = null;
+		$this->prefix = null;
 
 		$this->data = $data;
 
@@ -58,6 +59,9 @@ class NodeViz {
 		}
 		if (isset($request_parameters['graphHeight'])) {
 			$this->height = $request_parameters['graphHeight'];
+		}
+		if (isset($request_parameters['prefix'])) {
+			$this->prefix = $request_parameters['prefix'];
 		}
 		if (method_exists($this, 'preProcessGraph')) {
 			$this->preProcessGraph();
@@ -129,8 +133,8 @@ class NodeViz {
 					$this->data['nodes'][$node['id']]['type'] = $nodetype;
 					$this->data['nodes'][$node['id']]['relatedNodes'] = array();
 				}
-				$this->data['nodetypesindex'][$nodetype] = array_keys($nodes);
 			}
+			$this->data['nodetypesindex'][$nodetype] = array_keys($nodes);
 		}
 
 		$this->checkIsolates();
@@ -145,8 +149,8 @@ class NodeViz {
 					$this->data['edges'][$edge['id']] = $edge;
 					$this->data['edges'][$edge['id']]['type'] = $edgetype;
 				}
-				//$this->data['edgetypesindex'][$edgetype] = array_keys($edges);
 			}
+			$this->data['edgetypesindex'][$edgetype] = array_keys($edges);
 		}
 		//should we check for edges linking to non-existant nodes?
 
