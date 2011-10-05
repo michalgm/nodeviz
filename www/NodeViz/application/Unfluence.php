@@ -21,8 +21,8 @@ class Unfluence extends NodeViz {
 		// graph level properties
 		$this->data['properties'] = array(
 			//sets the scaling of the elements in the gui
-			'minSize' => array('candidates' => '1', 'donations'=>'10'),
-			'maxSize' => array('candidates' => '6', 'donations' =>'60'),
+			'minSize' => array('candidates' => '.5', 'donations'=>'5'),
+			'maxSize' => array('candidates' => '3', 'donations' =>'30'),
 			'log_scaling' => 0,
 			'state'=>'AL',
 			'year'=>'2006',
@@ -43,8 +43,8 @@ class Unfluence extends NodeViz {
 				'start'=>'self',
 
 			),
-			'node'=> array('label'=> ' ', 'imagescale'=>'true','fixedsize'=>1, 'style'=> 'setlinewidth(7), filled', 'regular'=>'true', 'fontsize'=>50),
-			'edge'=>array('arrowhead'=>'normal', 'color'=>'#99339966', 'fontsize'=>50, 'len'=>8)
+			'node'=> array('label'=> ' ', 'imagescale'=>'true','fixedsize'=>1, 'style'=> 'setlinewidth(7), filled', 'regular'=>'true', 'fontsize'=>15),
+			'edge'=>array('arrowhead'=>'normal', 'arrowsize'=>3, 'color'=>'#99999966', 'fontsize'=>15, 'len'=>4, 'minlen'=>4)
 		);
 		srand(20); //Don't copy this - this just makes sure that we are generating the same 'random' values each time
 	}
@@ -113,12 +113,13 @@ class Unfluence extends NodeViz {
 			$node['label'] = $node['id'];
 			$node['value'] = $node['total_dollars'];
 			if (isset($node['candidate_name'])) {
-				$node['color'] = 'red';
-				$node['fillcolor'] = 'pink';
+				$node['color'] = colorize($node['party'])."33";
+				$node['fillcolor'] = '#ffffff';
 				$node['tooltip'] = $node['label']." (Recieved ".money_format('%.0n', $node['value']).")";
+				#$node['fill-opacity'] = .5;
 			} else {
-				$node['color'] = 'blue';
-				$node['fillcolor'] = "#ccccff";
+				$node['color'] = 'cadetblue';
+				$node['fillcolor'] = "#ffffff";
 				$node['tooltip'] = $node['label']." (Gave ".money_format('%.0n', $node['value']).")";
 			}
 			$node['shape'] = 'circle';
@@ -162,4 +163,12 @@ function xml2array($xml) {
 	return $array;
 }
 
-
+function colorize($value){
+	$color = "gray";
+	if ($value == "REPUBLICAN"){$color = "#cc3333";}
+	if ($value == "DEMOCRAT"){$color = "#3333cc";}
+	if ($value == "GREEN"){$color = "#33cc33";}
+	if ($value == "LIBERTARIAN "){$color = "#cc33cc";}
+	if ($value == "PEACE & FREEDOM "){$color = "#33cccc";}
+	return($color);
+}
