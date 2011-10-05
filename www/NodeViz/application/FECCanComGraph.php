@@ -1,11 +1,11 @@
 <?php
 include_once('config.php');
-include_once('NodeViz.php');
+include_once('Graph.php');
 $dbname = 'oilchange';
 /*
 creates the graph data structure that will be used to pass data among components.  Structure must not change
 */
-class FECCanComGraph extends NodeViz { 
+class FECCanComGraph extends Graph { 
 
 	function __construct() {
 		parent::__construct();
