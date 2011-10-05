@@ -1,4 +1,5 @@
 <?php
+#require('libgv-php5/gv.php');
 
 //Interperter file to take graph data structure and convert into a dot file
 
@@ -6,7 +7,6 @@
 //neato will run when it reads the file.  See http://www.graphviz.org/doc/info/attrs.html
 //for list of params and dfns. 
 class GraphVizExporter {
-
  	static $GV_PARAMS = array(
 		'graph' => array(
 			'outputorder' => 'edgesfirst',
@@ -303,6 +303,7 @@ class GraphVizExporter {
 			$svg = preg_replace("/<!-- ([^ ]+) -->\n/", "", $svg);
 			$svg = preg_replace("/^.*fill=\"(black|white).*\n/m", "", $svg);
 			$svg = str_replace("G</title>\n<polygon fill=\"#ffffff", "G</title>\n<polygon id='svgscreen' style=\"opacity:0;\" fill=\"#ffffff", $svg);
+			//$svg = str_replace("fill=\"none", "style=\"opacity:0;\" fill=\"#ffffff", $svg);
 			#$svg = preg_replace("/<polygon id='svgscreen'[^>]*>/", "", $svg);
 			$svg = preg_replace("/id=\"graph1/", "id=\"graph0", $svg);
 			//$svg = preg_replace("/<g id=\"graph0/", "<script xlink:href=\"svgpan.js\"/> <g id=\"graph0", $svg);
@@ -313,15 +314,15 @@ class GraphVizExporter {
 		#	$newscale = substr($matches[1]/(96/72), 0, 8);
 		#	$svg = preg_replace("/transform=\"scale\([^\)]+\)/", "transform=\"scale($newscale $newscale)", $svg);
 		}
-		$svg = preg_replace("/^.*?<svg/s", "<svg", $svg);
-		$svg = str_replace("&#45;&gt;", "_", $svg);
-		$svg = str_replace("pt\"", "px\"", $svg);
-		$svg = preg_replace("/<title>.*/m", "", $svg);
-		$svg = preg_replace("/^<\/?a.*\n/m", "", $svg);
+		$svg = preg_replace("/^.*?<svg/s", "<svg", $svg); //Remove SVG Document header
+		$svg = str_replace("&#45;&gt;", "_", $svg); //FIXME? convert HTML -> to _?
+		$svg = str_replace("pt\"", "px\"", $svg); //convert points to pixels
+		$svg = preg_replace("/<title>.*/m", "", $svg); //remove 'title' tags
+		$svg = preg_replace("/^<\/?a.*\n/m", "", $svg); //FIXME? remove cruft after anchor tags
 		#$svg = preg_replace("/^<text.*\n/m", "", $svg);
-		$svg = preg_replace("/^<text/m", "<text class='zoom_7'", $svg);
-		$svg = preg_replace("/zoom_7' text-anchor=\"middle\"([^>]+ fill)/", "' text-anchor='end'$1", $svg);
-		$svg = preg_replace("/\.\.\/www\//", "", $svg);
+		$svg = preg_replace("/^<text/m", "<text class='zoom_7'", $svg); //FIXME set zoom class on labels
+		$svg = preg_replace("/zoom_7' text-anchor=\"middle\"([^>]+ fill)/", "' text-anchor='end'$1", $svg); //FIXME change the text anchor on labels?
+		$svg = preg_replace("/\.\.\/www\//", "", $svg); //FIXME change the local web path to be relative to http web path
 		//$tf = preg_match("/transform=\"scale(\([\-\.\d]+)\) rotate\(0\) translate\(([\-\.\d]+) ([\-\.\d]+)\)/", $svg);
 
 		#resize the svgscreen polygon to fill up the entire allotted graph viewable area
