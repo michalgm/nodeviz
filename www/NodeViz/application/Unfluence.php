@@ -1,5 +1,5 @@
 <?php
-include_once('NodeViz.php');
+include_once('Graph.php');
 $apiKey = "key=3420aea61e2f4cb1a8a925a0c738eaf0";
 $ftmUrl = "http://api.followthemoney.org/";
 $edges = array();
@@ -7,7 +7,7 @@ setlocale(LC_MONETARY, 'en_US.UTF-8');
 /*
 creates the graph data structure that will be used to pass data among components.  Structure must not change
 */
-class Unfluence extends NodeViz { 
+class Unfluence extends Graph { 
 
 	function __construct() {
 		parent::__construct();
