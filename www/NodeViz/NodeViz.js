@@ -16,7 +16,7 @@ NodeViz.prototype = {
 			} else {
 				NodeVizCounter++;
 			}
-			this.prefix = 'graph'+NodeVizCounter+'_';
+			this.prefix = 'nv'+NodeVizCounter+'_';
 		}
 		if (! $(this.errordiv)) { 
 			$(document.body).insert({ top: new Element('div', {'id': this.errordiv}) });
@@ -264,10 +264,4 @@ NodeViz.prototype = {
 		$(this.lightboxdiv).hide();
 		$(this.lightboxscreen).hide();
 	},
-//
-//
-//
-//
-// Static HTML Blocks
-
 }

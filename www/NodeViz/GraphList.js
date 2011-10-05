@@ -70,7 +70,7 @@ GraphList.prototype = {
 			}
 		}, this);
 		this.displayList(data.nodetypes[0]);
-		console.timeEnd('renderList');
+		//console.timeEnd('renderList');
 	},
 	displayList: function(nodetype) { 
 		oldnodetype = this.NodeViz.current['nodetype'];
