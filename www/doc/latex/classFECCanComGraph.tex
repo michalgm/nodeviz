@@ -1,0 +1,177 @@
+\hypertarget{classFECCanComGraph}{
+\section{FECCanComGraph Class Reference}
+\label{classFECCanComGraph}\index{FECCanComGraph@{FECCanComGraph}}
+}
+Inheritance diagram for FECCanComGraph:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classFECCanComGraph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classFECCanComGraph_a80281c19843e11fe180f54eb33e41258}{\_\-\_\-construct} ()
+\begin{DoxyCompactList}\small\item\em The default constructor for the graph initializes the the graph data array. \item\end{DoxyCompactList}\item 
+\hyperlink{classFECCanComGraph_a2823c90a2c17e875ed5c1ecaefacb406}{candidates\_\-fetchNodes} ()
+\begin{DoxyCompactList}\small\item\em There must be a $<$nodetype\_\-fetchNodes() function for each defined node type. \item\end{DoxyCompactList}\item 
+\hypertarget{classFECCanComGraph_ac2ffa9b979d90106cc63cf8662b8676a}{
+{\bfseries companies\_\-fetchNodes} ()}
+\label{classFECCanComGraph_ac2ffa9b979d90106cc63cf8662b8676a}
+
+\item 
+\hyperlink{classFECCanComGraph_ad6e930b0091fa7628329d81822bd7f97}{candidates\_\-nodeProperties} ()
+\begin{DoxyCompactList}\small\item\em There must be a $<$nodetype$>$\_\-nodeProperties() function for each node class. \item\end{DoxyCompactList}\item 
+\hypertarget{classFECCanComGraph_a12aae1328795455d83b967226544c923}{
+{\bfseries companies\_\-nodeProperties} ()}
+\label{classFECCanComGraph_a12aae1328795455d83b967226544c923}
+
+\item 
+\hypertarget{classFECCanComGraph_a647278b86c542246eb5928519b924513}{
+{\bfseries com2can\_\-fetchEdges} ()}
+\label{classFECCanComGraph_a647278b86c542246eb5928519b924513}
+
+\item 
+\hypertarget{classFECCanComGraph_a44242884b3117deb5266cf13d767b958}{
+{\bfseries com2can\_\-edgeProperties} ()}
+\label{classFECCanComGraph_a44242884b3117deb5266cf13d767b958}
+
+\item 
+\hyperlink{classFECCanComGraph_ae52ffce192d829d3d5248f7df3c9a697}{graphname} ()
+\begin{DoxyCompactList}\small\item\em Defines the graph's name if it isn't already set. \item\end{DoxyCompactList}\item 
+\hyperlink{classFECCanComGraph_a69baec21184cb7941222e3ab635fa0f2}{ajax\_\-showCanInfo} ()
+\begin{DoxyCompactList}\small\item\em UI Functions for displaying info on graph ui. \item\end{DoxyCompactList}\item 
+\hypertarget{classFECCanComGraph_a2fd8db3d3a1a07951bdb0b3cbda5c765}{
+{\bfseries ajax\_\-displayEdge} (\$graph)}
+\label{classFECCanComGraph_a2fd8db3d3a1a07951bdb0b3cbda5c765}
+
+\item 
+\hypertarget{classFECCanComGraph_ae01617c47d5fd775c3b4764257ee22a5}{
+{\bfseries ajax\_\-showComInfo} ()}
+\label{classFECCanComGraph_ae01617c47d5fd775c3b4764257ee22a5}
+
+\item 
+\hypertarget{classFECCanComGraph_a56cd38de8d5b37adf674ae51cce75af9}{
+{\bfseries ajax\_\-showcom2canInfo} (\$graph)}
+\label{classFECCanComGraph_a56cd38de8d5b37adf674ae51cce75af9}
+
+\item 
+\hypertarget{classFECCanComGraph_a039e5ef0592630273a3b4a8bd61379a8}{
+{\bfseries preProcessGraph} ()}
+\label{classFECCanComGraph_a039e5ef0592630273a3b4a8bd61379a8}
+
+\item 
+\hypertarget{classFECCanComGraph_a345ab5ab9d704539980bc7aa2fbf22a6}{
+{\bfseries postProcessGraph} ()}
+\label{classFECCanComGraph_a345ab5ab9d704539980bc7aa2fbf22a6}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classFECCanComGraph_a80281c19843e11fe180f54eb33e41258}{
+\index{FECCanComGraph@{FECCanComGraph}!\_\-\_\-construct@{\_\-\_\-construct}}
+\index{\_\-\_\-construct@{\_\-\_\-construct}!FECCanComGraph@{FECCanComGraph}}
+\subsubsection[{\_\-\_\-construct}]{\setlength{\rightskip}{0pt plus 5cm}FECCanComGraph::\_\-\_\-construct (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classFECCanComGraph_a80281c19843e11fe180f54eb33e41258}
+
+
+The default constructor for the graph initializes the the graph data array. 
+
+The array will have empty sub-\/arrays for: \par
+
+\begin{DoxyItemize}
+\item nodetypes: gives names of types or \char`\"{}classes\char`\"{} of nodes
+\item edgetypes: gives names of types or \char`\"{}classes\char`\"{} of edges, as well as the types of nodes they link
+\item properties: lots of different kinds of graph properties and flags
+\item nodes: arrays containing all the node objects (types mixed together)
+\item edges: arrays containing all the edge objects (types mixed together)
+\item subgraphs: array containing any subgraph (cluster) declarations
+\item queries: optionally contains records of the queries used to construct a network for debugging\par
+
+\item nodetypesindex: indexing datastructure for looking up nodes by type
+\item edgetypesindex: indexing datastructure for looking up edges by type. \par
+\par
+
+\end{DoxyItemize}
+
+Subclasses of \hyperlink{classGraph}{Graph} should still call this super method if they override the constructor.
+
+\begin{DoxyReturn}{Returns}
+\$this, an empty graph object, with arrays waiting eagerly to be filled with structure 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classGraph_abeec16b1020f6d57d82d91ecf13b3ba9}{Graph}.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classFECCanComGraph_a69baec21184cb7941222e3ab635fa0f2}{
+\index{FECCanComGraph@{FECCanComGraph}!ajax\_\-showCanInfo@{ajax\_\-showCanInfo}}
+\index{ajax\_\-showCanInfo@{ajax\_\-showCanInfo}!FECCanComGraph@{FECCanComGraph}}
+\subsubsection[{ajax\_\-showCanInfo}]{\setlength{\rightskip}{0pt plus 5cm}FECCanComGraph::ajax\_\-showCanInfo (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classFECCanComGraph_a69baec21184cb7941222e3ab635fa0f2}
+
+
+UI Functions for displaying info on graph ui. 
+
+fixme: need standard naming convention. ajax\_\-$<$nodetype$>$\_\-showInfo() ? \hypertarget{classFECCanComGraph_a2823c90a2c17e875ed5c1ecaefacb406}{
+\index{FECCanComGraph@{FECCanComGraph}!candidates\_\-fetchNodes@{candidates\_\-fetchNodes}}
+\index{candidates\_\-fetchNodes@{candidates\_\-fetchNodes}!FECCanComGraph@{FECCanComGraph}}
+\subsubsection[{candidates\_\-fetchNodes}]{\setlength{\rightskip}{0pt plus 5cm}FECCanComGraph::candidates\_\-fetchNodes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classFECCanComGraph_a2823c90a2c17e875ed5c1ecaefacb406}
+
+
+There must be a $<$nodetype\_\-fetchNodes() function for each defined node type. 
+
+It returns the ids of the nodes for the type. \hypertarget{classFECCanComGraph_ad6e930b0091fa7628329d81822bd7f97}{
+\index{FECCanComGraph@{FECCanComGraph}!candidates\_\-nodeProperties@{candidates\_\-nodeProperties}}
+\index{candidates\_\-nodeProperties@{candidates\_\-nodeProperties}!FECCanComGraph@{FECCanComGraph}}
+\subsubsection[{candidates\_\-nodeProperties}]{\setlength{\rightskip}{0pt plus 5cm}FECCanComGraph::candidates\_\-nodeProperties (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classFECCanComGraph_ad6e930b0091fa7628329d81822bd7f97}
+
+
+There must be a $<$nodetype$>$\_\-nodeProperties() function for each node class. 
+
+It sets the properties of the nodes of that type. \hypertarget{classFECCanComGraph_ae52ffce192d829d3d5248f7df3c9a697}{
+\index{FECCanComGraph@{FECCanComGraph}!graphname@{graphname}}
+\index{graphname@{graphname}!FECCanComGraph@{FECCanComGraph}}
+\subsubsection[{graphname}]{\setlength{\rightskip}{0pt plus 5cm}FECCanComGraph::graphname (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classFECCanComGraph_ae52ffce192d829d3d5248f7df3c9a697}
+
+
+Defines the graph's name if it isn't already set. 
+
+Defaults to using a crc32() hash of the graph properties array, which are usually passed in by the request. When caching is enabled, graph files names are used to determine if the cached file can be returned, so you may want to overide this method in a subclass if you want to fine tune the caching. \begin{DoxyReturn}{Returns}
+a string to be used as a graph file name. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classGraph_ae31fe01b00d373a1d022286a53f150a2}{Graph}.
+
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+/home/unfluence/graphframework/www/NodeViz/application/FECCanComGraph.php\end{DoxyCompactItemize}

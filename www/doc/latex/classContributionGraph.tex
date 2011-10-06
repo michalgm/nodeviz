@@ -1,0 +1,160 @@
+\hypertarget{classContributionGraph}{
+\section{ContributionGraph Class Reference}
+\label{classContributionGraph}\index{ContributionGraph@{ContributionGraph}}
+}
+Inheritance diagram for ContributionGraph:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classContributionGraph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classContributionGraph_a38e1cdf68fb42882fba9985ad277a60b}{\_\-\_\-construct} ()
+\begin{DoxyCompactList}\small\item\em The default constructor for the graph initializes the the graph data array. \item\end{DoxyCompactList}\item 
+\hyperlink{classContributionGraph_af2457f0e657749f0331b8121a213e295}{companies\_\-fetchNodes} ()
+\begin{DoxyCompactList}\small\item\em There must be a $<$nodetype\_\-fetchNodes() function for each defined node type. \item\end{DoxyCompactList}\item 
+\hypertarget{classContributionGraph_a5aff57cf53661c0fcff1222f2c7d08e4}{
+{\bfseries labels\_\-fetchNodes} ()}
+\label{classContributionGraph_a5aff57cf53661c0fcff1222f2c7d08e4}
+
+\item 
+\hypertarget{classContributionGraph_a6ef608b704b3e185e21f1198804639ea}{
+{\bfseries labels\_\-nodeProperties} ()}
+\label{classContributionGraph_a6ef608b704b3e185e21f1198804639ea}
+
+\item 
+\hypertarget{classContributionGraph_ade50723c7e0ee7907abd38ed83cc9527}{
+{\bfseries labels\_\-fetchEdges} ()}
+\label{classContributionGraph_ade50723c7e0ee7907abd38ed83cc9527}
+
+\item 
+\hyperlink{classContributionGraph_a1f28a16dbd9e3e01f86d1dafd413aa10}{companies\_\-nodeProperties} ()
+\begin{DoxyCompactList}\small\item\em There must be a $<$nodetype$>$\_\-nodeProperties() function for each node class. \item\end{DoxyCompactList}\item 
+\hypertarget{classContributionGraph_a6867c2126b2b6982cd6be87c9dd81ebc}{
+{\bfseries org2org\_\-fetchEdges} ()}
+\label{classContributionGraph_a6867c2126b2b6982cd6be87c9dd81ebc}
+
+\item 
+\hypertarget{classContributionGraph_a2466a4cfeb508a10907bca1a236da5fa}{
+{\bfseries orgOwnOrg\_\-fetchEdges} ()}
+\label{classContributionGraph_a2466a4cfeb508a10907bca1a236da5fa}
+
+\item 
+\hypertarget{classContributionGraph_ae28c404b5d3e8575f078f8a16f995596}{
+{\bfseries org2org\_\-edgeProperties} ()}
+\label{classContributionGraph_ae28c404b5d3e8575f078f8a16f995596}
+
+\item 
+\hypertarget{classContributionGraph_aa4e3fc734c8b3f15702cb40a07e79a74}{
+{\bfseries orgOwnOrg\_\-edgeProperties} ()}
+\label{classContributionGraph_aa4e3fc734c8b3f15702cb40a07e79a74}
+
+\item 
+\hyperlink{classContributionGraph_ae68c79da71081e432f27e82b48f8b621}{ajax\_\-showCanInfo} ()
+\begin{DoxyCompactList}\small\item\em UI Functions for displaying info on graph ui. \item\end{DoxyCompactList}\item 
+\hypertarget{classContributionGraph_a36185eea2e3f9bee81a51dea302d7e67}{
+{\bfseries ajax\_\-showOrgInfo} ()}
+\label{classContributionGraph_a36185eea2e3f9bee81a51dea302d7e67}
+
+\item 
+\hypertarget{classContributionGraph_a1eca3ae3b03e6de9f18dc8403f94c67f}{
+{\bfseries ajax\_\-displayEdge} (\$graph)}
+\label{classContributionGraph_a1eca3ae3b03e6de9f18dc8403f94c67f}
+
+\item 
+\hypertarget{classContributionGraph_ac2879eef7860832c701527e89df400b8}{
+{\bfseries preProcessGraph} ()}
+\label{classContributionGraph_ac2879eef7860832c701527e89df400b8}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classContributionGraph_a38e1cdf68fb42882fba9985ad277a60b}{
+\index{ContributionGraph@{ContributionGraph}!\_\-\_\-construct@{\_\-\_\-construct}}
+\index{\_\-\_\-construct@{\_\-\_\-construct}!ContributionGraph@{ContributionGraph}}
+\subsubsection[{\_\-\_\-construct}]{\setlength{\rightskip}{0pt plus 5cm}ContributionGraph::\_\-\_\-construct (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classContributionGraph_a38e1cdf68fb42882fba9985ad277a60b}
+
+
+The default constructor for the graph initializes the the graph data array. 
+
+The array will have empty sub-\/arrays for: \par
+
+\begin{DoxyItemize}
+\item nodetypes: gives names of types or \char`\"{}classes\char`\"{} of nodes
+\item edgetypes: gives names of types or \char`\"{}classes\char`\"{} of edges, as well as the types of nodes they link
+\item properties: lots of different kinds of graph properties and flags
+\item nodes: arrays containing all the node objects (types mixed together)
+\item edges: arrays containing all the edge objects (types mixed together)
+\item subgraphs: array containing any subgraph (cluster) declarations
+\item queries: optionally contains records of the queries used to construct a network for debugging\par
+
+\item nodetypesindex: indexing datastructure for looking up nodes by type
+\item edgetypesindex: indexing datastructure for looking up edges by type. \par
+\par
+
+\end{DoxyItemize}
+
+Subclasses of \hyperlink{classGraph}{Graph} should still call this super method if they override the constructor.
+
+\begin{DoxyReturn}{Returns}
+\$this, an empty graph object, with arrays waiting eagerly to be filled with structure 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classGraph_abeec16b1020f6d57d82d91ecf13b3ba9}{Graph}.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classContributionGraph_ae68c79da71081e432f27e82b48f8b621}{
+\index{ContributionGraph@{ContributionGraph}!ajax\_\-showCanInfo@{ajax\_\-showCanInfo}}
+\index{ajax\_\-showCanInfo@{ajax\_\-showCanInfo}!ContributionGraph@{ContributionGraph}}
+\subsubsection[{ajax\_\-showCanInfo}]{\setlength{\rightskip}{0pt plus 5cm}ContributionGraph::ajax\_\-showCanInfo (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classContributionGraph_ae68c79da71081e432f27e82b48f8b621}
+
+
+UI Functions for displaying info on graph ui. 
+
+fixme: need standard naming convention. ajax\_\-$<$nodetype$>$\_\-showInfo() ? \hypertarget{classContributionGraph_af2457f0e657749f0331b8121a213e295}{
+\index{ContributionGraph@{ContributionGraph}!companies\_\-fetchNodes@{companies\_\-fetchNodes}}
+\index{companies\_\-fetchNodes@{companies\_\-fetchNodes}!ContributionGraph@{ContributionGraph}}
+\subsubsection[{companies\_\-fetchNodes}]{\setlength{\rightskip}{0pt plus 5cm}ContributionGraph::companies\_\-fetchNodes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classContributionGraph_af2457f0e657749f0331b8121a213e295}
+
+
+There must be a $<$nodetype\_\-fetchNodes() function for each defined node type. 
+
+It returns the ids of the nodes for the type. \hypertarget{classContributionGraph_a1f28a16dbd9e3e01f86d1dafd413aa10}{
+\index{ContributionGraph@{ContributionGraph}!companies\_\-nodeProperties@{companies\_\-nodeProperties}}
+\index{companies\_\-nodeProperties@{companies\_\-nodeProperties}!ContributionGraph@{ContributionGraph}}
+\subsubsection[{companies\_\-nodeProperties}]{\setlength{\rightskip}{0pt plus 5cm}ContributionGraph::companies\_\-nodeProperties (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classContributionGraph_a1f28a16dbd9e3e01f86d1dafd413aa10}
+
+
+There must be a $<$nodetype$>$\_\-nodeProperties() function for each node class. 
+
+It sets the properties of the nodes of that type. 
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+/home/unfluence/graphframework/www/NodeViz/application/ContributionGraph.php\end{DoxyCompactItemize}

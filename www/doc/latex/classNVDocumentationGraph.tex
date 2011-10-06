@@ -1,0 +1,95 @@
+\hypertarget{classNVDocumentationGraph}{
+\section{NVDocumentationGraph Class Reference}
+\label{classNVDocumentationGraph}\index{NVDocumentationGraph@{NVDocumentationGraph}}
+}
+Inheritance diagram for NVDocumentationGraph:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classNVDocumentationGraph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classNVDocumentationGraph_ae3c6418b6e1fd018895ddc79101a0059}{\_\-\_\-construct} ()
+\begin{DoxyCompactList}\small\item\em The default constructor for the graph initializes the the graph data array. \item\end{DoxyCompactList}\item 
+\hyperlink{classNVDocumentationGraph_a236064565deaa3e43405ed8c500e0f76}{classes\_\-fetchNodes} ()
+\begin{DoxyCompactList}\small\item\em There must be a $<$nodetype\_\-fetchNodes() function for each defined node type. \item\end{DoxyCompactList}\item 
+\hypertarget{classNVDocumentationGraph_a5b2d84248df33e8f62187bd2f4058b5e}{
+{\bfseries classes\_\-nodeProperties} ()}
+\label{classNVDocumentationGraph_a5b2d84248df33e8f62187bd2f4058b5e}
+
+\item 
+\hypertarget{classNVDocumentationGraph_adc4e90a6c8762e3ecea12ac89c7aa506}{
+{\bfseries flows\_\-fetchEdges} ()}
+\label{classNVDocumentationGraph_adc4e90a6c8762e3ecea12ac89c7aa506}
+
+\item 
+\hypertarget{classNVDocumentationGraph_a647d977b5a4d1ae9db82468121e1075f}{
+{\bfseries flows\_\-edgeProperties} ()}
+\label{classNVDocumentationGraph_a647d977b5a4d1ae9db82468121e1075f}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classNVDocumentationGraph_ae3c6418b6e1fd018895ddc79101a0059}{
+\index{NVDocumentationGraph@{NVDocumentationGraph}!\_\-\_\-construct@{\_\-\_\-construct}}
+\index{\_\-\_\-construct@{\_\-\_\-construct}!NVDocumentationGraph@{NVDocumentationGraph}}
+\subsubsection[{\_\-\_\-construct}]{\setlength{\rightskip}{0pt plus 5cm}NVDocumentationGraph::\_\-\_\-construct (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classNVDocumentationGraph_ae3c6418b6e1fd018895ddc79101a0059}
+
+
+The default constructor for the graph initializes the the graph data array. 
+
+The array will have empty sub-\/arrays for: \par
+
+\begin{DoxyItemize}
+\item nodetypes: gives names of types or \char`\"{}classes\char`\"{} of nodes
+\item edgetypes: gives names of types or \char`\"{}classes\char`\"{} of edges, as well as the types of nodes they link
+\item properties: lots of different kinds of graph properties and flags
+\item nodes: arrays containing all the node objects (types mixed together)
+\item edges: arrays containing all the edge objects (types mixed together)
+\item subgraphs: array containing any subgraph (cluster) declarations
+\item queries: optionally contains records of the queries used to construct a network for debugging\par
+
+\item nodetypesindex: indexing datastructure for looking up nodes by type
+\item edgetypesindex: indexing datastructure for looking up edges by type. \par
+\par
+
+\end{DoxyItemize}
+
+Subclasses of \hyperlink{classGraph}{Graph} should still call this super method if they override the constructor.
+
+\begin{DoxyReturn}{Returns}
+\$this, an empty graph object, with arrays waiting eagerly to be filled with structure 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classGraph_abeec16b1020f6d57d82d91ecf13b3ba9}{Graph}.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classNVDocumentationGraph_a236064565deaa3e43405ed8c500e0f76}{
+\index{NVDocumentationGraph@{NVDocumentationGraph}!classes\_\-fetchNodes@{classes\_\-fetchNodes}}
+\index{classes\_\-fetchNodes@{classes\_\-fetchNodes}!NVDocumentationGraph@{NVDocumentationGraph}}
+\subsubsection[{classes\_\-fetchNodes}]{\setlength{\rightskip}{0pt plus 5cm}NVDocumentationGraph::classes\_\-fetchNodes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classNVDocumentationGraph_a236064565deaa3e43405ed8c500e0f76}
+
+
+There must be a $<$nodetype\_\-fetchNodes() function for each defined node type. 
+
+It returns the ids of the nodes for the type. 
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+/home/unfluence/graphframework/www/NodeViz/application/NVDocumentationGraph.php\end{DoxyCompactItemize}

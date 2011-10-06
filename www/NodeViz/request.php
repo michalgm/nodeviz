@@ -1,10 +1,8 @@
 <?php
-/************************************************************
-Name:	request.php
-Version:
-Date:
+/** Script to handle AJAX request and manage graph generation and response.
 Called by html frontend via HTTP RPC. Returns HTML and javascript strings to be interpreted by frontend javascript
-************************************************************/
+*/
+
 header('Content-type: application/json');
 set_error_handler('handleError');
 require_once("NodeVizUtils.php");

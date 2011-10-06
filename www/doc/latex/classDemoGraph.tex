@@ -1,0 +1,182 @@
+\hypertarget{classDemoGraph}{
+\section{DemoGraph Class Reference}
+\label{classDemoGraph}\index{DemoGraph@{DemoGraph}}
+}
+
+
+This class is a toy example to show how to extend the \hyperlink{classGraph}{Graph} class to create a graph setup file to load data into your graph.  
+
+
+Inheritance diagram for DemoGraph:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classDemoGraph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classDemoGraph_ab9d1da5df733b032df04bdbbb899b6cc}{\_\-\_\-construct} ()
+\begin{DoxyCompactList}\small\item\em Overrides the parent constructor in order to define the node and edge types and set some graph properties. \item\end{DoxyCompactList}\item 
+\hyperlink{classDemoGraph_a85887991e08523bd01f00760031706b6}{animals\_\-fetchNodes} ()
+\begin{DoxyCompactList}\small\item\em Will return a set of node ids for the 'animals' node type. \item\end{DoxyCompactList}\item 
+\hyperlink{classDemoGraph_af949a82a5c73184229ef710bb6ed21e0}{foods\_\-fetchNodes} ()
+\begin{DoxyCompactList}\small\item\em Will return a set of node ids for the 'foods' node type. \item\end{DoxyCompactList}\item 
+\hyperlink{classDemoGraph_a79c83f4743457c85c4b1630664924d5d}{animals\_\-nodeProperties} (\$nodes)
+\begin{DoxyCompactList}\small\item\em Sets the properties of each of the 'animals' nodes. \item\end{DoxyCompactList}\item 
+\hyperlink{classDemoGraph_a4139a86614f40bc7a51b9674088bf57a}{foods\_\-nodeProperties} (\$nodes)
+\begin{DoxyCompactList}\small\item\em Sets the properties of each of the 'foods' nodes. \item\end{DoxyCompactList}\item 
+\hyperlink{classDemoGraph_a239ac4f1fbe7821a989fbb64c045aa7a}{animal\_\-to\_\-food\_\-fetchEdges} ()
+\begin{DoxyCompactList}\small\item\em Returns an array of relationships for the 'animals\_\-to\_\-foods' edge type. \item\end{DoxyCompactList}\item 
+\hyperlink{classDemoGraph_ae08a911b43427ae06b8a0c8e141e158d}{animal\_\-to\_\-food\_\-edgeProperties} (\$edges)
+\begin{DoxyCompactList}\small\item\em Sets properties for each of the edges of the 'animals\_\-to\_\-food' type. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This class is a toy example to show how to extend the \hyperlink{classGraph}{Graph} class to create a graph setup file to load data into your graph. It creates a network with two types of nodes: \char`\"{}animals\char`\"{} and \char`\"{}foods\char`\"{}. It then defines an edgetype of \char`\"{}animal\_\-to\_\-food\char`\"{} which, not surprisingly, will link animals to foods. Then it creates a random set of fictional edges linking animals and foods. (What, you didn't think Lizards eat Garlic?) Then it must define the methods to actually return the lists of nodes, edges, and the properties for nodes and edges so that the graph can be assembled correctly. These are:
+\begin{DoxyItemize}
+\item \hyperlink{classDemoGraph_a85887991e08523bd01f00760031706b6}{animals\_\-fetchNodes()}
+\item \hyperlink{classDemoGraph_af949a82a5c73184229ef710bb6ed21e0}{foods\_\-fetchNodes()}
+\item \hyperlink{classDemoGraph_a239ac4f1fbe7821a989fbb64c045aa7a}{animal\_\-to\_\-food\_\-fetchEdges()}
+\item \hyperlink{classDemoGraph_a79c83f4743457c85c4b1630664924d5d}{animals\_\-nodeProperties()}
+\item \hyperlink{classDemoGraph_a4139a86614f40bc7a51b9674088bf57a}{foods\_\-nodeProperties()}
+\item \hyperlink{classDemoGraph_ae08a911b43427ae06b8a0c8e141e158d}{animal\_\-to\_\-food\_\-edgeProperties()} 
+\end{DoxyItemize}
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classDemoGraph_ab9d1da5df733b032df04bdbbb899b6cc}{
+\index{DemoGraph@{DemoGraph}!\_\-\_\-construct@{\_\-\_\-construct}}
+\index{\_\-\_\-construct@{\_\-\_\-construct}!DemoGraph@{DemoGraph}}
+\subsubsection[{\_\-\_\-construct}]{\setlength{\rightskip}{0pt plus 5cm}DemoGraph::\_\-\_\-construct (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classDemoGraph_ab9d1da5df733b032df04bdbbb899b6cc}
+
+
+Overrides the parent constructor in order to define the node and edge types and set some graph properties. 
+
+First it calls the parent::\_\-\_\-construct() method to make sure things get initialized correctly. In this case it sets the nodetypes to 'animals' and 'foods'. It sets edgetype to 'animal\_\-to\_\-food', sets the max an min sizes to draw the nodes, and some default GraphViz drawing parameters for nodes and edges and the overall graph. 
+
+Reimplemented from \hyperlink{classGraph_abeec16b1020f6d57d82d91ecf13b3ba9}{Graph}.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classDemoGraph_ae08a911b43427ae06b8a0c8e141e158d}{
+\index{DemoGraph@{DemoGraph}!animal\_\-to\_\-food\_\-edgeProperties@{animal\_\-to\_\-food\_\-edgeProperties}}
+\index{animal\_\-to\_\-food\_\-edgeProperties@{animal\_\-to\_\-food\_\-edgeProperties}!DemoGraph@{DemoGraph}}
+\subsubsection[{animal\_\-to\_\-food\_\-edgeProperties}]{\setlength{\rightskip}{0pt plus 5cm}DemoGraph::animal\_\-to\_\-food\_\-edgeProperties (
+\begin{DoxyParamCaption}
+\item[{\$}]{edges}
+\end{DoxyParamCaption}
+)}}
+\label{classDemoGraph_ae08a911b43427ae06b8a0c8e141e158d}
+
+
+Sets properties for each of the edges of the 'animals\_\-to\_\-food' type. 
+
+Properties control how the edge will be rendered by GraphViz, and other control the interaction in NodeVis. 
+\begin{DoxyParams}{Parameters}
+{\em \$edges} & an array of edges set previously \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the array \$edges, with each element modified to include additional parameters 
+\end{DoxyReturn}
+\hypertarget{classDemoGraph_a239ac4f1fbe7821a989fbb64c045aa7a}{
+\index{DemoGraph@{DemoGraph}!animal\_\-to\_\-food\_\-fetchEdges@{animal\_\-to\_\-food\_\-fetchEdges}}
+\index{animal\_\-to\_\-food\_\-fetchEdges@{animal\_\-to\_\-food\_\-fetchEdges}!DemoGraph@{DemoGraph}}
+\subsubsection[{animal\_\-to\_\-food\_\-fetchEdges}]{\setlength{\rightskip}{0pt plus 5cm}DemoGraph::animal\_\-to\_\-food\_\-fetchEdges (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classDemoGraph_a239ac4f1fbe7821a989fbb64c045aa7a}
+
+
+Returns an array of relationships for the 'animals\_\-to\_\-foods' edge type. 
+
+Each edge must have its own unique id, and must list the id of the node the edge is from ('fromId', in this case an animal node) and the node it goes to ('toId', in this case a foods node). \begin{DoxyReturn}{Returns}
+an array \$edges in which each element is an array with elements for 'id','fromId' and 'toId' 
+\end{DoxyReturn}
+\hypertarget{classDemoGraph_a85887991e08523bd01f00760031706b6}{
+\index{DemoGraph@{DemoGraph}!animals\_\-fetchNodes@{animals\_\-fetchNodes}}
+\index{animals\_\-fetchNodes@{animals\_\-fetchNodes}!DemoGraph@{DemoGraph}}
+\subsubsection[{animals\_\-fetchNodes}]{\setlength{\rightskip}{0pt plus 5cm}DemoGraph::animals\_\-fetchNodes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classDemoGraph_a85887991e08523bd01f00760031706b6}
+
+
+Will return a set of node ids for the 'animals' node type. 
+
+There must be a $<$nodetype\_\-fetchNodes() function for each defined node type. Will be called in the loadData() method of \hyperlink{classGraph}{Graph}. \begin{DoxyReturn}{Returns}
+a \$nodes array in which each element is an array with the property 'id' giving an id of an animal node. 
+\end{DoxyReturn}
+\hypertarget{classDemoGraph_a79c83f4743457c85c4b1630664924d5d}{
+\index{DemoGraph@{DemoGraph}!animals\_\-nodeProperties@{animals\_\-nodeProperties}}
+\index{animals\_\-nodeProperties@{animals\_\-nodeProperties}!DemoGraph@{DemoGraph}}
+\subsubsection[{animals\_\-nodeProperties}]{\setlength{\rightskip}{0pt plus 5cm}DemoGraph::animals\_\-nodeProperties (
+\begin{DoxyParamCaption}
+\item[{\$}]{nodes}
+\end{DoxyParamCaption}
+)}}
+\label{classDemoGraph_a79c83f4743457c85c4b1630664924d5d}
+
+
+Sets the properties of each of the 'animals' nodes. 
+
+The parameters will control how the nodes should be drawn by GraphViz, and how they will interact in NodeViz 
+\begin{DoxyParams}{Parameters}
+{\em \$nodes} & the array of nodes set previously \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the \$nodes array, with each element modified to include additional properties 
+\end{DoxyReturn}
+\hypertarget{classDemoGraph_af949a82a5c73184229ef710bb6ed21e0}{
+\index{DemoGraph@{DemoGraph}!foods\_\-fetchNodes@{foods\_\-fetchNodes}}
+\index{foods\_\-fetchNodes@{foods\_\-fetchNodes}!DemoGraph@{DemoGraph}}
+\subsubsection[{foods\_\-fetchNodes}]{\setlength{\rightskip}{0pt plus 5cm}DemoGraph::foods\_\-fetchNodes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classDemoGraph_af949a82a5c73184229ef710bb6ed21e0}
+
+
+Will return a set of node ids for the 'foods' node type. 
+
+There must be a $<$nodetype\_\-fetchNodes() function for each defined node type. \begin{DoxyReturn}{Returns}
+a \$nodes array in which each element is an array with the property 'id' giving an id of a foods node. 
+\end{DoxyReturn}
+\hypertarget{classDemoGraph_a4139a86614f40bc7a51b9674088bf57a}{
+\index{DemoGraph@{DemoGraph}!foods\_\-nodeProperties@{foods\_\-nodeProperties}}
+\index{foods\_\-nodeProperties@{foods\_\-nodeProperties}!DemoGraph@{DemoGraph}}
+\subsubsection[{foods\_\-nodeProperties}]{\setlength{\rightskip}{0pt plus 5cm}DemoGraph::foods\_\-nodeProperties (
+\begin{DoxyParamCaption}
+\item[{\$}]{nodes}
+\end{DoxyParamCaption}
+)}}
+\label{classDemoGraph_a4139a86614f40bc7a51b9674088bf57a}
+
+
+Sets the properties of each of the 'foods' nodes. 
+
+The parameters will control how the nodes should be drawn by GraphViz, and how they will interact in NodeViz 
+\begin{DoxyParams}{Parameters}
+{\em \$nodes} & the array of nodes set previously \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the \$nodes array, with each element modified to include additional properties 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+/home/unfluence/graphframework/www/NodeViz/application/DemoGraph.php\end{DoxyCompactItemize}

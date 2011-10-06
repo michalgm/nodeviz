@@ -1,0 +1,149 @@
+\hypertarget{classNodeViz}{
+\section{NodeViz Class Reference}
+\label{classNodeViz}\index{NodeViz@{NodeViz}}
+}
+Inheritance diagram for NodeViz:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classNodeViz}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classNodeViz_a713abe9f93bbb3e20d79d89751ff5f07}{graphname} ()
+\item 
+\hypertarget{classNodeViz_a48217350dd979a212fcdd175c95f7574}{
+{\bfseries setupGraph} (\$request\_\-parameters=array(), \$blank=0)}
+\label{classNodeViz_a48217350dd979a212fcdd175c95f7574}
+
+\item 
+\hyperlink{classNodeViz_a936052a8b7e5e4f2210a7a4f4a0c5d7e}{loadGraphData} ()
+\item 
+\hyperlink{classNodeViz_a0a8a15509e46fef208257105b2589882}{scaleSizes} (\$array, \$type, \$key)
+\item 
+\hypertarget{classNodeViz_a59d6fce5a408fb848b351955ea3f3296}{
+{\bfseries subval\_\-sort} (\$a, \$subkey)}
+\label{classNodeViz_a59d6fce5a408fb848b351955ea3f3296}
+
+\item 
+\hyperlink{classNodeViz_a9954743bc34dca28270913a8fe3c5468}{lookupNodeID} (\$id)
+\item 
+\hyperlink{classNodeViz_a3bbd5ae3fb61c26fde757d6393fb0a75}{checkGraph} ()
+\item 
+\hyperlink{classNodeViz_afed66215ed0628d931713fe654d13ebc}{addquery} (\$name, \$query)
+\item 
+\hyperlink{classNodeViz_aa9fcbd43ffae6cf1b1d65d02e02cb88d}{checkIsolates} ()
+\item 
+\hyperlink{classNodeViz_ae0ca6b02fb3326b323a8cdc77d7222b8}{getNodesByType} (\$type)
+\item 
+\hyperlink{classNodeViz_a4de3aa73b1ef90195559c221632a1488}{getEdgesByType} (\$type)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classNodeViz_a27ee51093b4eace279fb132ee21feb11}{
+{\bfseries \$data}}
+\label{classNodeViz_a27ee51093b4eace279fb132ee21feb11}
+
+\item 
+\hypertarget{classNodeViz_a8a6d6801b06ee43f2a263984f68395ac}{
+{\bfseries \$name}}
+\label{classNodeViz_a8a6d6801b06ee43f2a263984f68395ac}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The \hyperlink{classNodeViz}{NodeViz} class should be a superclass that defines the abstract graph data structure and functions relating to elements of the graph data. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classNodeViz_afed66215ed0628d931713fe654d13ebc}{
+\index{NodeViz@{NodeViz}!addquery@{addquery}}
+\index{addquery@{addquery}!NodeViz@{NodeViz}}
+\subsubsection[{addquery}]{\setlength{\rightskip}{0pt plus 5cm}NodeViz::addquery (
+\begin{DoxyParamCaption}
+\item[{\$}]{name, }
+\item[{\$}]{query}
+\end{DoxyParamCaption}
+)}}
+\label{classNodeViz_afed66215ed0628d931713fe654d13ebc}
+Adds a query string as an data property on the graph. Used for debugging. \hypertarget{classNodeViz_a3bbd5ae3fb61c26fde757d6393fb0a75}{
+\index{NodeViz@{NodeViz}!checkGraph@{checkGraph}}
+\index{checkGraph@{checkGraph}!NodeViz@{NodeViz}}
+\subsubsection[{checkGraph}]{\setlength{\rightskip}{0pt plus 5cm}NodeViz::checkGraph (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classNodeViz_a3bbd5ae3fb61c26fde757d6393fb0a75}
+Does crude checks that the graph object is valid enough to be returned to the browser. Currently triggers errors if the graph is blank (perhaps indicating a cache problem) or the graph contains no nodes. \hypertarget{classNodeViz_aa9fcbd43ffae6cf1b1d65d02e02cb88d}{
+\index{NodeViz@{NodeViz}!checkIsolates@{checkIsolates}}
+\index{checkIsolates@{checkIsolates}!NodeViz@{NodeViz}}
+\subsubsection[{checkIsolates}]{\setlength{\rightskip}{0pt plus 5cm}NodeViz::checkIsolates (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classNodeViz_aa9fcbd43ffae6cf1b1d65d02e02cb88d}
+If the removeIsolates graph property is set, it this function will removed any isolate (unconnected) nodes. Called several times during graph construction. \hypertarget{classNodeViz_a4de3aa73b1ef90195559c221632a1488}{
+\index{NodeViz@{NodeViz}!getEdgesByType@{getEdgesByType}}
+\index{getEdgesByType@{getEdgesByType}!NodeViz@{NodeViz}}
+\subsubsection[{getEdgesByType}]{\setlength{\rightskip}{0pt plus 5cm}NodeViz::getEdgesByType (
+\begin{DoxyParamCaption}
+\item[{\$}]{type}
+\end{DoxyParamCaption}
+)}}
+\label{classNodeViz_a4de3aa73b1ef90195559c221632a1488}
+Returns an array containing the ids of all the edges that have the given type. Used as a shortcut for looping over the edgetypesindex. \hypertarget{classNodeViz_ae0ca6b02fb3326b323a8cdc77d7222b8}{
+\index{NodeViz@{NodeViz}!getNodesByType@{getNodesByType}}
+\index{getNodesByType@{getNodesByType}!NodeViz@{NodeViz}}
+\subsubsection[{getNodesByType}]{\setlength{\rightskip}{0pt plus 5cm}NodeViz::getNodesByType (
+\begin{DoxyParamCaption}
+\item[{\$}]{type}
+\end{DoxyParamCaption}
+)}}
+\label{classNodeViz_ae0ca6b02fb3326b323a8cdc77d7222b8}
+Returns an array containing the ids of all the nodes that have the given type. Used as a shortcut for looping over the nodetypesindex. \hypertarget{classNodeViz_a713abe9f93bbb3e20d79d89751ff5f07}{
+\index{NodeViz@{NodeViz}!graphname@{graphname}}
+\index{graphname@{graphname}!NodeViz@{NodeViz}}
+\subsubsection[{graphname}]{\setlength{\rightskip}{0pt plus 5cm}NodeViz::graphname (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classNodeViz_a713abe9f93bbb3e20d79d89751ff5f07}
+Defines the graph's name if it isn't already set, then returns it. Defaults to using a hash of the graph properties, which are usually passed in by the request. When caching is enabled, graph files names are used to determine if the cached file can be returned, so you may want to overide this method in a subclass if you want to fine tune the caching. \hypertarget{classNodeViz_a936052a8b7e5e4f2210a7a4f4a0c5d7e}{
+\index{NodeViz@{NodeViz}!loadGraphData@{loadGraphData}}
+\index{loadGraphData@{loadGraphData}!NodeViz@{NodeViz}}
+\subsubsection[{loadGraphData}]{\setlength{\rightskip}{0pt plus 5cm}NodeViz::loadGraphData (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classNodeViz_a936052a8b7e5e4f2210a7a4f4a0c5d7e}
+Fill in nodes and edges and their properties in the graph data structure, searching for methods (usually in a subclass of \hyperlink{classGraph}{Graph}) to return the appropriate data. Sets node and edge properties. Optionally trims isolate nodes. Also calls any post processing functions if defined. \hypertarget{classNodeViz_a9954743bc34dca28270913a8fe3c5468}{
+\index{NodeViz@{NodeViz}!lookupNodeID@{lookupNodeID}}
+\index{lookupNodeID@{lookupNodeID}!NodeViz@{NodeViz}}
+\subsubsection[{lookupNodeID}]{\setlength{\rightskip}{0pt plus 5cm}NodeViz::lookupNodeID (
+\begin{DoxyParamCaption}
+\item[{\$}]{id}
+\end{DoxyParamCaption}
+)}}
+\label{classNodeViz_a9954743bc34dca28270913a8fe3c5468}
+Returns the node data array corresponding to an id \hypertarget{classNodeViz_a0a8a15509e46fef208257105b2589882}{
+\index{NodeViz@{NodeViz}!scaleSizes@{scaleSizes}}
+\index{scaleSizes@{scaleSizes}!NodeViz@{NodeViz}}
+\subsubsection[{scaleSizes}]{\setlength{\rightskip}{0pt plus 5cm}NodeViz::scaleSizes (
+\begin{DoxyParamCaption}
+\item[{\$}]{array, }
+\item[{\$}]{type, }
+\item[{\$}]{key}
+\end{DoxyParamCaption}
+)}}
+\label{classNodeViz_a0a8a15509e46fef208257105b2589882}
+Sets 'size' property to scaled value: takes graph object, entity type, and key of entity to use for scaled values. Size parameters of nodes are set so that the area of the node will be proportional to the value. The maximum and minimum sizes that the elements will be scaled to are controlled by the graph's maxSize and minSize properties for each type. 
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+/home/unfluence/graphframework/www/NodeViz/library/NodeViz.php\end{DoxyCompactItemize}

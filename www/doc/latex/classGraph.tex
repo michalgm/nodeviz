@@ -1,0 +1,303 @@
+\hypertarget{classGraph}{
+\section{Graph Class Reference}
+\label{classGraph}\index{Graph@{Graph}}
+}
+
+
+The \hyperlink{classGraph}{Graph} class is superclass that defines the abstract graph data structure and functions relating to elements of the graph data.  
+
+
+Inheritance diagram for Graph:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=1.794872cm]{classGraph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classGraph_abeec16b1020f6d57d82d91ecf13b3ba9}{\_\-\_\-construct} ()
+\begin{DoxyCompactList}\small\item\em The default constructor for the graph initializes the the graph data array. \item\end{DoxyCompactList}\item 
+\hyperlink{classGraph_ae31fe01b00d373a1d022286a53f150a2}{graphname} ()
+\begin{DoxyCompactList}\small\item\em Defines the graph's name if it isn't already set. \item\end{DoxyCompactList}\item 
+\hyperlink{classGraph_a709d645a5323981d2b6d09a65121153e}{setupGraph} (\$request\_\-parameters=array(), \$blank=0)
+\begin{DoxyCompactList}\small\item\em Initializes the graph with any parameters past in by the http request. \item\end{DoxyCompactList}\item 
+\hyperlink{classGraph_ac010f0389fcc16ee975d03af5aaa1dae}{loadGraphData} ()
+\begin{DoxyCompactList}\small\item\em Fill in nodes and edges and their properties in the graph data structure. \item\end{DoxyCompactList}\item 
+\hyperlink{classGraph_a8217420bb7c218aa141e664a6f3562f5}{scaleSizes} (\$array, \$type, \$key)
+\begin{DoxyCompactList}\small\item\em Utility function to scale the 'size' property of graph elements to a data value. \item\end{DoxyCompactList}\item 
+\hypertarget{classGraph_ad091d05774840be054c17806c30730d9}{
+{\bfseries subval\_\-sort} (\$a, \$subkey)}
+\label{classGraph_ad091d05774840be054c17806c30730d9}
+
+\item 
+\hyperlink{classGraph_a2dbdcb74c3ec884e36c7e9bd2af2894b}{lookupNodeID} (\$id)
+\begin{DoxyCompactList}\small\item\em Returns the node data array corresponding to an id. \item\end{DoxyCompactList}\item 
+\hyperlink{classGraph_afe74e5691b6653ac424162b5c07ffb36}{checkGraph} ()
+\begin{DoxyCompactList}\small\item\em Does crude checks that the graph object is valid enough to be returned to the browser. \item\end{DoxyCompactList}\item 
+\hyperlink{classGraph_ac5966cfcda85aa980d06d8e11e67612c}{addquery} (\$name, \$query)
+\begin{DoxyCompactList}\small\item\em Adds a query string as an data property on the graph for debugging. \item\end{DoxyCompactList}\item 
+\hyperlink{classGraph_a56a82fd5e3efba96b1eea155c8185beb}{checkIsolates} ()
+\begin{DoxyCompactList}\small\item\em If the removeIsolates graph property is set, it this function will removed any isolate (unconnected) nodes. \item\end{DoxyCompactList}\item 
+\hyperlink{classGraph_abf5f4c406c3eb3a82b3a2d1347715830}{getNodesByType} (\$type)
+\begin{DoxyCompactList}\small\item\em Returns an array containing the ids of all the nodes that have the given type. \item\end{DoxyCompactList}\item 
+\hyperlink{classGraph_a1e2982011dd121cff330730e8d561f22}{getEdgesByType} (\$type)
+\begin{DoxyCompactList}\small\item\em Returns an array containing the ids of all the edges that have the given type. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classGraph_af6af3c2ca091fb5b322717f76e29d9da}{
+{\bfseries \$data}}
+\label{classGraph_af6af3c2ca091fb5b322717f76e29d9da}
+
+\item 
+\hypertarget{classGraph_a30024815ae1797b4e6999919544a864a}{
+{\bfseries \$name}}
+\label{classGraph_a30024815ae1797b4e6999919544a864a}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The \hyperlink{classGraph}{Graph} class is superclass that defines the abstract graph data structure and functions relating to elements of the graph data. This structure is used as a common denominator to move relational data and paramters around between the various parts of NodeViz. Most of the data is represented in a set of hierarchical arrays which makes it easy to convert to a JSON object when it is sent to the client. \par
+\par
+ To build a graph, the subclass must set properties to define the types of nodes and edges the graph will include. It then must define functions corresponding to each type which can perform the operations necessary to assemble the relationship data and return it in array form to be included in the graph. The these subclass functions are names $<$node\_\-type$>$\_\-fetchNodes(), $<$edge\_\-type$>$\_\-fetchEdges, $<$node\_\-type$>$\_\-nodeProperties() and $<$edge\_\-type$>$\_\-edgeProperties() and will be called during a graph assembly loop in \hyperlink{classGraph_ac010f0389fcc16ee975d03af5aaa1dae}{loadGraphData()}. \par
+\par
+ For more information about configuring a GraphSetupFile subclass of \hyperlink{classGraph}{Graph} for your data, please check out the wiki documentation \href{http://code.google.com/p/nodeviz/wiki/GraphSetupFile}{\tt http://code.google.com/p/nodeviz/wiki/GraphSetupFile} and \hyperlink{classDemoGraph}{DemoGraph} as an example. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classGraph_abeec16b1020f6d57d82d91ecf13b3ba9}{
+\index{Graph@{Graph}!\_\-\_\-construct@{\_\-\_\-construct}}
+\index{\_\-\_\-construct@{\_\-\_\-construct}!Graph@{Graph}}
+\subsubsection[{\_\-\_\-construct}]{\setlength{\rightskip}{0pt plus 5cm}Graph::\_\-\_\-construct (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classGraph_abeec16b1020f6d57d82d91ecf13b3ba9}
+
+
+The default constructor for the graph initializes the the graph data array. 
+
+The array will have empty sub-\/arrays for: \par
+
+\begin{DoxyItemize}
+\item nodetypes: gives names of types or \char`\"{}classes\char`\"{} of nodes
+\item edgetypes: gives names of types or \char`\"{}classes\char`\"{} of edges, as well as the types of nodes they link
+\item properties: lots of different kinds of graph properties and flags
+\item nodes: arrays containing all the node objects (types mixed together)
+\item edges: arrays containing all the edge objects (types mixed together)
+\item subgraphs: array containing any subgraph (cluster) declarations
+\item queries: optionally contains records of the queries used to construct a network for debugging\par
+
+\item nodetypesindex: indexing datastructure for looking up nodes by type
+\item edgetypesindex: indexing datastructure for looking up edges by type. \par
+\par
+
+\end{DoxyItemize}
+
+Subclasses of \hyperlink{classGraph}{Graph} should still call this super method if they override the constructor.
+
+\begin{DoxyReturn}{Returns}
+\$this, an empty graph object, with arrays waiting eagerly to be filled with structure 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classContributionGraph_a38e1cdf68fb42882fba9985ad277a60b}{ContributionGraph}, \hyperlink{classDemoGraph_ab9d1da5df733b032df04bdbbb899b6cc}{DemoGraph}, \hyperlink{classFECCanComGraph_a80281c19843e11fe180f54eb33e41258}{FECCanComGraph}, and \hyperlink{classNVDocumentationGraph_ae3c6418b6e1fd018895ddc79101a0059}{NVDocumentationGraph}.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classGraph_ac5966cfcda85aa980d06d8e11e67612c}{
+\index{Graph@{Graph}!addquery@{addquery}}
+\index{addquery@{addquery}!Graph@{Graph}}
+\subsubsection[{addquery}]{\setlength{\rightskip}{0pt plus 5cm}Graph::addquery (
+\begin{DoxyParamCaption}
+\item[{\$}]{name, }
+\item[{\$}]{query}
+\end{DoxyParamCaption}
+)}}
+\label{classGraph_ac5966cfcda85aa980d06d8e11e67612c}
+
+
+Adds a query string as an data property on the graph for debugging. 
+
+This is for record-\/keeping purposes when dealing with complex parameters and queries, this is not where queries are added to construct the graph. 
+\begin{DoxyParams}{Parameters}
+{\em \$name} & a label for the query, e.g. 'my\_\-node\_\-id\_\-query' \\
+\hline
+{\em \$query} & the query string, e.g. 'SELECT id FROM myTable ...' \\
+\hline
+\end{DoxyParams}
+\hypertarget{classGraph_afe74e5691b6653ac424162b5c07ffb36}{
+\index{Graph@{Graph}!checkGraph@{checkGraph}}
+\index{checkGraph@{checkGraph}!Graph@{Graph}}
+\subsubsection[{checkGraph}]{\setlength{\rightskip}{0pt plus 5cm}Graph::checkGraph (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classGraph_afe74e5691b6653ac424162b5c07ffb36}
+
+
+Does crude checks that the graph object is valid enough to be returned to the browser. 
+
+Currently calls trigger\_\-error() if the graph is blank (perhaps indicating a cache problem) or the graph contains no nodes. \hypertarget{classGraph_a56a82fd5e3efba96b1eea155c8185beb}{
+\index{Graph@{Graph}!checkIsolates@{checkIsolates}}
+\index{checkIsolates@{checkIsolates}!Graph@{Graph}}
+\subsubsection[{checkIsolates}]{\setlength{\rightskip}{0pt plus 5cm}Graph::checkIsolates (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classGraph_a56a82fd5e3efba96b1eea155c8185beb}
+
+
+If the removeIsolates graph property is set, it this function will removed any isolate (unconnected) nodes. 
+
+Called several times during graph construction as node, edges, and properties are being added. Useful in case query mismatch creates cruft nodes. \hypertarget{classGraph_a1e2982011dd121cff330730e8d561f22}{
+\index{Graph@{Graph}!getEdgesByType@{getEdgesByType}}
+\index{getEdgesByType@{getEdgesByType}!Graph@{Graph}}
+\subsubsection[{getEdgesByType}]{\setlength{\rightskip}{0pt plus 5cm}Graph::getEdgesByType (
+\begin{DoxyParamCaption}
+\item[{\$}]{type}
+\end{DoxyParamCaption}
+)}}
+\label{classGraph_a1e2982011dd121cff330730e8d561f22}
+
+
+Returns an array containing the ids of all the edges that have the given type. 
+
+Used as a shortcut for looping over the edgetypesindex. 
+\begin{DoxyParams}{Parameters}
+{\em \$type} & string giving the name of the type of edges to be returned. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classGraph_abf5f4c406c3eb3a82b3a2d1347715830}{
+\index{Graph@{Graph}!getNodesByType@{getNodesByType}}
+\index{getNodesByType@{getNodesByType}!Graph@{Graph}}
+\subsubsection[{getNodesByType}]{\setlength{\rightskip}{0pt plus 5cm}Graph::getNodesByType (
+\begin{DoxyParamCaption}
+\item[{\$}]{type}
+\end{DoxyParamCaption}
+)}}
+\label{classGraph_abf5f4c406c3eb3a82b3a2d1347715830}
+
+
+Returns an array containing the ids of all the nodes that have the given type. 
+
+Used as a shortcut for looping over the nodetypesindex. 
+\begin{DoxyParams}{Parameters}
+{\em \$type} & string giving the name of the type of nodes to be returned. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classGraph_ae31fe01b00d373a1d022286a53f150a2}{
+\index{Graph@{Graph}!graphname@{graphname}}
+\index{graphname@{graphname}!Graph@{Graph}}
+\subsubsection[{graphname}]{\setlength{\rightskip}{0pt plus 5cm}Graph::graphname (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classGraph_ae31fe01b00d373a1d022286a53f150a2}
+
+
+Defines the graph's name if it isn't already set. 
+
+Defaults to using a crc32() hash of the graph properties array, which are usually passed in by the request. When caching is enabled, graph files names are used to determine if the cached file can be returned, so you may want to overide this method in a subclass if you want to fine tune the caching. \begin{DoxyReturn}{Returns}
+a string to be used as a graph file name. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classFECCanComGraph_ae52ffce192d829d3d5248f7df3c9a697}{FECCanComGraph}.
+
+\hypertarget{classGraph_ac010f0389fcc16ee975d03af5aaa1dae}{
+\index{Graph@{Graph}!loadGraphData@{loadGraphData}}
+\index{loadGraphData@{loadGraphData}!Graph@{Graph}}
+\subsubsection[{loadGraphData}]{\setlength{\rightskip}{0pt plus 5cm}Graph::loadGraphData (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classGraph_ac010f0389fcc16ee975d03af5aaa1dae}
+
+
+Fill in nodes and edges and their properties in the graph data structure. 
+
+Works by searching for functions (implemented in a subclass) to return the appropriate data for each node type and edge type. Sets node and edge properties. Optionally trims isolate nodes. Also calls any post processing functions if defined in a subclass. Called by \hyperlink{classGraph_a709d645a5323981d2b6d09a65121153e}{setupGraph()} For a more detailed explanation please see: \href{http://code.google.com/p/nodeviz/wiki/GraphSetupFile}{\tt http://code.google.com/p/nodeviz/wiki/GraphSetupFile} \hypertarget{classGraph_a2dbdcb74c3ec884e36c7e9bd2af2894b}{
+\index{Graph@{Graph}!lookupNodeID@{lookupNodeID}}
+\index{lookupNodeID@{lookupNodeID}!Graph@{Graph}}
+\subsubsection[{lookupNodeID}]{\setlength{\rightskip}{0pt plus 5cm}Graph::lookupNodeID (
+\begin{DoxyParamCaption}
+\item[{\$}]{id}
+\end{DoxyParamCaption}
+)}}
+\label{classGraph_a2dbdcb74c3ec884e36c7e9bd2af2894b}
+
+
+Returns the node data array corresponding to an id. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \$id} & the string id of the node to fetch \\
+\hline
+\end{DoxyParams}
+\hypertarget{classGraph_a8217420bb7c218aa141e664a6f3562f5}{
+\index{Graph@{Graph}!scaleSizes@{scaleSizes}}
+\index{scaleSizes@{scaleSizes}!Graph@{Graph}}
+\subsubsection[{scaleSizes}]{\setlength{\rightskip}{0pt plus 5cm}Graph::scaleSizes (
+\begin{DoxyParamCaption}
+\item[{\$}]{array, }
+\item[{\$}]{type, }
+\item[{\$}]{key}
+\end{DoxyParamCaption}
+)}}
+\label{classGraph_a8217420bb7c218aa141e664a6f3562f5}
+
+
+Utility function to scale the 'size' property of graph elements to a data value. 
+
+Takes graph object, entity type, and key of entity to use for scaled values. Size parameters of nodes are set so that the area of the node will be proportional to the value. The maximum and minimum sizes that the elements will be scaled to are controlled by the graph's maxSize and minSize properties for each type. Scales slightly differently if it is a square or circle shape. 
+\begin{DoxyParams}{Parameters}
+{\em \$array} & HEY GREG, WHAT IS THIS ARRAY FOR? \\
+\hline
+{\em \$type} & a string giving the type of the nodes that should be scaled \\
+\hline
+{\em \$key} & a string giving the name of the property with the value to be scaled to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+an array ... of node properties? 
+\end{DoxyReturn}
+\hypertarget{classGraph_a709d645a5323981d2b6d09a65121153e}{
+\index{Graph@{Graph}!setupGraph@{setupGraph}}
+\index{setupGraph@{setupGraph}!Graph@{Graph}}
+\subsubsection[{setupGraph}]{\setlength{\rightskip}{0pt plus 5cm}Graph::setupGraph (
+\begin{DoxyParamCaption}
+\item[{\$}]{request\_\-parameters = {\ttfamily array()}, }
+\item[{\$}]{blank = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}}
+\label{classGraph_a709d645a5323981d2b6d09a65121153e}
+
+
+Initializes the graph with any parameters past in by the http request. 
+
+These will be added to the properties array of the graph. Either creates a new graph using the loadGraph() function or loads it from cache on disk using the \$graphname. If width, height or prefix parameters are detected, they will be set in the graph. Finally, this method will trigger any preProcessGraph() methods that have been defined in a subclass. This function is usually called by request.php.
+
+\par
+{\itshape NOTE: parameters are not escaped or checked for validity by default. You need to sanitize inputs before includeing them in a query!\/} 
+\begin{DoxyParams}{Parameters}
+{\em \$request\_\-parameters} & the php request parameters array \\
+\hline
+{\em \$blank} & boolean, value of 0 means build graph from scratch, 1 means try to load from cache on disk. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\$this, a reference to the graph object 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+/home/unfluence/graphframework/www/NodeViz/library/Graph.php\end{DoxyCompactItemize}

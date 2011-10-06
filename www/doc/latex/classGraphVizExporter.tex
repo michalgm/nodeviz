@@ -1,0 +1,90 @@
+\hypertarget{classGraphVizExporter}{
+\section{GraphVizExporter Class Reference}
+\label{classGraphVizExporter}\index{GraphVizExporter@{GraphVizExporter}}
+}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classGraphVizExporter_a63ee3eef62e8e371f65a7b835ff7e03e}{
+static {\bfseries createDot} (\$graph)}
+\label{classGraphVizExporter_a63ee3eef62e8e371f65a7b835ff7e03e}
+
+\item 
+\hypertarget{classGraphVizExporter_ab48d8f07e6c16c1e822cc762b5276b0c}{
+static {\bfseries getWeightGV} (\$value)}
+\label{classGraphVizExporter_ab48d8f07e6c16c1e822cc762b5276b0c}
+
+\item 
+\hypertarget{classGraphVizExporter_a5ffcde0b5a56dd0a8ac57680f247520b}{
+static {\bfseries generateGraphFiles} (\$graph, \$datapath, \$format)}
+\label{classGraphVizExporter_a5ffcde0b5a56dd0a8ac57680f247520b}
+
+\item 
+\hypertarget{classGraphVizExporter_a7f97288f0c6800015bbe0101cbe38b7d}{
+static {\bfseries generateGraphvizOutput} (\$graph, \$datapath, \$format, \$returnsvg=0)}
+\label{classGraphVizExporter_a7f97288f0c6800015bbe0101cbe38b7d}
+
+\item 
+\hypertarget{classGraphVizExporter_ae10671113e79e66c0cd8b5ea3113b76c}{
+static {\bfseries processImap} (\$imap, \$datapath, \$graphname)}
+\label{classGraphVizExporter_ae10671113e79e66c0cd8b5ea3113b76c}
+
+\item 
+\hypertarget{classGraphVizExporter_a514360e45b911c0efcf51c3ffb4e783a}{
+static {\bfseries processSVG} (\$svgFile, \$datapath, \$graph)}
+\label{classGraphVizExporter_a514360e45b911c0efcf51c3ffb4e783a}
+
+\item 
+\hypertarget{classGraphVizExporter_a9312bb23e4f82aee8beee585cc28e5a3}{
+static {\bfseries processGraphData} (\$data, \$datapath, \$graphname)}
+\label{classGraphVizExporter_a9312bb23e4f82aee8beee585cc28e5a3}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static {\bfseries \$GV\_\-PARAMS}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classGraphVizExporter_a227940f38a3a387e9225d563e1170578}{
+\index{GraphVizExporter@{GraphVizExporter}!\$GV\_\-PARAMS@{\$GV\_\-PARAMS}}
+\index{\$GV\_\-PARAMS@{\$GV\_\-PARAMS}!GraphVizExporter@{GraphVizExporter}}
+\subsubsection[{\$GV\_\-PARAMS}]{\setlength{\rightskip}{0pt plus 5cm}GraphVizExporter::\$GV\_\-PARAMS\hspace{0.3cm}{\ttfamily  \mbox{[}static\mbox{]}}}}
+\label{classGraphVizExporter_a227940f38a3a387e9225d563e1170578}
+{\bfseries Initial value:}
+\begin{DoxyCode}
+ array(
+        'graph' => array(
+            'outputorder' => 'edgesfirst',
+            'truecolor' => 'true',
+            
+            'size' => '9,9!',
+            'dpi' => '96',
+            
+            'bgcolor' => 'transparent',
+            'splines' => '1',
+            'epsilon'=>'0.0',
+            'layoutEngine'=>'neato',
+            #'ratio'=>'fill'
+        ),
+        'node' => array(
+            'style' => 'setlinewidth(16), filled',
+            'fontsize' => '10',
+            'fixedsize' => 'true', 
+            'label'=>' ',
+            'imagescale'=>'true'
+        ),
+        'edge' => array(
+            'len' => '8',
+            'style'=>'setlinewidth(2)',
+            'labelfloat' => 'true'
+        )
+    )
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+/home/unfluence/graphframework/www/NodeViz/library/GraphVizExporter.php\end{DoxyCompactItemize}

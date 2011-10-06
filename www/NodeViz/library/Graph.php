@@ -1,12 +1,31 @@
 <?php
 
-/**The Graph class should be a superclass that defines the abstract graph data structure and functions relating to elements of the graph data.
+/**The Graph class is superclass that defines the abstract graph data structure and functions relating to elements of the graph data. This structure is used as a common denominator to move relational data and paramters around between the various parts of NodeViz. Most of the data is represented in a set of hierarchical arrays which makes it easy to convert to a JSON object when it is sent to the client.
+<br><br>
+To build a graph, the subclass must set properties to define the types of nodes and edges the graph will include.  It then must define functions corresponding to each type which can perform the operations necessary to assemble the relationship data and return it in array form to be included in the graph.  The these subclass functions are names <node_type>_fetchNodes(), <edge_type>_fetchEdges, <node_type>_nodeProperties() and <edge_type>_edgeProperties() and will be called during a graph assembly loop in loadGraphData().
+<br><br>
+For more information about configuring a GraphSetupFile subclass of Graph for your data, please check out the wiki documentation http://code.google.com/p/nodeviz/wiki/GraphSetupFile  and DemoGraph as an example.
 */
 class Graph {
 
 	var $data;
 	var $name;
 
+   /** The default constructor for the graph initializes the the graph data array. The array will have  empty sub-arrays for: <br/>
+   	- nodetypes: gives names of types or "classes" of nodes 
+   	- edgetypes: gives names of types or "classes" of edges, as well as the types of nodes they link 
+   	- properties: lots of different kinds of graph properties and flags 
+   	- nodes: arrays containing all the node objects (types mixed together)
+   	- edges: arrays containing all the edge objects (types mixed together)
+   	- subgraphs:  array containing any subgraph (cluster) declarations
+   	- queries: optionally contains records of the queries used to construct a network for debugging<br/>
+   	- nodetypesindex: indexing datastructure for looking up nodes by type
+   	- edgetypesindex: indexing datastructure for looking up edges by type. <br/><br/>
+   
+   Subclasses of Graph should still call this super method if they override the constructor.
+   
+   @returns $this, an empty graph object, with arrays waiting eagerly to be filled with structure
+   */
 	function __construct() {
 		//create empty graph structure;
 		$data = array(
@@ -31,7 +50,8 @@ class Graph {
 	}
 
 
-	/** Defines the graph's name if it isn't already set, then returns it. Defaults to using a hash of the graph properties, which are usually passed in by the request. When caching is enabled, graph files names are used to determine if the cached file can be returned, so you may want to overide this method in a subclass if you want to fine tune the caching. 
+	/** Defines the graph's name if it isn't already set. Defaults to using a crc32() hash of the graph properties array, which are usually passed in by the request. When caching is enabled, graph files names are used to determine if the cached file can be returned, so you may want to overide this method in a subclass if you want to fine tune the caching. 
+	@returns a string to be used as a graph file name.
 	*/
 	function graphname() {
 		if (! $this->name) { 
@@ -41,6 +61,14 @@ class Graph {
 		return $this->name;
 	}
 
+
+	/** Initializes the graph with any parameters past in by the http request. These will be added to the properties array of the graph.  Either creates a new graph using the loadGraph() function or loads it from cache on disk using the $graphname. If  width, height or prefix parameters are detected, they will be set in the graph.  Finally, this method will trigger any preProcessGraph() methods that have been defined in a subclass. This function is usually called by request.php.
+	
+	<br><em>NOTE: parameters are not escaped or checked for validity by default. You need to sanitize inputs before includeing them in a query!</em>
+		@param $request_parameters  the php request parameters array
+		@param $blank boolean, value of 0 means build graph from scratch, 1 means try to load from cache on disk.
+		@returns $this, a reference to the graph object
+	*/
 	function setupGraph($request_parameters=array(), $blank=0) {
 		global $datapath;
 		global $framework_config;
@@ -88,7 +116,7 @@ class Graph {
 		return $this;	
 	}
 
-	/** Fill in nodes and edges and their properties in the graph data structure, searching for methods (usually in a subclass of Graph) to return the appropriate data. Sets node and edge properties. Optionally trims isolate nodes.  Also calls any post processing functions if defined.  
+	/** Fill in nodes and edges and their properties in the graph data structure. Works by searching for functions (implemented in a subclass) to return the appropriate data for each node type and edge type. Sets node and edge properties. Optionally trims isolate nodes.  Also calls any post processing functions if defined in a subclass. Called by setupGraph() For a more detailed explanation please see: http://code.google.com/p/nodeviz/wiki/GraphSetupFile
 	*/
 	function loadGraphData() {
 		global $debug;
@@ -187,7 +215,11 @@ class Graph {
 	
 	#-------------------------------------------------
 
-	/**Sets 'size' property to scaled value: takes graph object, entity type, and key of entity to use for scaled values. Size parameters of nodes are set so that the area of the node will be proportional to the value. The maximum and minimum sizes that the elements will be scaled to are controlled by the graph's maxSize and minSize properties for each type. 
+	/**Utility function to scale the 'size' property of graph elements to a data value. Takes graph object, entity type, and key of entity to use for scaled values. Size parameters of nodes are set so that the area of the node will be proportional to the value. The maximum and minimum sizes that the elements will be scaled to are controlled by the graph's maxSize and minSize properties for each type. Scales slightly differently if it is a square or circle shape. 
+		@param $array HEY GREG, WHAT IS THIS ARRAY FOR?
+		@param $type a string giving the type of the nodes that should be scaled
+		@param $key a string giving the name of the property with the value to be scaled to
+		@returns an array ... of node properties?
 	*/
 	function scaleSizes($array, $type, $key){
 		$graph = $this->data;
@@ -282,6 +314,7 @@ class Graph {
 	}	
 
 	/** Returns the node data array corresponding to an id
+		@param $id the string id of the node to fetch
 	*/
 	function lookupNodeID($id) {
 		$graph = $this->data;
@@ -293,7 +326,7 @@ class Graph {
 		}
 	}
 
-    /** Does crude checks that the graph object is valid enough to be returned to the browser.  Currently triggers errors if the graph is blank (perhaps indicating a cache problem) or the graph contains no nodes.
+    /** Does crude checks that the graph object is valid enough to be returned to the browser.  Currently calls trigger_error() if the graph is blank (perhaps indicating a cache problem) or the graph contains no nodes.
     
     */
 	function checkGraph() {
@@ -308,8 +341,9 @@ class Graph {
 	}
 
 
-	/** Adds a query string as an data property on the graph. Used for debugging. 
-	
+	/** Adds a query string as an data property on the graph for debugging. This is for record-keeping purposes when dealing with complex parameters and queries, this is not where queries are added to construct the graph.
+		@param $name a label for the query, e.g. 'my_node_id_query'
+		@param $query the query string, e.g. 'SELECT id FROM myTable ...'
 	*/
 	function addquery($name, $query) {
 		global $debug;
@@ -317,9 +351,9 @@ class Graph {
 	}
 
 
-   /** If the removeIsolates graph property is set, it this function will removed any isolate (unconnected) nodes.  Called several times during graph construction. 
+   /** If the removeIsolates graph property is set, it this function will removed any isolate (unconnected) nodes.  Called several times during graph construction as node, edges, and properties are being added. Useful in case query mismatch creates cruft nodes.
    */
-   
+
 	function checkIsolates() {
 		//Get rid of any isolated nodes if retainIsolates is set to 0
 		if (isset($this->data['properties']['removeIsolates'])) {
@@ -346,6 +380,7 @@ class Graph {
 	}
 
    /** Returns an array containing the ids of all the nodes that have the given type.  Used as a shortcut for looping over the nodetypesindex. 
+   	@param $type string giving the name of the type of nodes to be returned. 
    */
 	function getNodesByType($type) {
 		$nodes = array();
@@ -356,6 +391,7 @@ class Graph {
 	}
 	
 	/** Returns an array containing the ids of all the edges that have the given type. Used as a shortcut for looping over the edgetypesindex. 
+		@param $type string giving the name of the type of edges to be returned. 
 	*/
 	function getEdgesByType($type) {
 		$edges = array();
