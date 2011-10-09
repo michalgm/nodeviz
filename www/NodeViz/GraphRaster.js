@@ -28,14 +28,16 @@ var GraphRaster = Class.create(GraphImage, {
 		$('G').descendants().each(function(a) { 
 			if (this.NodeViz.data.edges[a.id]) { 
 				var edge = this.NodeViz.data.edges[a.id];
-				Event.observe($(a), 'mouseout', this.hideTooltip.bind(this)); 
+				this.NodeViz.addEvents($(a), edge, 'edge', 'raster');
+				//Event.observe($(a), 'mouseout', this.hideTooltip.bind(this)); 
 				Event.observe($(a), 'mousemove', this.mousemove.bind(this));
-				if (edge.onMouseover != '') { Event.observe($(a), 'mouseover', function(e) { eval(edge.onMouseover); }.bind(this)); }
-				if (edge.onClick != '') { Event.observe($(a), 'click', function(e) { eval(edge.onClick); }.bind(this)); }
+				//if (edge.onMouseover != '') { Event.observe($(a), 'mouseover', function(e) { eval(edge.onMouseover); }.bind(this)); }
+				//if (edge.onClick != '') { Event.observe($(a), 'click', function(e) { eval(edge.onClick); }.bind(this)); }
 			} else if (this.NodeViz.data.nodes[a.id]) { 
 				var node = this.NodeViz.data.nodes[a.id];
-				if (node.onMouseover != '') { Event.observe($(a), 'mouseover', function(e) { eval(node.onMouseover); }.bind(this)); }
-				if (node.onClick != '') { Event.observe($(a), 'click', function(e) { eval(node.onClick); }.bind(this)); }
+				this.NodeViz.addEvents($(a), node, 'node', 'raster');
+				//if (node.onMouseover != '') { Event.observe($(a), 'mouseover', function(e) { eval(node.onMouseover); }.bind(this)); }
+				//if (node.onClick != '') { Event.observe($(a), 'click', function(e) { eval(node.onClick); }.bind(this)); }
 				//Event.observe($(a), 'mouseout', function(e) { this.NodeViz.unhighlightNode(a.id); }.bind(this)); 
 				var coords = $(a).getAttribute('coords').split(',');
 				if ($(a).getAttribute('shape') == 'circle') {

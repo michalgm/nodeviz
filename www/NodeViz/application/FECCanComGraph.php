@@ -1,6 +1,6 @@
 <?php
-include_once('config.php');
-include_once('Graph.php');
+require_once('Graph.php');
+require_once('oc_config.php');
 $dbname = 'oilchange';
 /*
 creates the graph data structure that will be used to pass data among components.  Structure must not change
@@ -179,11 +179,9 @@ class FECCanComGraph extends Graph {
 		#$graph['nodes']['candidates'] = $nodes;
 		foreach($nodes as &$node) {
 			$node['shape'] = 'box';
-			$node['onClick'] = "this.NodeViz.selectNode('".$node['id']."');";
 			if ($node['campaignstate'] != '00' && $node['campaignstate'] != '') {
 				$state = "-$node[campaignstate]";
 			} else { $state = ""; }
-			$node['onMouseover'] = "this.NodeViz.highlightNode('".$node['id']."');";
 			$node['tooltip'] = safeLabel(niceName($node['Name'])." (".$node['PartyDesignation1'][0]."$state)").'<br/>$'.$node['nicecash'];
 			$node['FName'] = htmlspecialchars(niceName($node['Name']), ENT_QUOTES);
 			$node['Name'] = htmlspecialchars(niceName($node['Name'], 1), ENT_QUOTES);
@@ -245,8 +243,6 @@ class FECCanComGraph extends Graph {
 		#$graph['nodes']['companies'] = $nodes;
 		foreach($nodes as &$node) {
 			$node['shape'] = 'circle';
-			$node['onClick'] = "this.NodeViz.selectNode('".$node['id']."');";
-			$node['onMouseover'] = "this.NodeViz.highlightNode('".$node['id']."');";
 			$node['tooltip'] = safeLabel($node['Name']).'<br/>$'.$node['nicecash'];
 			$node['color'] = lookupPartyColor($node['sitecode']);
 			//$node['fillcolor'] = 'white';
@@ -337,14 +333,13 @@ class FECCanComGraph extends Graph {
 				//unset($graph['edges'][$key]); 
 				continue;
 			}
-			$edge['onClick'] = "this.NodeViz.selectEdge('".$edge['id']."');";
+			$edge['click'] = "this.selectEdge('".$edge['id']."');";
 			$edge['cash'] = $edgeprops[$edge['id']]['cash'];   //get the appropriate ammount properties
 			$edge['nicecash'] = $edgeprops[$edge['id']]['nicecash']; 
 			$edge['tooltip'] = $edgeprops[$edge['id']]['nicecash']; 
 			$edge['Name'] = htmlspecialchars($graph['nodes'][$edge['fromId']]['Name'], ENT_QUOTES);
 			$edge['CandidateName'] = $graph['nodes'][$edge['toId']]['Name'];
 			$edge['weight'] = $edge['cash'];
-			$edge['onMouseover'] = "this.showTooltip('$".$edge['nicecash']."');";
 			$edge['type'] = 'com2can';
 			if (isset($edgeprops[$edge['id']]['coalcash'])) {
 				$edge['coalcash'] = $edgeprops[$edge['id']]['coalcash'];

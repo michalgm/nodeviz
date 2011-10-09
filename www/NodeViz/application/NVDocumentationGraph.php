@@ -64,8 +64,7 @@ class NVDocumentationGraph extends Graph {
 		foreach ($nodes as &$node) {
 			$node['label'] = $node['id'];
 			$node['tooltip'] = $node['id'];
-			$node['onClick'] = "this.NodeViz.selectNode('".$node['id']."'); this.NodeViz.panToNode('".$node['id']."');";
-			$node['onMouseover'] = "this.NodeViz.highlightNode('".$node['id']."');";
+			$node['click'] = "this.selectNode('".$node['id']."'); this.panToNode('".$node['id']."');";
 		}
 		
 		return $nodes;	
@@ -132,11 +131,8 @@ class NVDocumentationGraph extends Graph {
 		
 		$l=0;
 		foreach ($edges as &$edge){
-			//add mouseover events
-			$edge['onMouseover']="this.showTooltip('".$labels[$l]."')";
-			
 			//add select event for click
-			$edge['onClick']="this.NodeViz.selectEdge('".$edge['id']."')";
+			$edge['click']="this.selectEdge('".$edge['id']."')";
 			$l=$l+1;
 		}	
 		return $edges;

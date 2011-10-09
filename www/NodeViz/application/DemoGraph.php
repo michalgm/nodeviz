@@ -99,8 +99,6 @@ class DemoGraph extends Graph {
 			$node['fillcolor'] = 'pink';
 			$node['value'] = rand(0, 20);
 			$node['tooltip'] = $animals[$aid]." (".$node['value'].")";
-			$node['onClick'] = "this.NodeViz.selectNode('".$node['id']."'); this.NodeViz.panToNode('".$node['id']."');";
-			$node['onMouseover'] = "this.NodeViz.highlightNode('".$node['id']."');";
 		}
 		$nodes = $this->scaleSizes($nodes, 'animals', 'value');
 		return $nodes;	
@@ -121,8 +119,6 @@ class DemoGraph extends Graph {
 			$node['color'] = 'black';
 			$node['fillcolor'] = "#ccccff";
 			$node['value'] = rand(0, 20);
-			$node['onClick'] = "this.NodeViz.selectNode('".$node['id']."'); this.NodeViz.panToNode('".$node['id']."');";
-			$node['onMouseover'] = "this.NodeViz.highlightNode('".$node['id']."');";
 		}
 		$nodes = $this->scaleSizes($nodes, 'foods', 'value');
 		return $nodes;	
@@ -168,7 +164,6 @@ class DemoGraph extends Graph {
 			$edge['weight'] = $edge['value'];
 			$edge['label'] = $animals[$aid] . ' eats ' . $edge['value']. ' '. $foods[$fid];
 			$edge['tooltip'] = $animals[$aid] . ' eats ' . $edge['value']. ' '. $foods[$fid];
-			$edge['onMouseover'] = "this.showTooltip('".$edge['tooltip']."');";
 		}
 		$edges = $this->scaleSizes($edges, 'animal_to_food', 'value');
 		return $edges;

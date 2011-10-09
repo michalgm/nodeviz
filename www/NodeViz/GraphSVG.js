@@ -86,6 +86,8 @@ var GraphSVG = Class.create(GraphImage, {
 				}, this);
 			}
 			if (n.childNodes[1]) {
+				this.NodeViz.addEvents(n, node, 'node', 'svg');
+				/*
 				Event.observe(n,'mouseover', function(e) { eval(node.onMouseover); }.bind(this));
 				Event.observe(n,'mouseout', function(e) { this.NodeViz.unhighlightNode(n.id); }.bind(this));
 				Event.observe(n,'mouseup', function(e) { 
@@ -94,10 +96,11 @@ var GraphSVG = Class.create(GraphImage, {
 						eval(node.onClick);
 					}
 				}.bind(this));
+				*/
 			}
 		}, this);
-		$$('#svg_overlay .edge').each( function(n) {
-			var edgeid = n.id;
+		$$('#svg_overlay .edge').each( function(e) {
+			var edgeid = e.id;
 			var edge = this.NodeViz.data.edges[edgeid];
 			if (edge['zoom']) { 
 				this.addClassName($(edgeid), 'zoom_'+edge['zoom']);
@@ -109,6 +112,8 @@ var GraphSVG = Class.create(GraphImage, {
 					this.addClassName($('underlay_'+edgeid), c);	
 				}, this);
 			}
+			this.NodeViz.addEvents(e, edge, 'edge', 'svg');
+			/*
 			Event.observe(n,'mouseover', function(eventObject) { eval(edge.onMouseover); }.bind(this));
 			Event.observe(n,'mouseout', this.hideTooltip.bind(this));
 			Event.observe(n,'mouseup', function(e) { 
@@ -117,6 +122,7 @@ var GraphSVG = Class.create(GraphImage, {
 					eval(edge.onClick);
 				}
 			}.bind(this));
+			*/
 			//Event.observe(n,'click', graphviz[n.id].onClick);
 		}, this);
 		this.setupZoomListeners($('svg_overlay').childNodes[0]);

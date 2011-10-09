@@ -123,8 +123,7 @@ class Unfluence extends Graph {
 				$node['tooltip'] = $node['label']." (Gave ".money_format('%.0n', $node['value']).")";
 			}
 			$node['shape'] = 'circle';
-			$node['onClick'] = "this.NodeViz.selectNode('".$node['id']."'); this.NodeViz.panToNode('".$node['id']."');";
-			$node['onMouseover'] = "this.NodeViz.highlightNode('".$node['id']."');";
+			$node['click'] = "this.selectNode('".$node['id']."'); this.panToNode('".$node['id']."');";
 		}
 		$nodes = $this->scaleSizes($nodes, 'candidates', 'value');
 		return $nodes;	
@@ -143,7 +142,6 @@ class Unfluence extends Graph {
 			}
 			$edge['weight'] = $edge['value'];
 			$edge['tooltip'] = money_format('%.0n', $edge['value'])." from ".$this->data['nodes'][$edge['fromId']]['label']." to ".$this->data['nodes'][$edge['toId']]['label'];
-			$edge['onMouseover'] = "this.showTooltip('".$edge['tooltip']."');";
 		}
 		$edges = $this->scaleSizes($edges, 'donations', 'value');
 		return $edges;

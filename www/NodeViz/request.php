@@ -6,7 +6,7 @@ Called by html frontend via HTTP RPC. Returns HTML and javascript strings to be 
 header('Content-type: application/json');
 set_error_handler('handleError');
 require_once("NodeVizUtils.php");
-set_include_path(get_include_path() . PATH_SEPARATOR . $nodeViz_config['library_path'].PATH_SEPARATOR.$nodeViz_config['application_path']);
+set_include_path(get_include_path().PATH_SEPARATOR.$nodeViz_config['library_path'].PATH_SEPARATOR.$nodeViz_config['application_path']);
 #chdir($nodeViz_config['web_path']);
 #reinterpret_paths();
 

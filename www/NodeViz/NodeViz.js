@@ -264,4 +264,31 @@ NodeViz.prototype = {
 		$(this.lightboxdiv).hide();
 		$(this.lightboxscreen).hide();
 	},
+	addEvents: function(dom_element, graph_element, element_type, renderer) {
+		var eventslist = ['mouseover', 'mousemove','mouseout', 'mouseenter', 'mouseleave' , 'mouseup', 'mousedown', 'click', 'dblclick'];
+		eventslist.each(function(eventtype) {
+			var action = '';
+			if (typeof graph_element[eventtype] != 'undefined') {
+				action = graph_element[eventtype];	
+			} else if (typeof this.default_events[element_type][eventtype] != 'undefined') {
+				action = this.default_events[element_type][eventtype]; 
+			}
+			if (action != '') {
+				Event.observe(dom_element,eventtype, function(evt) { 
+					eval(action);
+				}.bind(this));
+			}
+		}.bind(this));
+	},
+	default_events: { 
+		'node': {
+			'mouseenter': "this.highlightNode(graph_element.id);",
+			'mouseleave': "if(renderer != 'raster') { this.unhighlightNode(graph_element.id); }",
+			'mouseup': "this.selectNode(graph_element.id);"
+		},
+		'edge': {
+			'mouseenter': "if(renderer != 'list') { this.renderers.GraphImage.showTooltip(graph_element.tooltip); }",
+			'mouseleave': "if(renderer != 'list') { this.renderers.GraphImage.hideTooltip(); }"
+		}
+	}
 }

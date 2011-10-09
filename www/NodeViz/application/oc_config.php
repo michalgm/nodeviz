@@ -1,6 +1,6 @@
 <?php
-include_once("oc_utils.php");
-include_once("dbaccess.php");
+require_once("oc_utils.php");
+require_once("dbaccess.php");
 /*
 if(file_exists('utils.php')) { include_once("utils.php"); }
 if(file_exists('oc_utils.php')) { include_once("oc_utils.php"); }

@@ -1,6 +1,6 @@
 <?php
-include_once('config.php');
-include_once('Graph.php');
+require_once('Graph.php');
+require_once('oc_config.php');
 /*
 creates the graph data structure that will be used to pass data among components.  Structure must not change
 */
@@ -228,13 +228,11 @@ from relationships join entities on from_id = entityid  and view = 'prop_25_26' 
 		$nodes = dbLookupArray($query);
 		foreach($nodes as &$node) {
 			$node['shape'] = 'circle';
-			$node['onClick'] = "this.NodeViz.selectNode('".$node['id']."');";
 			$nodeamount = '$'.$node['nicecash'];
 			if ($node['cash'] == 0){
 				$nodeamount = "(amount not disclosed)";
 			}
 			$node['tooltip'] = safeLabel($node['Name']).'<br/>'.$nodeamount;
-			$node['onMouseover'] = "this.NodeViz.highlightNode('".$node['id']."');";
 			$node['color'] = lookupIndustryColor($node['industry']);
 			$node['fillcolor'] = '#c0c0c0';
 			$node['tileimage'] = "$company_images"."c".$node['image'].".png";
@@ -340,14 +338,12 @@ function org2org_edgeProperties() {
 				unset($graph['edgetypesindex']['org2org'][$key]); 
 				continue;
 			}
-			$edge['onClick'] = "this.NodeViz.selectEdge('".$edge['id']."');";
-			#$edge['onClick'] = "this.NodeViz.selectEdge(eventObject)";
 			$edge['cash'] = $edgeprops[$edge['id']]['cash'];   //get the appropriate ammount properties
 			$edge['nicecash'] = $edgeprops[$edge['id']]['nicecash']; 
 			$edge['Name'] = htmlspecialchars($graph['nodes'][$edge['fromId']]['Name'], ENT_QUOTES);
 			$edge['OrganizationName'] = $graph['nodes'][$edge['toId']]['Name'];
 			$edge['weight'] = $edge['cash'];
-			$edge['onMouseover'] = "this.showTooltip('$".$edge['nicecash']."');";
+			$edge['tooltip'] = '$'.$edge['nicecash'];
 			$edge['type'] = 'org2org';
 			$edge['color'] = lookupIndustryColor($edgeprops[$edge['id']]['industry']);
 			$edge['class'] = 'level2';
@@ -378,13 +374,12 @@ function orgOwnOrg_edgeProperties() {
 				unset($graph['edges']['orgOwnOrg'][$key]); 
 				continue;
 			}
-			$edge['onClick'] = "this.NodeViz.selectEdge('".$edge['id']."');";
+			$edge['click'] = "this.selectEdge('".$edge['id']."');";
 			$edge['weight'] = $edgeprops[$edge['id']]['weight'];   //get the appropriate ammount properties
 			$edge['nicecash'] = $edgeprops[$edge['id']]['nicecash']; 
 			$edge['Name'] = htmlspecialchars($graph['nodes'][$edge['fromId']]['Name'], ENT_QUOTES);
 			$edge['OrganizationName'] = $graph['nodes'][$edge['toId']]['Name'];
 			//$edge['weight'] = $edge['cash'];
-			$edge['onMouseover'] = "this.showTooltip('".$edge['nicecash']."');";
 			$edge['type'] = 'orgOwnOrg';
 			$edge['color'] = '#CCCCCC';
 			//$edge['style'] = 'dashed';

@@ -41,9 +41,10 @@ GraphList.prototype = {
 				}
 				nodelist_entry = new Element('li', {'id': 'list_'+nodeid});
 				nodelist_entry.update(this.listNodeEntry(node));
-				Event.observe(nodelist_entry, 'mouseover', function(e) { this.highlightNode(nodeid, 1); }.bind(this.NodeViz));
-				Event.observe(nodelist_entry, 'mouseout', function(e) { this.unhighlightNode(nodeid); }.bind(this.NodeViz));
-				Event.observe(nodelist_entry, 'click', function(e) { this.selectNode(nodeid); }.bind(this.NodeViz));
+				this.NodeViz.addEvents(nodelist_entry, node, 'node', 'list');
+				//Event.observe(nodelist_entry, 'mouseover', function(e) { this.highlightNode(nodeid, 1); }.bind(this.NodeViz));
+				//Event.observe(nodelist_entry, 'mouseout', function(e) { this.unhighlightNode(nodeid); }.bind(this.NodeViz));
+				//Event.observe(nodelist_entry, 'click', function(e) { this.selectNode(nodeid); }.bind(this.NodeViz));
 				nodelist.insert({ bottom: nodelist_entry});
 
 				//setup sub lists
@@ -109,9 +110,10 @@ GraphList.prototype = {
 					var subelem = new Element('li', {'id': sublistdiv+'_'+snode.id});
 
 					subelem.update(this.listSubNodeEntry(snode, node, edgetype, direction));
-					Event.observe(subelem, 'mouseover', function(e) { this.highlightNode(snode.id, 1); }.bind(this.NodeViz));
-					Event.observe(subelem, 'mouseout', function(e) { this.unhighlightNode(snode.id); }.bind(this.NodeViz));
-					Event.observe(subelem, 'click', function(e) { this.selectNode(snode.id); }.bind(this.NodeViz));
+					this.NodeViz.addEvents(subelem, snode, 'node', 'list');
+					//Event.observe(subelem, 'mouseover', function(e) { this.highlightNode(snode.id, 1); }.bind(this.NodeViz));
+					//Event.observe(subelem, 'mouseout', function(e) { this.unhighlightNode(snode.id); }.bind(this.NodeViz));
+					//Event.observe(subelem, 'click', function(e) { this.selectNode(snode.id); }.bind(this.NodeViz));
 					elem.insert({ bottom: subelem });
 				}, this);
 				sublists.insert({ bottom: elem });
