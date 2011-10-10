@@ -275,6 +275,13 @@ NodeViz.prototype = {
 			}
 			if (action != '') {
 				Event.observe(dom_element,eventtype, function(evt) { 
+					if ((eventtype == 'click' || eventtype == 'mouseup') && renderer == 'svg') {
+						origin = this.renderers.GraphImage.getEventPoint(evt).matrixTransform(this.renderers.GraphImage.stateTf); 
+						state_origin = this.renderers.GraphImage.stateOrigin; 
+						if (state_origin.x != origin.x || state_origin.y != origin.y) {
+							return;
+						}
+					}
 					eval(action);
 				}.bind(this));
 			}
@@ -284,7 +291,7 @@ NodeViz.prototype = {
 		'node': {
 			'mouseenter': "this.highlightNode(graph_element.id);",
 			'mouseleave': "if(renderer != 'raster') { this.unhighlightNode(graph_element.id); }",
-			'mouseup': "this.selectNode(graph_element.id);"
+			'click': "this.selectNode(graph_element.id);"
 		},
 		'edge': {
 			'mouseenter': "if(renderer != 'list') { this.renderers.GraphImage.showTooltip(graph_element.tooltip); }",
