@@ -1,5 +1,5 @@
 <?php
-#require('libgv-php5/gv.php');
+require('libgv-php5/gv.php');
 
 //Interperter file to take graph data structure and convert into a dot file
 
@@ -178,11 +178,11 @@ class GraphVizExporter {
 		}
 
 		$layoutEngine = $GV_PARAMS['graph']['layoutEngine'];
-		$layoutEngine = (isset($layoutEngine) && $layoutEngine != 'neato') ? "-K$layoutEngine" : "";
 
 		$imageFile = "$datapath/$graphname.png";
 		$dotFile = "$datapath/$graphname.dot";
 		$svgFile = "$datapath/$graphname.svg.raw";
+		$imapFile = "$datapath/$graphname.imap";
 		if ($nodeViz_config['debug']) { 
 			$nicegraphfile = fopen("$datapath/$graphname.nicegraph", "w");
 			fwrite($nicegraphfile, print_r($graph, 1));
@@ -191,30 +191,27 @@ class GraphVizExporter {
 			fwrite($origdot, $dotString);
 			fclose($origdot);
 		}
-		$logdir = $nodeViz_config['nodeViz_path'].'/'.$nodeViz_config['log_path'];
-		if (! is_dir($logdir) || ! is_writable($logdir) || (is_file("$logdir/graphviz.log") && ! is_writable("$logdir/graphviz.log"))) {
-			trigger_error("Unable to write log to log directory '$logdir'", E_USER_ERROR);
-		}
-		$descriptorspec = array(
-		   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-		   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-		   2 => array("file", $logdir."/graphviz.log", "a") // stderr is a file to write to
-		);
-
-		//use neato to generate and save image file, and generate imap file to STDOUT
+	
+		//use gv.php to process dot string, apply layout, and generate outputs
 		chdir($nodeViz_config['web_path']);
-		$process = proc_open("neato -vvv $layoutEngine -Tsvg -o $svgFile -Tdot -o $dotFile -Tpng -o $imageFile -Tcmapx ", $descriptorspec, $pipes);
-		fwrite($pipes[0], $dotString);
-		fclose($pipes[0]);
-		$imap =  stream_get_contents($pipes[1]); //store imap file
-		fclose($pipes[1]);
-		$result = proc_close($process);
-		chdir($nodeViz_config['nodeViz_path']);
-		if($result) { 
-			trigger_error("GraphViz interpreter failed - returned $result", E_USER_ERROR);
+		ob_start();
+		$gv = gv::readstring($dotString);
+		gv::layout($gv, $layoutEngine);		
+		gv::render($gv, 'svg', $svgFile);
+		//FIXME - we should be able to use 'renderresult' to write to string, but it breaks - why?
+		gv::render($gv, 'cmapx', $imapFile);
+		if($nodeViz_config['debug']) {
+			gv::render($gv, 'dot', $dotFile);
 		}
+		gv:rm($gv);
+		if(ob_get_contents()) {
+			ob_end_clean();
+			trigger_error("GraphViz interpreter failed", E_USER_ERROR);
+		}
+		ob_end_clean();
+		chdir($nodeViz_config['nodeViz_path']);
 		
-		$imap = GraphVizExporter::processImap($imap, $datapath, $graphname);
+		$imap = GraphVizExporter::processImap($imapFile, $datapath, $graphname);
 		
 		$svg = GraphVizExporter::processSVG($svgFile, $datapath, $graph);
 
@@ -225,7 +222,6 @@ class GraphVizExporter {
 			chdir($nodeViz_config['web_path']);
 			system("grep -v levelfour $datapath$graphname.svg | convert -quality 92 svg:- $datapath$graphname.$format");
 			chdir($nodeViz_config['nodeViz_path']);
-			unlink("$datapath$graphname.png");
 		}
 		
 		#chmod all our files
@@ -273,12 +269,13 @@ class GraphVizExporter {
 		return array('image'=>$image, 'graph'=>$graph, 'overlay'=>$overlay, 'dot'=>$dot);
 	}
 
-	public static function processImap($imap, $datapath, $graphname) {
+	public static function processImap($imapFile, $datapath, $graphname) {
+		$imap = file_get_contents($imapFile);
 		$imap = str_replace('<map id="G" name="G">', "", $imap);
 		$imap = str_replace("</map>", "", $imap);
 		$imap = preg_replace("/ (target|title|href|alt)=\"[^\"]*\"/", "", $imap);
 		$imap = "<map id='G' name='G'>".join("\n", array_reverse(explode("\n", $imap)))."</map>";
-		$imapfile = fopen ("$datapath/$graphname.imap", 'w');
+		$imapfile = fopen ($imapFile, 'w');
 		fwrite($imapfile, $imap);
 		fclose($imapfile);
 		return $imap;
