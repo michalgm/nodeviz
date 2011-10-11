@@ -40,6 +40,7 @@ NodeViz has two main parts:
   * GraphViz open source graph drawing package http://graphviz.org
   * Scriptaculous JS library http://script.aculo.us/
   * Prototype JS library http://www.prototypejs.org/
+  * ImageMagick http://www.imagemagick.org/
 
 = What NodeViz does not do = 
   * Network analysis (try Gephi, the R network library, Pajek, etc)
