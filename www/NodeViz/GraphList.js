@@ -36,15 +36,18 @@ GraphList.prototype = {
 			Event.observe($(nodetype+'_menu'), 'click', function(e) { this.displayList(nodetype); }.bind(this));
 			$H(data.nodetypesindex[nodetype]).values().each( function(nodeid) {
 				var node = data.nodes[nodeid];
-				if (node['Name']) { 
-					this.nodeLists[nodetype].set(node['Name'], nodeid);
+				var label = '';
+				if (node['label']) { 
+					label = node['label'];
+				} else if (node['id']) { 
+					label = node['id'];
+				}
+				if (label != '') { 
+					this.nodeLists[nodetype].set(label, nodeid);
 				}
 				nodelist_entry = new Element('li', {'id': 'list_'+nodeid});
 				nodelist_entry.update(this.listNodeEntry(node));
 				this.NodeViz.addEvents(nodelist_entry, node, 'node', 'list');
-				//Event.observe(nodelist_entry, 'mouseover', function(e) { this.highlightNode(nodeid, 1); }.bind(this.NodeViz));
-				//Event.observe(nodelist_entry, 'mouseout', function(e) { this.unhighlightNode(nodeid); }.bind(this.NodeViz));
-				//Event.observe(nodelist_entry, 'click', function(e) { this.selectNode(nodeid); }.bind(this.NodeViz));
 				nodelist.insert({ bottom: nodelist_entry});
 
 				//setup sub lists
@@ -111,9 +114,6 @@ GraphList.prototype = {
 
 					subelem.update(this.listSubNodeEntry(snode, node, edgetype, direction));
 					this.NodeViz.addEvents(subelem, snode, 'node', 'list');
-					//Event.observe(subelem, 'mouseover', function(e) { this.highlightNode(snode.id, 1); }.bind(this.NodeViz));
-					//Event.observe(subelem, 'mouseout', function(e) { this.unhighlightNode(snode.id); }.bind(this.NodeViz));
-					//Event.observe(subelem, 'click', function(e) { this.selectNode(snode.id); }.bind(this.NodeViz));
 					elem.insert({ bottom: subelem });
 				}, this);
 				sublists.insert({ bottom: elem });
@@ -123,8 +123,8 @@ GraphList.prototype = {
 	listNodeEntry: function(node) {
 		var label;
 		var content = "";
-		if (node.Name) { 
-			label = node.Name;
+		if (node.label) { 
+			label = node.label;
 		} else { 
 			label = node.id;
 		}
@@ -133,8 +133,8 @@ GraphList.prototype = {
 	listSubNodeEntry: function(node, parentNode, edgetype, direction) { 
 		var label;
 		var node_class = direction == 'to' ? 'to_node_item' : 'from_node_item'; 
-		if (node.Name) { 
-			label = node.Name;
+		if (node.label) { 
+			label = node.label;
 		} else { 
 			label = node.id;
 		}

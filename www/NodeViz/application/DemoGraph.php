@@ -113,12 +113,12 @@ class DemoGraph extends Graph {
 		global $foods;
 		foreach ($nodes as &$node) {
 			$fid = str_replace('food_', '', $node['id']);
-			$node['tooltip'] = $foods[$fid];
 			$node['label'] = $foods[$fid];
 			$node['shape'] = 'box';
 			$node['color'] = 'black';
 			$node['fillcolor'] = "#ccccff";
 			$node['value'] = rand(0, 20);
+			$node['tooltip'] = $animals[$aid]." (".$node['value'].")";
 		}
 		$nodes = $this->scaleSizes($nodes, 'foods', 'value');
 		return $nodes;	
