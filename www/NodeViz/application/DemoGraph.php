@@ -118,7 +118,7 @@ class DemoGraph extends Graph {
 			$node['color'] = 'black';
 			$node['fillcolor'] = "#ccccff";
 			$node['value'] = rand(0, 20);
-			$node['tooltip'] = $animals[$aid]." (".$node['value'].")";
+			$node['tooltip'] = $foods[$fid]." (".$node['value'].")";
 		}
 		$nodes = $this->scaleSizes($nodes, 'foods', 'value');
 		return $nodes;	
