@@ -2,9 +2,17 @@
 \section{Unfluence Class Reference}
 \label{classUnfluence}\index{Unfluence@{Unfluence}}
 }
+Inheritance diagram for Unfluence:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classUnfluence}
+\end{center}
+\end{figure}
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
+\hyperlink{classUnfluence_a051adc1ac4ae2294936c39afce839db6}{\_\-\_\-construct} ()
+\begin{DoxyCompactList}\small\item\em The default constructor for the graph initializes the the graph data array. \item\end{DoxyCompactList}\item 
 \hyperlink{classUnfluence_a8d4f12eca0b3e53007c81bea13240147}{candidates\_\-fetchNodes} ()
 \begin{DoxyCompactList}\small\item\em There must be a $<$nodetype\_\-fetchNodes() function for each defined node type. \item\end{DoxyCompactList}\item 
 \hypertarget{classUnfluence_aea5260b7f98790032a850129eaf95d7f}{
@@ -22,6 +30,48 @@
 \label{classUnfluence_aa1c27e10f5c6306c8a1ad6249a5ae1da}
 
 \end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classUnfluence_a051adc1ac4ae2294936c39afce839db6}{
+\index{Unfluence@{Unfluence}!\_\-\_\-construct@{\_\-\_\-construct}}
+\index{\_\-\_\-construct@{\_\-\_\-construct}!Unfluence@{Unfluence}}
+\subsubsection[{\_\-\_\-construct}]{\setlength{\rightskip}{0pt plus 5cm}Unfluence::\_\-\_\-construct (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classUnfluence_a051adc1ac4ae2294936c39afce839db6}
+
+
+The default constructor for the graph initializes the the graph data array. 
+
+The array will have empty sub-\/arrays for: \par
+
+\begin{DoxyItemize}
+\item nodetypes: gives names of types or \char`\"{}classes\char`\"{} of nodes
+\item edgetypes: gives names of types or \char`\"{}classes\char`\"{} of edges, as well as the types of nodes they link
+\item properties: lots of different kinds of graph properties and flags
+\item nodes: arrays containing all the node objects (types mixed together)
+\item edges: arrays containing all the edge objects (types mixed together)
+\item subgraphs: array containing any subgraph (cluster) declarations
+\item queries: optionally contains records of the queries used to construct a network for debugging\par
+
+\item nodetypesindex: indexing datastructure for looking up nodes by type
+\item edgetypesindex: indexing datastructure for looking up edges by type. \par
+\par
+
+\end{DoxyItemize}
+
+Subclasses of \hyperlink{classGraph}{Graph} should still call this super method if they override the constructor.
+
+\begin{DoxyReturn}{Returns}
+\$this, an empty graph object, with arrays waiting eagerly to be filled with structure 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classGraph_abeec16b1020f6d57d82d91ecf13b3ba9}{Graph}.
+
 
 
 \subsection{Member Function Documentation}
@@ -42,4 +92,4 @@ It returns the ids of the nodes for the type.
 
 The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
 \item 
-/home/unfluence/graphframework/www/NodeViz/application/Unfluence.php\end{DoxyCompactItemize}
+/home/skyebend/checkouttest/nodeviz/www/NodeViz/application/Unfluence.php\end{DoxyCompactItemize}

@@ -64,11 +64,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h1>Unfluence Class Reference</h1>  </div>
 </div>
 <div class="contents">
-<!-- doxytag: class="Unfluence" -->
+<!-- doxytag: class="Unfluence" --><!-- doxytag: inherits="Graph" --><div class="dynheader">
+Inheritance diagram for Unfluence:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classUnfluence.png" usemap="#Unfluence_map" alt=""/>
+  <map id="Unfluence_map" name="Unfluence_map">
+<area href="classGraph.html" alt="Graph" shape="rect" coords="0,0,69,24"/>
+</map>
+ </div></div>
+
 <p><a href="classUnfluence-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUnfluence.html#a051adc1ac4ae2294936c39afce839db6">__construct</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The default constructor for the graph initializes the the graph data array.  <a href="#a051adc1ac4ae2294936c39afce839db6"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUnfluence.html#a8d4f12eca0b3e53007c81bea13240147">candidates_fetchNodes</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">There must be a &lt;nodetype_fetchNodes() function for each defined node type.  <a href="#a8d4f12eca0b3e53007c81bea13240147"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aea5260b7f98790032a850129eaf95d7f"></a><!-- doxytag: member="Unfluence::candidates_nodeProperties" ref="aea5260b7f98790032a850129eaf95d7f" args="($nodes)" -->
@@ -78,6 +89,45 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa1c27e10f5c6306c8a1ad6249a5ae1da"></a><!-- doxytag: member="Unfluence::donations_edgeProperties" ref="aa1c27e10f5c6306c8a1ad6249a5ae1da" args="($edges)" -->
 &#160;</td><td class="memItemRight" valign="bottom"><b>donations_edgeProperties</b> ($edges)</td></tr>
 </table>
+<hr/><h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a051adc1ac4ae2294936c39afce839db6"></a><!-- doxytag: member="Unfluence::__construct" ref="a051adc1ac4ae2294936c39afce839db6" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Unfluence::__construct </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>The default constructor for the graph initializes the the graph data array. </p>
+<p>The array will have empty sub-arrays for: <br/>
+</p>
+<ul>
+<li>nodetypes: gives names of types or "classes" of nodes</li>
+<li>edgetypes: gives names of types or "classes" of edges, as well as the types of nodes they link</li>
+<li>properties: lots of different kinds of graph properties and flags</li>
+<li>nodes: arrays containing all the node objects (types mixed together)</li>
+<li>edges: arrays containing all the edge objects (types mixed together)</li>
+<li>subgraphs: array containing any subgraph (cluster) declarations</li>
+<li>queries: optionally contains records of the queries used to construct a network for debugging<br/>
+</li>
+<li>nodetypesindex: indexing datastructure for looking up nodes by type</li>
+<li>edgetypesindex: indexing datastructure for looking up edges by type. <br/>
+<br/>
+</li>
+</ul>
+<p>Subclasses of <a class="el" href="classGraph.html" title="The Graph class is superclass that defines the abstract graph data structure and functions relating t...">Graph</a> should still call this super method if they override the constructor.</p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>$this, an empty graph object, with arrays waiting eagerly to be filled with structure </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classGraph.html#abeec16b1020f6d57d82d91ecf13b3ba9">Graph</a>.</p>
+
+</div>
+</div>
 <hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a8d4f12eca0b3e53007c81bea13240147"></a><!-- doxytag: member="Unfluence::candidates_fetchNodes" ref="a8d4f12eca0b3e53007c81bea13240147" args="()" -->
 <div class="memitem">
@@ -99,7 +149,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/unfluence/graphframework/www/NodeViz/application/Unfluence.php</li>
+<li>/home/skyebend/checkouttest/nodeviz/www/NodeViz/application/Unfluence.php</li>
 </ul>
 </div>
 <!--- window showing the filter options -->
@@ -107,7 +157,7 @@ Public Member Functions</h2></td></tr>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -116,7 +166,7 @@ Public Member Functions</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Wed Oct 5 2011 22:29:42 for NodeViz by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Oct 6 2011 21:54:42 for NodeViz by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.3 </small></address>
 </body>

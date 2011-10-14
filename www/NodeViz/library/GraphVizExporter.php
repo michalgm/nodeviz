@@ -1,15 +1,18 @@
 <?php
 require('libgv-php5/gv.php');
 
-//Interperter file to take graph data structure and convert into a dot file
-
-//global vars that allow tweaking settings of sections in dot file and setting how
-//neato will run when it reads the file.  See http://www.graphviz.org/doc/info/attrs.html
-//for list of params and dfns. 
+/**
+Interpreter file to take a Graph data structure and convert into a ".dot" formatted file than can be passed to GraphViz.  Manages launching and running GraphVis program to do the graph layout. Also includes functions to clean up SVG and imagemap files.
+*/
 class GraphVizExporter {
+	
+	/**Global vars that allow tweaking settings of sections in dot file and setting how
+neato will run when it reads the file.  See http://www.graphviz.org/doc/info/attrs.html
+for list of params and dfns. Used as default values but can be overridden in Graph setup files. 
+*/
  	static $GV_PARAMS = array(
 		'graph' => array(
-			'outputorder' => 'edgesfirst',
+			'outputorder' => 'edgesfirst',  /*! draw edges before drawing nodes !*/
 			'truecolor' => 'true',
 			//'maxiter' => '10000', //turning this off speeds things up, but does it mean that some might not converge?
 			'size' => '9,9!',
@@ -35,6 +38,12 @@ class GraphVizExporter {
 		)
 	);
 
+
+	/**  Loops through the passed graph structure and writes it to a text string in the .dot file format. All graph data will be written, even if it is not a valid GraphViz paramters.  When some important GraphViz params are not included, it uses the default values in $GV_PARAMS.
+		@param $graph  the graph to be converted
+		@returns $dot a string in .dot format ready to be written out
+	
+	*/
 	static function createDot($graph){ //add more arguments to control dot file creation
 		$GV_PARAMS = GraphVizExporter::$GV_PARAMS;
 
@@ -166,6 +175,13 @@ class GraphVizExporter {
 	  return $value;
 	}
 
+	/**
+	Manage the export of the Graph object, piping the .dot file to GraphViz to compute layouts, and cacheing images,etc. First creates graph file using createDot().  Uses neato network layout by default, other graphviz layouts can be specified iwht the layoutEngine parameter. Uses the Graph's graphname() function for the base of the filename. Normally writes out a .dot, .svg .png and .imap versions of the network.  If debugMode is set, it will also write out a human-readable dot file with a suffix .nicegraph.  Post-processes the .imap, .svg and ? file using the fuctions processImap(), processSVG() and processGraphData().
+	@param $graph the Graph object to be exported
+	@param $datapath the data working directory that the files should be witten to
+	@param $format  string giving suffix for other image format to save graph images as. (i.e. ".jpg")
+	@returns an array with $imap and $svg elements
+	*/
 	public static function generateGraphFiles($graph, $datapath, $format) {
 		global $nodeViz_config;
 
@@ -236,6 +252,14 @@ class GraphVizExporter {
 		return array($imap, $svg);
 	}
 
+	/**
+	Determines if the network image files need to be generated or loaded from cache, and loads information into arrays to be returned to client. Contents of image and overly change depending if the browser making the request set useSVG request parameter.
+	@param $graph  the Graph object, to be returned as JSON. 
+	@param $datapath string giving the path to the cache directory
+	@param $format  string indicating if it will be returning svg or png image for network?
+	@param $returnsvg NOT USED?  seems to read request param instead.
+	@returns an array with elements for the 'image', 'graph', 'overlay', and 'dot' data.
+	*/
 	public static function generateGraphvizOutput($graph, $datapath, $format, $returnsvg = 0) {
 		global $nodeViz_config;
 		$graphname = $graph->graphname();
@@ -244,10 +268,14 @@ class GraphVizExporter {
 		$svgFile = "$datapath$graphname.svg";
  
 		$cache = $nodeViz_config['cache'];
+		
+		//check if cache directory is writable
 		if (! is_dir($nodeViz_config['cache_path']) || ! is_readable($nodeViz_config['cache_path'])) {
 			trigger_error("Unable to read cache to cache directory '".$nodeViz_config['cache_path']."'", E_USER_ERROR);
 		}
 		$output = "";
+		
+		//either write files to the cache, or load in the cached files
 		if ($cache != 1) {
 			if (! is_writable($nodeViz_config['cache_path'])) {
 				trigger_error("Unable to write cache to cache directory '".$nodeViz_config['cache_path']."'", E_USER_ERROR);
@@ -281,6 +309,20 @@ class GraphVizExporter {
 		return $imap;
 	}
 
+
+	/**
+		Modifies the SVG rendering of the network produced by GraphViz to be ready to insert into the XHTML document, tweaks some elements to work better in the NodeViz interactive display. Writes out the new SVG file and (when not in debug mode) deltes the old SVG file.  Key changes to SVG are:
+			- adding a large 'screen' which will be used to hide the graph when certain elements are hilited
+			- changing the id of the svg element
+			- removing svg document header
+			- removing title tags
+			- adding a zoom_level class to text elements to work with the css zooming
+			- rewriting image paths from local to web paths
+		@param $svgFile string with the name of the file containing the SVG content
+		@param $datapath string with the location of the cache directory where files are location
+		@param $graph the Graph object corresponding to the SVG image.
+		@returns $svg string with modified SVG content
+	*/
 	public static function processSVG($svgFile, $datapath, $graph) {
 		global $old_graphviz;
 		global $nodeViz_config;
