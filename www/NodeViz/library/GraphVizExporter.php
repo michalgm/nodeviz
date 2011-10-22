@@ -1,5 +1,6 @@
 <?php
-require('libgv-php5/gv.php');
+
+//require('libgv-php5/gv.php');
 
 /**
 Interpreter file to take a Graph data structure and convert into a ".dot" formatted file than can be passed to GraphViz.  Manages launching and running GraphVis program to do the graph layout. Also includes functions to clean up SVG and imagemap files.
@@ -277,6 +278,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		
 		//either write files to the cache, or load in the cached files
 		if ($cache != 1) {
+			require('libgv-php5/gv.php'); //load the graphviz php bindings
 			if (! is_writable($nodeViz_config['cache_path'])) {
 				trigger_error("Unable to write cache to cache directory '".$nodeViz_config['cache_path']."'", E_USER_ERROR);
 			}
