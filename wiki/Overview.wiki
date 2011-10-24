@@ -24,7 +24,7 @@ NodeViz has two main parts:
 
   * Networks can be rendered as both graphs and lists, with synchronized interaction between them. 
 
-  * Networks can be cached on the server to avoid repeating the expensive network layout process.
+  * Networks can be cached on the server to avoid repeating the expensive network layout process, an for cases where GraphViz can't be installed on the production server..
 
   * A structured template for assembling a network from an arbitrary data source (usually a database).
 
@@ -36,11 +36,14 @@ NodeViz has two main parts:
 
 = Dependencies = 
 
-  * PHP
+  * PHP 5.3 +
   * GraphViz open source graph drawing package http://graphviz.org
+  * GraphViz php bindings (libgv-php5)
   * Scriptaculous JS library http://script.aculo.us/
   * Prototype JS library http://www.prototypejs.org/
   * ImageMagick http://www.imagemagick.org/
+
+Note that it is possible to deploy on a server that doesn't have GraphViz by generating pre-cached data files..
 
 = What NodeViz does not do = 
   * Network analysis (try Gephi, the R network library, Pajek, etc)
