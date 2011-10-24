@@ -220,7 +220,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		if($nodeViz_config['debug']) {
 			gv::render($gv, 'dot', $dotFile);
 		}
-		gv:rm($gv);
+		gv::rm($gv);
 		if(ob_get_contents()) {
 			ob_end_clean();
 			trigger_error("GraphViz interpreter failed", E_USER_ERROR);

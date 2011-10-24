@@ -71,8 +71,8 @@ class Graph {
 	*/
 	function setupGraph($request_parameters=array(), $blank=0) {
 		global $datapath;
-		global $framework_config;
-		$cache = $framework_config['cache'];
+		global $nodeViz_config;
+		$cache = $nodeViz_config['cache'];
 		
 		$this->input_parameters = $request_parameters;
 		//Override defaults with input values if they exist
