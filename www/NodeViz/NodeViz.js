@@ -97,8 +97,9 @@ NodeViz.prototype = {
 		if ($('image')) {
 			this.offsetX = Position.positionedOffset($('image'))[0] ;
 			this.offsetY = Position.positionedOffset($('image'))[1] ;
-			this.tooltipOffsetX = Position.cumulativeOffset(this.graphdiv)[0] - 15;
+			//this.tooltipOffsetX = Position.cumulativeOffset(this.graphdiv)[0] - 15;
 			//tooltipOffsetY = Position.cumulativeOffset($('graphs'))[1];
+			this.tooltipOffsetX = -5
 			this.tooltipOffsetY = 5;
 		}
 	},
