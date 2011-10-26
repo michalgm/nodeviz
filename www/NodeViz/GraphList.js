@@ -19,19 +19,23 @@ GraphList.prototype = {
 	appendOptions: function() {
 
 	},
+	// This function builds the html for the list view of the graph
 	render: function(responseData) {
 		//console.time('renderList');
 		var data = this.NodeViz.data;
 		this.nodeLists = new Hash();
 		$(this.listdiv).insert({ top: new Element('ul', {'id': 'list_menu'}) });
+		//Build seperate sub lists for each node type
 		$H(data.nodetypes).values().each( function(nodetype) {
 			this.nodeLists[nodetype] = new Hash();
 			$('list_menu').insert({ bottom: new Element('li', {'id': nodetype+'_menu'}).update(nodetype)});
 			$(this.listdiv).insert({ bottom: new Element('div', {'id': nodetype+'_list_container', 'class': 'nodelist_container'}) });
 			$(nodetype+'_list_container').insert({top: new Element('div', {'id': nodetype+'_list_header', 'class': 'nodelist_header'}).update('<span class="node_type_label">'+nodetype+' Nodes</span>')});
 
+			//Create the search field for the top of the lsist
 			var search = ' <label for="'+nodetype+'_search">Search</label> <input class="node_search" id="'+nodetype+'_search" autocomplete="off" size="20" type="text" value="" /> <div class="autocomplete node_search_list" id="'+nodetype+'_search_list" style="display:none"></div>';
 			$(nodetype+'_list_header').insert({bottom: new Element('div', {'id': nodetype+'_search_container', 'class': 'node_search_container'}).update(search)});
+			
 			var nodelist = new Element('ul', {'id': nodetype+'_list', 'class': 'nodelist'});
 			Event.observe($(nodetype+'_menu'), 'click', function(e) { this.displayList(nodetype); }.bind(this));
 			$H(data.nodetypesindex[nodetype]).values().each( function(nodeid) {
@@ -50,7 +54,7 @@ GraphList.prototype = {
 				this.NodeViz.addEvents(nodelist_entry, node, 'node', 'list');
 				nodelist.insert({ bottom: nodelist_entry});
 
-				//setup sub lists
+				//setup more sub lists for each connected node type
 				var sublists= new Element('div', {'id': nodeid+'_sublists', 'class': 'sublists_container'});
 				$H(data.edgetypes).keys().each( function(edgetype) {
 					this.setupSubLists(node, edgetype, 'from', sublists); 
@@ -58,7 +62,7 @@ GraphList.prototype = {
 				}, this);
 				Event.observe(sublists, 'click', function(e) { e.stop(); }.bind(this.NodeViz));
 				Event.observe(sublists, 'mouseover', function(e) { e.stop(); }.bind(this.NodeViz));
-				nodelist.insert({ bottom: sublists});
+				nodelist_entry.insert({ bottom: sublists});
 			}, this);
 			$(nodetype+'_list_container').insert({ bottom: nodelist });
 			if (this.nodeLists[nodetype].keys()[0]) { 
