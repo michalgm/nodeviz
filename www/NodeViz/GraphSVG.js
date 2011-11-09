@@ -1,7 +1,10 @@
 var GraphSVG = Class.create(GraphImage, {
 	initialize: function($super, NodeViz) {
+		this.zoomlevels = 8;
+		this.zoom_delta = .8;
+		this.default_zoom = 1;
 		$super(NodeViz);
-		if (this.NodeViz.useSVG != 1 ) { return; } 
+		if (this.NodeViz.options.useSVG != 1 ) { return; } 
 		//this.GraphSVGZoom = new GraphSVGZoom(this);
 		$(this.graphdiv).innerHTML += this.zoomControlsHTML;
 	},
@@ -9,9 +12,7 @@ var GraphSVG = Class.create(GraphImage, {
 		$super();
 		this.state = '';
 		this.stateOrigin = '';
-		this.zoomlevels = 8;
-		this.zoom_delta = .8;
-		this.current_zoom = 1;
+		this.current_zoom = this.default_zoom;
 		this.previous_zoom = 1;
 		this.zoom_point = null;
 		if (this.zoomSlider) { 
@@ -142,7 +143,6 @@ var GraphSVG = Class.create(GraphImage, {
 	unhighlightNode: function($super, id) {
 		$super(id);
 		var NodeViz = this.NodeViz;
-		if (! NodeViz.useSVG) { return; }
 		var node = $(id);
 		$A($(id).childNodes).reverse().detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; }).removeAttribute('class');
 		if (NodeViz.current['network'] == id || (NodeViz.data.nodes[NodeViz.current['network']] && NodeViz.data.nodes[NodeViz.current['network']]['relatedNodes'][id])) {
@@ -513,6 +513,7 @@ var GraphSVG = Class.create(GraphImage, {
 		this.zoomSlider.setValue(d);
 	},
 	SVGzoom: function(d) { 
+		$(this.graphdiv).addClassName('zooming');
 		this.previous_zoom = this.current_zoom;
 		this.current_zoom = d;
 		var zoom_amount = d - this.previous_zoom;
@@ -530,6 +531,7 @@ var GraphSVG = Class.create(GraphImage, {
 		//var k = this.root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
 		new Effect.AnimateZoom($('graph0'), {point: p, zoom: z, queue: {'position': 'end', 'scope': 'zoom'}, duration: .5, afterFinish: function() {
 				this.setZoomFilters();
+				$(this.graphdiv).removeClassName('zooming');
 			}.bind(this)
 		});
 		//new Effect.AnimateZoom($('underlay_graph0'), {point: p, zoom: z});

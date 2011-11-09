@@ -116,6 +116,8 @@
 	#error .errorstring { display:block; max-height: 200px; overflow: auto; background: #fee; padding: 3px; }
 	#error .code { font-family: monospace; white-space: pre-wrap; }
 
+	.zooming text { display: none; }
+
 	.zoom_0 .zoom_1, .zoom_0 .zoom_2, .zoom_0 .zoom_3, .zoom_0 .zoom_4, .zoom_0 .zoom_5, .zoom_0 .zoom_6, .zoom_0 .zoom_7, .zoom_0 .zoom_8, .zoom_0 .zoom_9, .zoom_0 .zoom_10  { display: none; }
 	.zoom_1 .zoom_2, .zoom_1 .zoom_3, .zoom_1 .zoom_4, .zoom_1 .zoom_5, .zoom_1 .zoom_6, .zoom_1 .zoom_7, .zoom_1 .zoom_8, .zoom_1 .zoom_9, .zoom_1 .zoom_10  { display: none; }
 	.zoom_2 .zoom_3, .zoom_2 .zoom_4, .zoom_2 .zoom_5, .zoom_2 .zoom_6, .zoom_2 .zoom_7, .zoom_2 .zoom_8, .zoom_2 .zoom_9, .zoom_2 .zoom_10  { display: none; }

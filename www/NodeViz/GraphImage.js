@@ -4,7 +4,7 @@ var GraphImage = Class.create();
 GraphImage.prototype = {
 	initialize: function(NodeViz) {
 		this.NodeViz = NodeViz;
-		this.graphdiv = this.NodeViz.graphdiv;
+		Object.extend(this, NodeViz.options.image);	
 		if (! $('tooltip')) { 
 			$(document.body).insert({ top: new Element('div', {'id': 'tooltip'}) });
 		}
@@ -19,29 +19,40 @@ GraphImage.prototype = {
 	render: function(responseData) {
 	},
 	appendOptions: function() {
-		this.NodeViz.params.useSVG = this.NodeViz.useSVG;
+		this.NodeViz.params.useSVG = this.NodeViz.options.useSVG;
 		this.NodeViz.params.graphWidth = this.graphDimensions.width;
 		this.NodeViz.params.graphHeight = this.graphDimensions.height;
 	},
+	setOffsets: function() { 
+		if ($('image')) {
+			this.offsetX = Position.positionedOffset($('image'))[0] ;
+			this.offsetY = Position.positionedOffset($('image'))[1] ;
+			//this.tooltipOffsetX = Position.cumulativeOffset(this.graphdiv)[0] - 15;
+			//tooltipOffsetY = Position.cumulativeOffset($('graphs'))[1];
+			this.tooltipOffsetX = -5;
+			this.tooltipOffsetY = 5;
+		}
+	},
+	
 	//Catches mousemove events
 	mousemove: function(e) {
 		if($('tooltip').style.visibility == 'visible') { 
 			var mousepos = { 'x': Event.pointerX(e), 'y': Event.pointerY(e) };
-			$('tooltip').setStyle({'top': (mousepos['y']- this.NodeViz.tooltipOffsetY - $('tooltip').getHeight()) + 'px', 'left': (mousepos['x']  - this.NodeViz.tooltipOffsetX) + 'px'});
+			$('tooltip').setStyle({'top': (mousepos['y']- this.tooltipOffsetY - $('tooltip').getHeight()) + 'px', 'left': (mousepos['x']  - this.tooltipOffsetX) + 'px'});
 		}
 	},
 	setupListeners: function() { 
 		Event.observe($('image'), 'mousemove', this.mousemove.bind(this));
 		Event.observe($('tooltip'), 'mousemove', this.mousemove.bind(this))
 		Event.observe($('tooltip'), 'mouseout', this.hideTooltip.bind(this));
-		Event.observe(window, 'resize', this.NodeViz.setOffsets.bind(this));
+		Event.observe(window, 'resize', this.setOffsets.bind(this));
 	},
 
 	showTooltip: function(label) {
 		if (typeof(this.state) != 'undefined' && this.state !== '') { return; }
 		if(label != '') { 
-			if (! this.NodeViz.offsetY) { 
-				this.NodeViz.setOffsets();
+			if (! this.offsetY) { 
+				this.setOffsets();
 			}
 			tooltip = $('tooltip');
 			tooltip.innerHTML = label;

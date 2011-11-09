@@ -5,7 +5,9 @@ GraphList.prototype = {
 
 	initialize: function(NodeViz) {
 		this.NodeViz = NodeViz;
-		this.listdiv = this.NodeViz.listdiv;
+		this.scrollList = 0;
+		Object.extend(this, NodeViz.options.list);	
+		//this.listdiv = this.NodeViz.listdiv;
 	},
 	reset: function() { 
 		var data = this.NodeViz.data;
@@ -182,7 +184,7 @@ GraphList.prototype = {
 		var elem = $('list_'+id);
 		elem.addClassName('selected');
 		$(id+'_sublists').setStyle({'display': 'block'});
-		if (this.NodeViz.scrollList) { 
+		if (this.scrollList) { 
 			elem.parentNode.scrollTop = elem.offsetTop;
 		}
 	},

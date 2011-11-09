@@ -2,13 +2,15 @@ var NodeViz = Class.create();
 
 NodeViz.prototype = {
 	initialize: function(options) { 
-		this.timeOutLength = 100;
-		this.errordiv = 'error';
-		this.lightboxdiv = 'lightbox';
-		this.lightboxscreen = 'lightboxscreen';
-		this.optionsform = 'graphoptions';
-		this.NodeVizPath = 'NodeViz/';
-		Object.extend(this, options);
+		this.options = {
+			timeOutLength : 100,
+			errordiv : 'error',
+			lightboxdiv : 'lightbox',
+			lightboxscreen : 'lightboxscreen',
+			optionsform : 'graphoptions',
+			NodeVizPath : 'NodeViz/',
+		}
+		Object.extend(this.options, options);
 		if (! this.prefix) { 
 
 			if (typeof(NodeVizCounter) == 'undefined') { 
@@ -16,26 +18,26 @@ NodeViz.prototype = {
 			} else {
 				NodeVizCounter++;
 			}
-			this.prefix = 'nv'+NodeVizCounter+'_';
+			this.options.prefix = 'nv'+NodeVizCounter+'_';
 		}
-		if (! $(this.errordiv)) { 
-			$(document.body).insert({ top: new Element('div', {'id': this.errordiv}) });
+		if (! $(this.options.errordiv)) { 
+			$(document.body).insert({ top: new Element('div', {'id': this.options.errordiv}) });
 		}
 		this.renderers = {};
-		if (this.graphdiv) { 
-			if ((typeof this.useSVG === 'undefined' && document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")) || this.useSVG == 1) { 
-				this.useSVG = 1;
+		if (this.options.image.graphdiv) { 
+			if ((typeof this.options.useSVG === 'undefined' && document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")) || this.options.useSVG == 1) { 
+				this.options.useSVG = 1;
 				this.renderers['GraphImage'] = new GraphSVG(this);
 			} else {
-				this.useSVG = 0;
+				this.options.useSVG = 0;
 				this.renderers['GraphImage'] = new GraphRaster(this);
 			}
 		}
-		if(this.listdiv) { 
+		if(this.options.list.listdiv) { 
 			this.renderers['GraphList'] = new GraphList(this);
 		}
-		if ($(this.optionsform)) {
-			Element.observe($(this.optionsform), 'change', this.reloadGraph.bind(this));
+		if ($(this.options.optionsform)) {
+			Element.observe($(this.options.optionsform), 'change', this.reloadGraph.bind(this));
 		}
 		this.reloadGraph();
 	},
@@ -63,12 +65,12 @@ NodeViz.prototype = {
 		return 0;	
 	},
 	reportError: function(code, message) {
-		$(this.errordiv).update("We're sorry, an error has occured: <span class='errorstring'>"+message+"</span> (<span class='errorcode'>"+code+"</span>)");
-		$(this.errordiv).show();
+		$(this.options.errordiv).update("We're sorry, an error has occured: <span class='errorstring'>"+message+"</span> (<span class='errorcode'>"+code+"</span>)");
+		$(this.options.errordiv).show();
 	},
 	clearError: function() {
-		$(this.errordiv).update('');
-		$(this.errordiv).hide();
+		$(this.options.errordiv).update('');
+		$(this.options.errordiv).hide();
 	},
 	timeOutExceeded: function(request) {
 		statusCode=10;
@@ -92,16 +94,6 @@ NodeViz.prototype = {
 			this.requests.splice(this.requests.indexOf(r), 1);
 		}, this);
 		$$('.loading').each(function (e) { e.remove(); });
-	},
-	setOffsets: function() { 
-		if ($('image')) {
-			this.offsetX = Position.positionedOffset($('image'))[0] ;
-			this.offsetY = Position.positionedOffset($('image'))[1] ;
-			//this.tooltipOffsetX = Position.cumulativeOffset(this.graphdiv)[0] - 15;
-			//tooltipOffsetY = Position.cumulativeOffset($('graphs'))[1];
-			this.tooltipOffsetX = -5
-			this.tooltipOffsetY = 5;
-		}
 	},
 	getGraphOptions: function() {
 		this.params = Form.serialize($('graphoptions'), true);
@@ -143,9 +135,9 @@ NodeViz.prototype = {
 
 		var params = this.getGraphOptions();
 		//console.time('fetch');
-		var request = new Ajax.Request(this.NodeVizPath+'request.php', {
+		var request = new Ajax.Request(this.options.NodeVizPath+'/request.php', {
 			parameters: params,
-			timeOut: this.timeOutLength,
+			timeOut: this.options.timeOutLength,
 			onLoading: function() { this.onLoading('images'); }.bind(this),
 			onTimeOut: this.timeOutExceeded.bind(this),
 			evalJS: true,
@@ -170,7 +162,7 @@ NodeViz.prototype = {
 	},
 	panToNode: function(id,level) {
 		//zooms graph if in svg mode
-		if (this.useSVG ==1) {
+		if (this.options.useSVG ==1) {
 			this.renderers['GraphImage'].panToNode(id, level);
 		}
 	},
@@ -213,10 +205,10 @@ NodeViz.prototype = {
 		var params = this.getGraphOptions();
 		params.action = 'displayEdge';
 		params.edgeid = id;
-		var request = new Ajax.Request(this.NodeVizPath+'request.php', {
+		var request = new Ajax.Request(this.options.NodeVizPath+'request.php', {
 			parameters: params,
-			timeOut: this.timeOutLength,
-			onLoading: function() { this.onLoading(this.lightboxdiv+'contents'); }.bind(this),
+			timeOut: this.options.timeOutLength,
+			onLoading: function() { this.onLoading(this.options.lightboxdiv+'contents'); }.bind(this),
 			onTimeOut: this.timeOutExceeded.bind(this),
 			sanitizeJSON: true,
 			onComplete: function(response,json) {
@@ -240,30 +232,30 @@ NodeViz.prototype = {
 		this.requests[this.requests.length+1] = request;
 	},
 	unselectEdge: function() {
-		$(this.lightboxdiv+'contents').update();
-		$(this.lightboxdiv).hide();
-		$(this.lightboxscreen).hide();
+		$(this.options.lightboxdiv+'contents').update();
+		$(this.options.lightboxdiv).hide();
+		$(this.options.lightboxscreen).hide();
 
 	},
 	showLightbox: function(contents) { 
 		this.clearError();
-		if (! $(this.lightboxdiv)) { 
-			$(document.body).insert({ top: new Element('div', {'id': this.lightboxdiv}) });
-			$(this.lightboxdiv).insert({top: new Element('img', {'id': this.lightboxdiv+'close', 'src': 'images/close.png', 'alt': 'Close', 'class': 'close'}) });
-			$(this.lightboxdiv+'close').observe('click', this.hideLightbox.bind(this));
-			$(this.lightboxdiv).insert({ bottom: new Element('div', {'id': this.lightboxdiv+'contents'}) });
+		if (! $(this.options.lightboxdiv)) { 
+			$(document.body).insert({ top: new Element('div', {'id': this.options.lightboxdiv}) });
+			$(this.options.lightboxdiv).insert({top: new Element('img', {'id': this.options.lightboxdiv+'close', 'src': 'images/close.png', 'alt': 'Close', 'class': 'close'}) });
+			$(this.options.lightboxdiv+'close').observe('click', this.hideLightbox.bind(this));
+			$(this.options.lightboxdiv).insert({ bottom: new Element('div', {'id': this.options.lightboxdiv+'contents'}) });
 		}
-		if (! $(this.lightboxscreen)) { 
-			$(document.body).insert({ top: new Element('div', {'id': this.lightboxscreen}) });
+		if (! $(this.options.lightboxscreen)) { 
+			$(document.body).insert({ top: new Element('div', {'id': this.options.lightboxscreen}) });
 		}
-		$(this.lightboxdiv+'contents').update(contents);
-		$(this.lightboxdiv).show();
-		$(this.lightboxscreen).show();
+		$(this.options.lightboxdiv+'contents').update(contents);
+		$(this.options.lightboxdiv).show();
+		$(this.options.lightboxscreen).show();
 
 	},
 	hideLightbox: function() {
-		$(this.lightboxdiv).hide();
-		$(this.lightboxscreen).hide();
+		$(this.options.lightboxdiv).hide();
+		$(this.options.lightboxscreen).hide();
 	},
 	addEvents: function(dom_element, graph_element, element_type, renderer) {
 		var eventslist = ['mouseover', 'mousemove','mouseout', 'mouseenter', 'mouseleave' , 'mouseup', 'mousedown', 'click', 'dblclick'];

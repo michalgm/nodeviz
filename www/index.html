@@ -16,8 +16,22 @@
 	<script type="text/javascript" src="NodeViz/GraphSVG.js" ></script>
 	<script type="text/javascript">
 	//<![CDATA[
-		function initGraph() {
-			gf = new NodeViz({graphdiv: 'graphs', listdiv:'lists', scrollList: 1});
+	function initGraph() {
+		var graphoptions = {
+			image: {
+				graphdiv: 'graphs',
+				zoomlevels: '2',
+				zoom_delta: 9,
+
+			},
+			list: {
+					listdiv: 'lists',
+					scrollList: 1
+				},
+			};
+
+			//gf = new NodeViz({graphdiv: 'graphs', listdiv:'lists', scrollList: 1});
+			gf = new NodeViz(graphoptions);
 			//gf = new NodeViz({graphdiv: 'graphs', listdiv:'lists', scrollList: 1, useSVG: 0});
 		}	
 	//]]>	
