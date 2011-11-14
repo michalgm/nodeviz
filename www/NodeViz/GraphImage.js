@@ -54,7 +54,7 @@ GraphImage.prototype = {
 			if (! this.offsetY) { 
 				this.setOffsets();
 			}
-			tooltip = $('tooltip');
+			var tooltip = $('tooltip');
 			tooltip.innerHTML = label;
 			tooltip.style.visibility='visible'; //show the tooltip
 		}
@@ -76,5 +76,5 @@ GraphImage.prototype = {
 	selectNode: function(id) {
 	},
 	unselectNode: function(id) {
-	},
+	}
 };

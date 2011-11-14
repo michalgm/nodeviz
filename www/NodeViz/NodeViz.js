@@ -1,3 +1,4 @@
+MOUSEENTER_MOUSELEAVE_EVENTS_SUPPORTED = 0;
 var NodeViz = Class.create();
 
 NodeViz.prototype = {
@@ -8,7 +9,7 @@ NodeViz.prototype = {
 			lightboxdiv : 'lightbox',
 			lightboxscreen : 'lightboxscreen',
 			optionsform : 'graphoptions',
-			NodeVizPath : 'NodeViz/',
+			NodeVizPath : 'NodeViz/'
 		}
 		Object.extend(this.options, options);
 		if (! this.prefix) { 
@@ -265,6 +266,11 @@ NodeViz.prototype = {
 				action = graph_element[eventtype];	
 			} else if (typeof this.default_events[element_type][eventtype] != 'undefined') {
 				action = this.default_events[element_type][eventtype]; 
+			}
+			//We have to override mouseenter and leave events for raster type because IE 7 & 8 don't seem to support them on image maps
+			if (renderer == 'raster') {
+				if (eventtype == 'mouseenter') { eventtype = 'mouseover'; }
+				else if (eventtype == 'mouseleave') { eventtype = 'mouseout'; }
 			}
 			if (action != '') {
 				Event.observe(dom_element,eventtype, function(evt) { 

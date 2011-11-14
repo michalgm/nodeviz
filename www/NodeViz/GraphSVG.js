@@ -343,7 +343,7 @@ var GraphSVG = Class.create(GraphImage, {
 					}.bind(this);
 					this.zoom_event = do_zoom.delay(.2);
 				}
-			}.bind(this),
+			}.bind(this)
 		});
 		this.center = this.calculateCenter();
 	},
@@ -556,4 +556,6 @@ var GraphSVG = Class.create(GraphImage, {
 			<span id='zoomout' class='zoomout' alt='Zoom Out' title='Zoom Out'>[-]</span>\
 			<span id='zoomreset' class='zoomreset' alt='Reset Zoom' title='Reset Zoom'>[0]</span>\
 		</div>\
-	",	});
+	"
+}
+);

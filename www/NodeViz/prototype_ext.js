@@ -164,9 +164,11 @@ Element.addMethods(ext);
 //SVGElement.prototype.setStyle = Element.setStyle;
 //SVGElement.prototype.makePositioned = Element.makePositioned;
 //SVGElement.prototype.getStyle = Element.getStyle;
-hack_extend(Element.Methods, SVGElement.prototype);
-hack_extend(Effect.Methods, SVGElement.prototype);
-SVGElement.prototype.className = function() { this.getAttribute('class'); }
+if (typeof SVGElement !== 'undefined') { 
+	hack_extend(Element.Methods, SVGElement.prototype);
+	hack_extend(Effect.Methods, SVGElement.prototype);
+	SVGElement.prototype.className = function() { this.getAttribute('class'); }
+}
 function hack_extend(methods, destination) {
     onlyIfAbsent = true;
     for (var property in methods) {
@@ -184,7 +186,7 @@ Effect.Translate = Class.create(Effect.Base, {
     var options = Object.extend({
       x:    0,
       y:    0,
-	  ctm: this.element.getCTM(),
+	  ctm: this.element.getCTM()
     }, arguments[1] || { });
     this.start(options);
   },
@@ -214,7 +216,7 @@ Effect.AnimateZoom = Class.create(Effect.Base, {
     var options = Object.extend({
       zoom:    0,
 	  point:	0,
-	  ctm: this.element.getCTM(),
+	  ctm: this.element.getCTM()
     }, arguments[1] || { });
     this.start(options);
   },

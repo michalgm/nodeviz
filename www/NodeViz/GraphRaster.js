@@ -39,18 +39,31 @@ var GraphRaster = Class.create(GraphImage, {
 				//if (node.onMouseover != '') { Event.observe($(a), 'mouseover', function(e) { eval(node.onMouseover); }.bind(this)); }
 				//if (node.onClick != '') { Event.observe($(a), 'click', function(e) { eval(node.onClick); }.bind(this)); }
 				//Event.observe($(a), 'mouseout', function(e) { this.NodeViz.unhighlightNode(a.id); }.bind(this)); 
-				var coords = $(a).getAttribute('coords').split(',');
-				if ($(a).getAttribute('shape') == 'circle') {
-					node['width'] = coords[2]*2;
-					node['height'] = coords[2]*2;
-					node['posx'] = coords[0] - (coords[2]);
-					node['posy'] = coords[1] - (coords[2]);
-					
+				var shape = $(a).getAttribute('shape').toLowerCase();
+				var coords = [];
+				if (shape == 'poly') {
+					//If it's a polygon, we need to get the bounding box and just highlight that
+					var allcoords = $(a).getAttribute('coords').split(/[, ]/);
+					var xs = [];
+					var ys = [];
+					while(allcoords.length) {
+						xs.push(allcoords.shift());
+						ys.push(allcoords.shift());
+					}
+					coords = [Math.min.apply(Math, xs), Math.min.apply(Math, ys), Math.max.apply(Math, xs), Math.max.apply(Math, ys)];
 				} else {
-					node['width'] = (coords[2] - coords[0]);
-					node['height'] = (coords[3] - coords[1]);
-					node['posx'] = coords[0];
-					node['posy'] = coords[1];
+					coords = $(a).getAttribute('coords').split(',');
+				}
+				if (shape == 'circle') {
+					node['width'] = parseFloat(coords[2])*2;
+					node['height'] = parseFloat(coords[2])*2;
+					node['posx'] = parseFloat(coords[0]) - parseFloat(coords[2]);
+					node['posy'] = parseFloat(coords[1]) - parseFloat(coords[2]);
+				} else {
+					node['width'] = parseFloat(coords[2]) - parseFloat(coords[0]);
+					node['height'] = parseFloat(coords[3]) - parseFloat(coords[1]);
+					node['posx'] = parseFloat(coords[0]);
+					node['posy'] = parseFloat(coords[1]);
 				}
 			}
 		}, this);
@@ -70,8 +83,8 @@ var GraphRaster = Class.create(GraphImage, {
 		var node = this.NodeViz.data.nodes[id];
 		$('highlight').style.width = parseFloat(node['width']) +2 +'px';
 		$('highlight').style.height = parseFloat(node['height']) +2 +'px';
-		$('highlight').style.top = parseFloat(node['posy']) -1 + this.NodeViz.offsetY + 'px';
-		$('highlight').style.left = parseFloat(node['posx']) -1 + this.NodeViz.offsetX + 'px';
+		$('highlight').style.top = parseFloat(node['posy']) -1 + this.offsetY + 'px';
+		$('highlight').style.left = parseFloat(node['posx']) -1 + this.offsetX + 'px';
 		$('highlight').style.visibility = 'visible';
 		if (node['shape'] != 'circle') { 
 			$('highlight').addClassName('selected');
@@ -89,6 +102,6 @@ var GraphRaster = Class.create(GraphImage, {
 
 	highlightImageHTML: "\
 		<div id='highlight'><img id='highlightimg' alt='' src='images/highlight.gif' /></div>\
-	",
+	"
 
 });
