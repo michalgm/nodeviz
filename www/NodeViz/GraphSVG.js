@@ -328,6 +328,7 @@ var GraphSVG = Class.create(GraphImage, {
 		var defaultValue = this.current_zoom;
 		var x = 0;
 		var values = new Array();
+		this.zoomlevels = parseFloat(this.zoomlevels);
 		while (x <= this.zoomlevels) { 
 			values.unshift(x);
 			x++;
