@@ -18,13 +18,25 @@ var GraphSVG = Class.create(GraphImage, {
 		Event.observe($('zoomin'), 'click', function(e) { this.zoom('in'); }.bind(this));
 		Event.observe($('zoomout'), 'click', function(e) { this.zoom('out'); }.bind(this));
 		Event.observe($('zoomreset'), 'click', function(e) { this.zoom('reset'); }.bind(this));
+		this.zoomlevels = parseFloat(this.zoomlevels);
+		//we need to build the zoomlevels css
 		var x = 0;
 		var values = new Array();
-		this.zoomlevels = parseFloat(this.zoomlevels);
+		var css_string = '';
 		while (x <= this.zoomlevels) { 
+			var y = x+1;
+			while (y <= this.zoomlevels) { 
+				css_string += '.zoom_'+x+' .zoom_'+y+', ';
+				y++;
+			}
 			values.unshift(x);
 			x++;
 		}
+		css_string = css_string.slice(0, -2);
+		css_string += " { display: none; }";
+		//insert the zoom stylesheet into the doc header
+		$$('head')[0].appendChild(new Element('style', {'type': 'text/css'}).update(css_string));
+
 		this.zoomSlider = new Control.Slider('zoomHandle', 'zoomSlider', {values: values, range: $R(this.zoomlevels,0), sliderValue: 1,
 			onChange: function(value) { 
 				if(this.current_zoom != value) { 
