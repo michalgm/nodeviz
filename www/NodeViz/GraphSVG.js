@@ -3,29 +3,52 @@ var GraphSVG = Class.create(GraphImage, {
 		this.zoomlevels = 8;
 		this.zoom_delta = .8;
 		this.default_zoom = 1;
+		this.current_zoom = this.default_zoom;
 		$super(NodeViz);
 		if (this.NodeViz.options.useSVG != 1 ) { return; } 
-		//this.GraphSVGZoom = new GraphSVGZoom(this);
+
+		Event.observe(window, 'resize', function() {
+			[$('svg_overlay'), $('image')].each(function(e) {
+				e.childNodes[0].setAttribute('height', $(this.graphdiv).getHeight());
+				e.childNodes[0].setAttribute('width', $(this.graphdiv).getWidth());
+			}.bind(this));
+		}.bind(this));
+
 		$(this.graphdiv).innerHTML += this.zoomControlsHTML;
+		Event.observe($('zoomin'), 'click', function(e) { this.zoom('in'); }.bind(this));
+		Event.observe($('zoomout'), 'click', function(e) { this.zoom('out'); }.bind(this));
+		Event.observe($('zoomreset'), 'click', function(e) { this.zoom('reset'); }.bind(this));
+		var x = 0;
+		var values = new Array();
+		this.zoomlevels = parseFloat(this.zoomlevels);
+		while (x <= this.zoomlevels) { 
+			values.unshift(x);
+			x++;
+		}
+		this.zoomSlider = new Control.Slider('zoomHandle', 'zoomSlider', {values: values, range: $R(this.zoomlevels,0), sliderValue: 1,
+			onChange: function(value) { 
+				if(this.current_zoom != value) { 
+					if (this.zoom_event) { 
+						window.clearTimeout(this.zoom_event);
+					}
+					var do_zoom = function() {
+						this.SVGzoom(value);
+					}.bind(this);
+					this.zoom_event = do_zoom.delay(.2);
+				}
+			}.bind(this)
+		});
 	},
 	reset: function($super) {
 		$super();
 		this.state = '';
 		this.stateOrigin = '';
-		this.current_zoom = this.default_zoom;
+		this.current_zoom = 1;
 		this.previous_zoom = 1;
 		this.zoom_point = null;
-		if (this.zoomSlider) { 
-			this.zoomSlider.setValue(this.current_zoom);
-		}
-		Event.stopObserving('zoomin');
-		Event.stopObserving('zoomout');
-		Event.stopObserving('zoomreset');
-		Event.stopObserving('zoomSlider');
-		Event.stopObserving('zoomHandle');
 		Event.stopObserving(this.root);
 		$$('.node').each(function(e) { Element.stopObserving(e); });
-		$$('.edge', '#svg', '#graphs', '#svgscreen').each(function(e) { Element.stopObserving(e); });
+		$$('.edge', '#svg', '#graphs', '#svgscreen', '#images').each(function(e) { Element.stopObserving(e); });
 
 	},
 	render: function($super, responseData) { 
@@ -56,7 +79,6 @@ var GraphSVG = Class.create(GraphImage, {
 		$('images').insert(new Element('div', {'id': 'svg_overlay'}));
 		$('svg_overlay').appendChild($('svg_overlay').ownerDocument.importNode(svgdoc.firstChild, true));
 
-
 		$('svg_overlay').style.setProperty('position','absolute', '');
 		$('svg_overlay').style.setProperty('top','0px', '');
 		$('graph0').style.setProperty('opacity', '1', '');
@@ -64,8 +86,8 @@ var GraphSVG = Class.create(GraphImage, {
 		$('svg_overlay').style.setProperty('display', 'block','');
 		this.setupListeners();
 
-		//apply the initial filter
-		this.setZoomFilters();
+		//apply the default zoom
+		this.zoom(this.default_zoom);
 		//console.timeEnd('renderSVG');
 	},
 	setupListeners: function($super) {
@@ -88,16 +110,6 @@ var GraphSVG = Class.create(GraphImage, {
 			}
 			if (n.childNodes[1]) {
 				this.NodeViz.addEvents(n, node, 'node', 'svg');
-				/*
-				Event.observe(n,'mouseover', function(e) { eval(node.onMouseover); }.bind(this));
-				Event.observe(n,'mouseout', function(e) { this.NodeViz.unhighlightNode(n.id); }.bind(this));
-				Event.observe(n,'mouseup', function(e) { 
-					var origin = this.getEventPoint(e).matrixTransform(this.stateTf);
-					if (this.stateOrigin.x == origin.x && this.stateOrigin.y == origin.y) {
-						eval(node.onClick);
-					}
-				}.bind(this));
-				*/
 			}
 		}, this);
 		$$('#svg_overlay .edge').each( function(e) {
@@ -114,17 +126,6 @@ var GraphSVG = Class.create(GraphImage, {
 				}, this);
 			}
 			this.NodeViz.addEvents(e, edge, 'edge', 'svg');
-			/*
-			Event.observe(n,'mouseover', function(eventObject) { eval(edge.onMouseover); }.bind(this));
-			Event.observe(n,'mouseout', this.hideTooltip.bind(this));
-			Event.observe(n,'mouseup', function(e) { 
-				var origin = this.getEventPoint(e).matrixTransform(this.stateTf);
-				if (this.stateOrigin.x == origin.x && this.stateOrigin.y == origin.y) {
-					eval(edge.onClick);
-				}
-			}.bind(this));
-			*/
-			//Event.observe(n,'click', graphviz[n.id].onClick);
 		}, this);
 		this.setupZoomListeners($('svg_overlay').childNodes[0]);
 	},
@@ -316,36 +317,12 @@ var GraphSVG = Class.create(GraphImage, {
 		Event.stopObserving('svgscreen', 'click');
 		Event.observe($('svgscreen'), 'mouseup', function(e) { this.handleMouseUp(e); }.bind(this));
 		Event.observe($('images'), 'mouseleave', function(e) { this.handleMouseUp(e); }.bind(this));
-		Event.observe($('zoomin'), 'click', function(e) { this.zoom('in'); }.bind(this));
-		Event.observe($('zoomout'), 'click', function(e) { this.zoom('out'); }.bind(this));
-		Event.observe($('zoomreset'), 'click', function(e) { this.zoom('reset'); }.bind(this));
 		if(navigator.userAgent.toLowerCase().indexOf('webkit') >= 0) {
 			Event.observe(root, 'mousewheel', function(e) { this.handleMouseWheel(e); }.bind(this)); // Chrome/Safari
 		} else {
-			Event.observe(root, 'DOMMouseScroll', function(e) { this.handleMouseWheel(e); }.bind(this)); // Chrome/Safari
+			Event.observe(root, 'DOMMouseScroll', function(e) { this.handleMouseWheel(e); }.bind(this)); 
 		}
 		Event.observe(root, 'dblclick', function(e) { this.zoom('in', this.getEventPoint(e)); }.bind(this));
-		var defaultValue = this.current_zoom;
-		var x = 0;
-		var values = new Array();
-		this.zoomlevels = parseFloat(this.zoomlevels);
-		while (x <= this.zoomlevels) { 
-			values.unshift(x);
-			x++;
-		}
-		this.zoomSlider = new Control.Slider('zoomHandle', 'zoomSlider', {values: values, range: $R(this.zoomlevels,0), sliderValue: defaultValue,
-			onChange: function(value) { 
-				if(this.current_zoom != value) { 
-					if (this.zoom_event) { 
-						window.clearTimeout(this.zoom_event);
-					}
-					var do_zoom = function() {
-						this.SVGzoom(value);
-					}.bind(this);
-					this.zoom_event = do_zoom.delay(.2);
-				}
-			}.bind(this)
-		});
 		this.center = this.calculateCenter();
 	},
 /**
