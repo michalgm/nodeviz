@@ -361,7 +361,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		$svg = preg_replace("/<title>.*/m", "", $svg); //remove 'title' tags
 		$svg = preg_replace("/^<\/?a.*\n/m", "", $svg); //FIXME? remove cruft after anchor tags
 		#$svg = preg_replace("/^<text.*\n/m", "", $svg);
-		$svg = preg_replace("/^<text/m", "<text class='zoom_7'", $svg); //FIXME set zoom class on labels
+		$svg = preg_replace("/^<text/m", "<text class='label zoom_7'", $svg); //FIXME set zoom class on labels
 		$svg = preg_replace("/zoom_7' text-anchor=\"middle\"([^>]+ fill)/", "' text-anchor='end'$1", $svg); //FIXME change the text anchor on labels?
 		$svg = preg_replace("/\.\.\/www\//", "", $svg); //FIXME change the local web path to be relative to http web path
 		//$tf = preg_match("/transform=\"scale(\([\-\.\d]+)\) rotate\(0\) translate\(([\-\.\d]+) ([\-\.\d]+)\)/", $svg);
