@@ -235,7 +235,6 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		$graphData = GraphVizExporter::processGraphData($graph->data, $datapath, $graphname);
 		
 		if ($format != 'png') { 
-			#system("convert -quality 92 $datapath$graphname.png $datapath$graphname.$format");
 			chdir($nodeViz_config['web_path']);
 			system("grep -v levelfour $datapath$graphname.svg | convert -quality 92 svg:- $datapath$graphname.$format");
 			chdir($nodeViz_config['nodeViz_path']);
@@ -344,51 +343,17 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 			$svg = preg_replace("/<!-- ([^ ]+) -->\n/", "", $svg);
 			$svg = preg_replace("/^.*fill=\"(black|white).*\n/m", "", $svg);
 			$svg = str_replace("G</title>\n<polygon fill=\"#ffffff", "G</title>\n<polygon id='svgscreen' style=\"opacity:0;\" fill=\"#ffffff", $svg);
-			//$svg = str_replace("fill=\"none", "style=\"opacity:0;\" fill=\"#ffffff", $svg);
-			#$svg = preg_replace("/<polygon id='svgscreen'[^>]*>/", "", $svg);
 			$svg = preg_replace("/id=\"graph1/", "id=\"graph0", $svg);
-			//$svg = preg_replace("/<g id=\"graph0/", "<script xlink:href=\"svgpan.js\"/> <g id=\"graph0", $svg);
 			$svg = preg_replace("/viewBox=\"[^\"]*\"/", "", $svg);
-			//$svg = preg_replace("/<ellipse fill=\"#.*/", "", $svg);
-			//rescale the svg
-		#	preg_match("/transform=\"scale\(([\.\d]+)/", $svg, $matches);
-		#	$newscale = substr($matches[1]/(96/72), 0, 8);
-		#	$svg = preg_replace("/transform=\"scale\([^\)]+\)/", "transform=\"scale($newscale $newscale)", $svg);
 		}
 		$svg = preg_replace("/^.*?<svg/s", "<svg", $svg); //Remove SVG Document header
 		$svg = str_replace("&#45;&gt;", "_", $svg); //FIXME? convert HTML -> to _?
 		$svg = str_replace("pt\"", "px\"", $svg); //convert points to pixels
 		$svg = preg_replace("/<title>.*/m", "", $svg); //remove 'title' tags
 		$svg = preg_replace("/^<\/?a.*\n/m", "", $svg); //FIXME? remove cruft after anchor tags
-		#$svg = preg_replace("/^<text.*\n/m", "", $svg);
 		$svg = preg_replace("/^<text/m", "<text class='label zoom_7'", $svg); //FIXME set zoom class on labels
 		$svg = preg_replace("/zoom_7' text-anchor=\"middle\"([^>]+ fill)/", "' text-anchor='end'$1", $svg); //FIXME change the text anchor on labels?
 		$svg = preg_replace("/\.\.\/www\//", "", $svg); //FIXME change the local web path to be relative to http web path
-		//$tf = preg_match("/transform=\"scale(\([\-\.\d]+)\) rotate\(0\) translate\(([\-\.\d]+) ([\-\.\d]+)\)/", $svg);
-
-		#resize the svgscreen polygon to fill up the entire allotted graph viewable area
-		#(we need to convert coords from pixel values to scaled svg)
-		preg_match("/transform=\"scale\(([\d\.\-]+) ([\d\.\-]+)?\)/", $svg, $tf);
-		if(!$tf[2]) { $tf[2] = $tf[1]; }
-		$converted_width = $graph->width / $tf[1];
-		$converted_height = $graph->height / $tf[2];
-		$points = "0,0 0,-$converted_height $converted_width,-$converted_height $converted_width,0 0,0";
-		$svg = preg_replace('/(<polygon id=\'svgscreen\'.*?" points=)"([^"]+)"/', "$1\"$points\"", $svg);
-
-		#pull out all the node x values
-		/*
-		preg_match_all("/<ellipse[^>]+ cx=\"([^\"]+)\"/", $svg, $matches);
-		$matches = $matches[1];
-		sort($matches);
-		$x_values = array_values(array_unique($matches));
-		preg_match("/svgscreen[^>]+ points=\"[^,]+,[^,]+,([^ ]+)/", $svg, $matches);
-		$y = $matches[1] *.97;
-		$labels = "
-			<text class='columnlabels' text-anchor='middle' x='".$x_values[1]."' y='$y' font-family='Arial, Helvetica, sans-serif' font-size='150.00' fill='#999999' >Direct Giving Only</text>
-			<text class='columnlabels' text-anchor='middle' x='".$x_values[2]."' y='$y' font-family='Arial, Helvetica, sans-serif' font-size='150.00' fill='#999999' >Both Direct and Indirect</text>
-		";
-		$svg = preg_replace("/(svgscreen'[^>]*>)/", "$1$labels", $svg);
-		*/
 
 		#write out the new svg
 		$svgout = fopen("$datapath/$graphname.svg", 'w');

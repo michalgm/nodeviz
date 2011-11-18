@@ -70,6 +70,10 @@ var GraphSVG = Class.create(GraphImage, {
 		var overlay = responseData.overlay;
 		overlay = overlay.replace("<div id='svg_overlay' style='display: none'>", '');
 		overlay = overlay.replace("</div>", '');
+		overlay.match(/<svg width=\"([\d\.]+)px\" height=\"([\d\.]+)px\"/);
+		this.graphWidth = RegExp.$1;
+		this.graphHeight = RegExp.$2;
+
 		overlay = overlay.replace(/<svg width=\"[\d\.]+px\" height=\"[\d\.]+px\"/, "<svg width=\""+this.graphDimensions.width+"\" height=\""+this.graphDimensions.height+"\"");
 		//parse the SVG into a new document
 		var dsvg = new DOMParser();
@@ -91,6 +95,21 @@ var GraphSVG = Class.create(GraphImage, {
 		$('images').insert(new Element('div', {'id': 'svg_overlay'}));
 		$('svg_overlay').appendChild($('svg_overlay').ownerDocument.importNode(svgdoc.firstChild, true));
 
+		//Center the svg images (using the original graph dimensions)
+		this.root = $('svg_overlay').childNodes[0];
+		this.stateTf = $('graph0').getCTM().inverse();
+		var delta = this.root.createSVGPoint();
+		delta.x = (this.graphDimensions.width - this.graphWidth)/2;
+		delta.y = (this.graphDimensions.height - this.graphHeight)/2;
+		delta.matrixTransform(this.stateTf);	
+		var matrix = $('graph0').getCTM();
+		matrix.e+= delta.x;
+		matrix.f+= delta.y;
+		var s = "matrix(" + matrix.a + "," + matrix.b + "," + matrix.c + "," + matrix.d + "," + matrix.e + "," + matrix.f + ")";
+		$('graph0').setAttribute('transform', s);
+		$('underlay_graph0').setAttribute('transform', s);
+
+		//Show the Graphs
 		$('svg_overlay').style.setProperty('position','absolute', '');
 		$('svg_overlay').style.setProperty('top','0px', '');
 		$('graph0').style.setProperty('opacity', '1', '');
@@ -139,7 +158,7 @@ var GraphSVG = Class.create(GraphImage, {
 			}
 			this.NodeViz.addEvents(e, edge, 'edge', 'svg');
 		}, this);
-		this.setupZoomListeners($('svg_overlay').childNodes[0]);
+		this.setupZoomListeners(this.root);
 	},
 	highlightNode: function($super, id, text, noshowtooltip) {
 		if (this.state != '') { return; }
@@ -318,7 +337,6 @@ var GraphSVG = Class.create(GraphImage, {
 		//this.setCTM(g, $('graph0').getCTM().translate(delta.x, delta.y));
 	},
 	setupZoomListeners: function(root){
-		this.root = root;
 		this.stateTf = $('graph0').getCTM().inverse();
 		Event.observe($('svgscreen'), 'mousedown', function(e) { this.handleMouseDown(e); }.bind(this));
 		Event.observe($('svgscreen'), 'mousemove', function(e) { this.handleMouseMove(e); }.bind(this));
@@ -491,7 +509,7 @@ var GraphSVG = Class.create(GraphImage, {
 		} else if (d == 'out') { 
 			d = this.zoomSlider.value- 1;
 		} else if (d == 'reset') {
-			this.NodeViz.panToNode('graph0', 1);
+			this.NodeViz.panToNode('graph0', this.default_zoom);
 			return;
 		}
 		if (d < 0 || d > this.zoomlevels) {
