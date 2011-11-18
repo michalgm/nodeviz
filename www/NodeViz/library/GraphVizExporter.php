@@ -234,11 +234,17 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 
 		$graphData = GraphVizExporter::processGraphData($graph->data, $datapath, $graphname);
 		
-		if ($format != 'png') { 
-			chdir($nodeViz_config['web_path']);
-			system("grep -v levelfour $datapath$graphname.svg | convert -quality 92 svg:- $datapath$graphname.$format");
-			chdir($nodeViz_config['nodeViz_path']);
-		}
+		#Generate the raster version
+		$im = new Imagick();
+		$im->setFormat('svg');
+		#remove labels from the raster version
+		$raster_svg = preg_replace('/<text.+\/text>/m', "", $svg);;
+		$im->readImageBlob($raster_svg);
+		$im->setImageFormat($format);
+		$im->setImageCompressionQuality(90);
+		$im->writeImage("$datapath$graphname.$format");
+		$im->clear();
+		$im->destroy();
 		
 		#chmod all our files
 		foreach (array('.svg', '.svg.raw', '.dot', '.graph', '.nicegraph', '_orig.dot', '.imap', ".$format") as $ext) {
