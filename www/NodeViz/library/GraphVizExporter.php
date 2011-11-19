@@ -345,20 +345,18 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 				return 'rx="'.$matches[1].'"'.$matches[2].'start'.$matches[3].(($matches[1])+$matches[4]+15).'"';
 			}
 			$svg = preg_replace_callback("/rx=\"([^\"]+)\"([^<]+<text text-anchor=\")[^\"]+(\" x=\")([^\"]+)\"/", "shiftlabels", $svg);
-			$svg = str_replace("font-size=\"10.00\"", "font-size=\"16.00\"", $svg);
-			$svg = preg_replace("/<!-- ([^ ]+) -->\n/", "", $svg);
+			#$svg = str_replace("font-size=\"10.00\"", "font-size=\"16.00\"", $svg);
+			$svg = preg_replace("/<!-- ([^ ]+) -->\n/", "", $svg); //remove comments
 			$svg = preg_replace("/^.*fill=\"(black|white).*\n/m", "", $svg);
-			$svg = str_replace("G</title>\n<polygon fill=\"#ffffff", "G</title>\n<polygon id='svgscreen' style=\"opacity:0;\" fill=\"#ffffff", $svg);
-			$svg = preg_replace("/id=\"graph1/", "id=\"graph0", $svg);
-			$svg = preg_replace("/viewBox=\"[^\"]*\"/", "", $svg);
+			$svg = str_replace("G</title>\n<polygon fill=\"#ffffff", "G</title>\n<polygon id='svgscreen' style=\"opacity:0;\" fill=\"#ffffff", $svg); //set id and opacity on svgscreen
+			$svg = preg_replace("/id=\"graph1/", "id=\"graph0", $svg); //rename svg object
+			$svg = preg_replace("/viewBox=\"[^\"]*\"/", "", $svg); //remove viewbox
 		}
 		$svg = preg_replace("/^.*?<svg/s", "<svg", $svg); //Remove SVG Document header
 		$svg = str_replace("&#45;&gt;", "_", $svg); //FIXME? convert HTML -> to _?
 		$svg = str_replace("pt\"", "px\"", $svg); //convert points to pixels
 		$svg = preg_replace("/<title>.*/m", "", $svg); //remove 'title' tags
 		$svg = preg_replace("/^<\/?a.*\n/m", "", $svg); //FIXME? remove cruft after anchor tags
-		$svg = preg_replace("/^<text/m", "<text class='label zoom_7'", $svg); //FIXME set zoom class on labels
-		$svg = preg_replace("/zoom_7' text-anchor=\"middle\"([^>]+ fill)/", "' text-anchor='end'$1", $svg); //FIXME change the text anchor on labels?
 		$svg = preg_replace("/\.\.\/www\//", "", $svg); //FIXME change the local web path to be relative to http web path
 
 		#write out the new svg

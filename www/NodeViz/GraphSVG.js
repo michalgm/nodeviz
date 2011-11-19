@@ -139,6 +139,7 @@ var GraphSVG = Class.create(GraphImage, {
 					this.addClassName($('underlay_'+nodeid), c);	
 				}, this);
 			}
+			this.formatLabels(n, node);	
 			if (n.childNodes[1]) {
 				this.NodeViz.addEvents(n, node, 'node', 'svg');
 			}
@@ -156,6 +157,7 @@ var GraphSVG = Class.create(GraphImage, {
 					this.addClassName($('underlay_'+edgeid), c);	
 				}, this);
 			}
+			this.formatLabels(e, edge);	
 			this.NodeViz.addEvents(e, edge, 'edge', 'svg');
 		}, this);
 		this.setupZoomListeners(this.root);
@@ -254,13 +256,13 @@ var GraphSVG = Class.create(GraphImage, {
 		this.unhighlightNode(id);
 	},
 	hasClassName: function(element, className) {
-		var elementClassName = element.getAttribute('class');
+		var elementClassName = element.getAttribute('class') || '';
 		return (elementClassName.length > 0 && (elementClassName == className ||
 		new RegExp("(^|\\s)" + className + "(\\s|$)").test(elementClassName)));
 	},
 
 	addClassName: function(element, className) {
-		var elementClassName = element.getAttribute('class');
+		var elementClassName = element.getAttribute('class') || '';
 		if (!this.hasClassName(element, className)) {
 			elementClassName += (elementClassName ? ' ' : '') + className;
 		}
@@ -556,6 +558,33 @@ var GraphSVG = Class.create(GraphImage, {
 		center.x = $('svg_overlay').positionedOffset()[0] + ($('svg_overlay').getWidth() /2);
 		center.y = $('svg_overlay').positionedOffset()[1] + ($('svg_overlay').getHeight() /2);
 		return center;
+	},
+	formatLabels: function(dom_element, graph_element) {
+		var label = dom_element.getElementsByTagName('text')[0];
+		var ulabel = $('underlay_'+graph_element.id).getElementsByTagName('text')[0];
+		
+		if (label) {
+			this.addClassName(label, 'label');
+			this.addClassName(ulabel, 'label');
+			if (typeof(graph_element['label_zoom_level']) != 'undefined') {
+				this.addClassName(label, 'zoom_'+graph_element['label_zoom_level']);
+				this.addClassName(ulabel, 'zoom_'+graph_element['label_zoom_level']);
+			}
+			if (typeof(graph_element['label_offset_x']) != 'undefined') {
+				var x = parseFloat(graph_element['label_offset_x'] * this.stateTf.a) + parseFloat(label.getAttribute('x'));
+				label.setAttribute('x', x);
+				ulabel.setAttribute('x', x);
+			}
+			if (typeof(graph_element['label_offset_y']) != 'undefined') {
+				var y = parseFloat(graph_element['label_offset_y'] * this.stateTf.d) + parseFloat(label.getAttribute('y'));
+				label.setAttribute('y', y);
+				ulabel.setAttribute('y', y);
+			}
+			if (typeof(graph_element['label_text_anchor']) != 'undefined') {
+				label.setAttribute('text-anchor', graph_element['label_text_anchor']);
+				ulabel.setAttribute('text-anchor', graph_element['label_text_anchor']);
+			}	
+		}
 	},
 	zoomControlsHTML: "\
 		<div id='zoomcontrols'>\

@@ -117,3 +117,5 @@
 	#error .code { font-family: monospace; white-space: pre-wrap; }
 
 	.zooming text { display: none; }
+
+	.label { font-size: 16px; }

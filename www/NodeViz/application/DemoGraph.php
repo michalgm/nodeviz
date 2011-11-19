@@ -114,6 +114,11 @@ class DemoGraph extends Graph {
 		foreach ($nodes as &$node) {
 			$fid = str_replace('food_', '', $node['id']);
 			$node['label'] = $foods[$fid];
+			$node['label_offset_x'] = 10;
+			$node['label_offset_y'] = 5;
+			$node['label_zoom_level'] = 3;
+			$node['label_text_anchor'] = 'start';
+
 			$node['shape'] = 'box';
 			$node['color'] = 'black';
 			$node['fillcolor'] = "#ccccff";
