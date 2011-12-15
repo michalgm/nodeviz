@@ -25,9 +25,9 @@ Object.extend( Form.Element.Methods, {
     element = $(element);
     var method;
      // detect radio button and checkbox collections
-    if ("length" in element && "type" in element[0] && element[0].type == "radio") {
+    if ("length" in element && element[0] && "type" in element[0] && element[0].type == "radio") {
       method = "manyRadioSelector";
-    } else if ("length" in element && "type" in element[0] && element[0].type == "checkbox") {
+    } else if ("length" in element && element[0] && "type" in element[0] && element[0].type == "checkbox") {
         method = "manyCheckboxSelector";
     } else {
       method = element.tagName.toLowerCase();
