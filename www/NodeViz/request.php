@@ -32,11 +32,15 @@ $datapath = $nodeViz_config['nodeViz_path'].'/'.$nodeViz_config['cache_path'];
 $graph = new $setupfile();
 
 //either build or load the cached graph
+writelog('start');
 $graph->setupGraph($_REQUEST);
+writelog('check',2);
+
 //Make sure we actually have data in the graph object
 //if bad, checkGraph() will print an error state and exit.
 $graph->checkGraph();
 
+writelog('render',2);
 if(isset($_REQUEST['action'])) {
 	$ajaxfunc = 'ajax_'.$_REQUEST['action'];
 	if (method_exists($graph, $ajaxfunc)) { 
@@ -50,6 +54,7 @@ if(isset($_REQUEST['action'])) {
 	$data = GraphVizExporter::generateGraphvizOutput($graph, $datapath, 'jpg', $returnSVG);
 }
 
+writelog('done');
 setResponse(1, 'Success', $data);
 
 function setResponse($statusCode, $statusString, $data="") {

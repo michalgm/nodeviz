@@ -122,23 +122,30 @@ class Graph {
 		global $debug;
 		if ($debug) { $start = microtime(1); }
 
+		writelog("before fetching nodes", 3);
 		foreach ($this->data['nodetypes'] as $nodetype) {
 			$function =  "$nodetype"."_fetchNodes";
 			if(method_exists($this, $function)) {
+				writelog("before $nodetype node fetch", 4);
 				$nodes = $this->$function();
+				writelog("after $nodetype node fetch", 4);
 				$this->data['nodetypesindex'][$nodetype] = array_keys($nodes);
 				foreach ($nodes as $node) { 
 					if(isset($this->data['nodes'][$node['id']])) { trigger_error('Node id '.$node['id']." already exists", E_USER_ERROR); }
 					$this->data['nodes'][$node['id']] = $node;
 					$this->data['nodes'][$node['id']]['type'] = $nodetype;
 				}
+				$nodes = null;
 			}
 		}
 
+		writelog("before fetching edges", 3);
 		foreach (array_keys($this->data['edgetypes']) as $edgetype) {
 			$function =  "$edgetype"."_fetchEdges";
 			if(method_exists($this, $function)) {
+				writelog("before $edgetype edge fetch", 4);
 				$edges = $this->$function();
+				writelog("after $edgetype edge fetch", 4);
 				$this->data['edgetypesindex'][$edgetype] = array_keys($edges);
 				foreach ($edges as $edge) { 
 					if(! isset($edge['toId'])) { trigger_error("toId is not set for edge ".$edge['id'], E_USER_ERROR); }
@@ -147,16 +154,20 @@ class Graph {
 					$this->data['edges'][$edge['id']] = $edge;
 					$this->data['edges'][$edge['id']]['type'] = $edgetype;
 				}
+				$edges = null;
 			}
 		}
 
 		$this->checkIsolates();
+		writelog("before node properries", 3);
 
 		foreach ($this->data['nodetypes'] as $nodetype) {
 			$function =  "$nodetype"."_nodeProperties";
 			if(method_exists($this, $function)) {
 				$existing_nodes = $this->getNodesByType($nodetype);
+				writelog("before fetching $nodetype node properties", 4);
 				$nodes = $this->$function($existing_nodes);
+				writelog("after fetching $nodetype node properties", 4);
 				foreach (array_keys($existing_nodes) as $nodeid) { unset($this->data['nodes'][$nodeid]); }
 				foreach ($nodes as $node) {
 					$this->data['nodes'][$node['id']] = $node;
@@ -169,11 +180,14 @@ class Graph {
 
 		$this->checkIsolates();
 
+		writelog("before edge properries", 3);
 		foreach (array_keys($this->data['edgetypes']) as $edgetype) {
 			$function =  "$edgetype"."_edgeProperties";
 			if(method_exists($this, $function)) {
 				$existing_edges = $this->getEdgesByType($edgetype);
+				writelog("before fetching $edgetype edge properties", 4);
 				$edges = $this->$function($existing_edges);
+				writelog("after fetching $edgetype edge properties", 4);
 				foreach (array_keys($existing_edges) as $edgeid) { unset($this->data['edges'][$edgeid]); }
 				foreach ($edges as $edge) {
 					$this->data['edges'][$edge['id']] = $edge;
@@ -186,6 +200,7 @@ class Graph {
 
 		$this->checkIsolates();
 	
+		writelog("before related", 3);
 		//Populate the related nodes fields for each node by stepping through the edges
 		foreach ($this->data['edges'] as $edge) {
 			//delete edges linking to non-existent nodes;
@@ -243,11 +258,15 @@ class Graph {
 			}
 			if ($shape == 'edge') {
 				$scale = $maxSize - $minSize;  //the range we actually want
-			} else if ($shape == 'circle') { 
+			} else if ($shape == 'circle' || $shape == 'octagon' || $shape == 'polygon') { 
 				//we need to comvert sizes from diameter to radius
 				$maxSize = $maxSize/2;
 				$minSize = $minSize/2;
 				$scale = pow($maxSize,2)*pi() - pow($minSize,2)*pi();  //the range we actually want
+			} else if ($shape == 'triangle') { 
+				$scale = sqrt(3)/4*pow($maxSize,2) - sqrt(3)/4*pow($minSize,2);  //adjust to value we want
+			} else if ($shape == 'diamond') { 
+				$scale = sqrt(pow($maxSize,2)/2) - sqrt(pow($minSize,2)/2);
 			} else {
 				$scale = pow($maxSize,2) - pow($minSize,2);  //the range we actually want
 			}
@@ -284,9 +303,16 @@ class Graph {
 					 //now calculate appropriate with from area depending on shape
 					if ($shape == 'edge') { 
 						$size = ($normed * $scale) + $minSize;  //adjust to value we want
-					} else if ($shape == 'circle') { 
+					} else if ($shape == 'circle' || $shape == 'octagon' || $shape == 'polygon') { 
 						$area = ($normed * $scale) + pow($minSize,2)*pi();  //adjust to value we want
 						$size = sqrt(abs($area)/pi())*2;  //get radius and multiple by 2 for diameter
+					} else if ($shape == 'triangle') { 
+						$area = ($normed * $scale) + (sqrt(3)/4*pow($minSize,2));  //adjust to value we want
+						$size = sqrt(abs($area)) / (sqrt(3)/4);
+					} else if ($shape == 'diamond') { 
+						$area = ($normed * $scale) + pow($minSize,2)/2;
+						$size = sqrt(pow(sqrt(abs($area)),2)*2);
+						#$scale = sqrt(pow($maxSize,2)/2) - sqrt(pow($minSize,2)/2);
 					} else {
 						$area = ($normed * $scale) + pow($minSize,2);  //adjust to value we want
 						$size = sqrt(abs($area));
@@ -371,8 +397,8 @@ class Graph {
 					$nodetype = $this->data['nodes'][$id]['type'];
 					unset($this->data['nodes'][$id]); 
 					$index = array_search($id, $this->data['nodetypesindex'][$nodetype]);
-					if ($index) {
-						unset($this->data['nodetypesindex'][$nodetype][$index]); 
+					if (isset($index)) {
+						unset($this->data['nodetypesindex'][$nodetype][$index]);
 					}
 				}
 			}

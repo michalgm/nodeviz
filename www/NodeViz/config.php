@@ -14,7 +14,7 @@ $nodeViz_config = array(
 	'log_path' => "../log/", # Where should we write logs (needs to be writable by your webserver)
 	'cache_path' => "../cache/", # Where should we store graph cache files (needs to be writable by your webserver)
 	'cache' => 0, # Should we use stored cache files, or regenerate graphs from scratch every time
-	'debug' => 1, # Should we include extra debugging information during graph generation
+	'debug' => 2, # Sets the debug level to determine what level of extra information should be written to logs
 	'old_graphviz' => 0, #Set this to 1 if graphviz version < 2.24
 
 	#setupfiles needs to be an associative array of the graph setup files your application will use. 
