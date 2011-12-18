@@ -9,7 +9,8 @@ NodeViz.prototype = {
 			lightboxdiv : 'lightbox',
 			lightboxscreen : 'lightboxscreen',
 			optionsform : 'graphoptions',
-			NodeVizPath : 'NodeViz/'
+			NodeVizPath : 'NodeViz/',
+			disableAutoLoad : 0
 		}
 		Object.extend(this.options, options);
 		if (! this.prefix) { 
@@ -37,10 +38,12 @@ NodeViz.prototype = {
 		if(this.options.list.listdiv) { 
 			this.renderers['GraphList'] = new GraphList(this);
 		}
-		if ($(this.options.optionsform)) {
-			Element.observe($(this.options.optionsform), 'change', this.reloadGraph.bind(this));
+		if (this.options.disableAutoLoad != 1 ) {
+			if ($(this.options.optionsform)) {
+				Element.observe($(this.options.optionsform), 'change', this.reloadGraph.bind(this));
+			}
+			this.reloadGraph();
 		}
-		this.reloadGraph();
 	},
 	checkResponse: function(response) {
 		var statusCode = null;
