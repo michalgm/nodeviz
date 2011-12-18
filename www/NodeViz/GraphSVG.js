@@ -119,6 +119,10 @@ var GraphSVG = Class.create(GraphImage, {
 
 		//apply the default zoom
 		this.zoom(this.default_zoom);
+		if (this.default_zoom == 1) { 
+			this.setZoomFilters();
+		}
+
 		//console.timeEnd('renderSVG');
 	},
 	setupListeners: function($super) {
@@ -129,7 +133,7 @@ var GraphSVG = Class.create(GraphImage, {
 		$$('#svg_overlay .node').each( function(n) {
 			var nodeid = n.id;
 			var node = this.NodeViz.data.nodes[n.id]
-			if (node['zoom']) { 
+			if (typeof(node['zoom']) != 'undefined') { 
 				this.addClassName($(nodeid), 'zoom_'+node['zoom']);
 				this.addClassName($('underlay_'+nodeid), 'zoom_'+node['zoom']);
 			}
@@ -536,7 +540,7 @@ var GraphSVG = Class.create(GraphImage, {
 		} else { 
 			center = this.zoom_point;
 		}
-		p = center.matrixTransform(g.getCTM().inverse());
+		var p = center.matrixTransform(g.getCTM().inverse());
 		z = Math.pow(z, zoom_amount);
 		//var k = this.root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
 		new Effect.AnimateZoom($('graph0'), {point: p, zoom: z, queue: {'position': 'end', 'scope': 'zoom'}, duration: .5, afterFinish: function() {
