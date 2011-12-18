@@ -51,7 +51,7 @@ GraphList.prototype = {
 				if (label != '') { 
 					this.nodeLists[nodetype].set(label, nodeid);
 				}
-				nodelist_entry = new Element('li', {'id': 'list_'+nodeid});
+				var nodelist_entry = new Element('li', {'id': 'list_'+nodeid});
 				nodelist_entry.update(this.listNodeEntry(node));
 				this.NodeViz.addEvents(nodelist_entry, node, 'node', 'list');
 				nodelist.insert({ bottom: nodelist_entry});
@@ -83,7 +83,7 @@ GraphList.prototype = {
 		//console.timeEnd('renderList');
 	},
 	displayList: function(nodetype) { 
-		oldnodetype = this.NodeViz.current['nodetype'];
+		var oldnodetype = this.NodeViz.current['nodetype'];
 		if(oldnodetype != '') { 
 			$(oldnodetype+'_list_container').removeClassName('selected');
 			$(oldnodetype+'_menu').removeClassName('selected');
