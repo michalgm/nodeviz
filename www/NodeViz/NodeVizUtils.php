@@ -46,17 +46,19 @@ function setupHeaders() {
 }
 
 //writelog: writes string out to logfile
-function writelog($string) {
+function writelog($string, $loglevel = 1) {
 	global $nodeViz_config, $logfile;
-	$logdir = $nodeViz_config['nodeViz_path']."/".$nodeViz_config['log_path'];
-	if (!$logfile) {  //open logfile if it isn't open
-		$logfilename = "$logdir/".basename($_SERVER['PHP_SELF']).".log";
-		$logfile= fopen($logfilename, 'a'); 
-		if (! $logfile) {
-			trigger_error("Unable to write log to log directory '$logdir'", E_USER_ERROR);
+	if ($loglevel <= $nodeViz_config['debug']) { 
+		$logdir = $nodeViz_config['nodeViz_path']."/".$nodeViz_config['log_path'];
+		if (!$logfile) {  //open logfile if it isn't open
+			$logfilename = "$logdir/".basename($_SERVER['PHP_SELF']).".log";
+			$logfile= fopen($logfilename, 'a'); 
+			if (! $logfile) {
+				trigger_error("Unable to write log to log directory '$logdir'", E_USER_ERROR);
+			}
 		}
+		fwrite($logfile, time()." - ".number_format(memory_get_usage())." - $string\n");
 	}
-	fwrite($logfile, time()." - $string\n");
 }
 
 /* below are mostly non-essential functions usefull for many apps */
@@ -359,6 +361,12 @@ function __json_encode( $data ) {
     return $json;
 } 
 
-
+function debug($message, $level=1) {
+	global $nodeViz_config;
+	$debug = $nodeViz_config['debug'];
+	if ($debug == $level) {
+		file_put_contents('php://stderr', number_format(memory_get_usage())." - $message\n");
+	}
+}
 
 
