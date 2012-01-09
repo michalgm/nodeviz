@@ -15,8 +15,6 @@
 *
 * - getters and setters for form radio and checkbox inputs
 *
-* - Ajax.Request.abort
-* (from http://blog.pothoven.net/2007/12/aborting-ajax-requests-for-prototypejs.html)
 */
 
 Object.extend( Form.Element.Methods, {
@@ -238,4 +236,23 @@ Effect.AnimateZoom = Class.create(Effect.Base, {
   }
 });
 
+//Word-case strings - from http://www.mediacollege.com/internet/javascript/text/case-capitalize.html
+Object.extend(String.prototype, {
+	toWordCase: function(){
+	   return this.toLowerCase().replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
+	}
+});
 
+/* - Ajax.Request.abort
+* (from http://blog.pothoven.net/2007/12/aborting-ajax-requests-for-prototypejs.html)
+*/
+Object.extend(Ajax.Request.prototype, {
+	abort: function() {
+		// prevent and state change callbacks from being issued
+		this.transport.onreadystatechange = Prototype.emptyFunction;
+		// abort the XHR
+		this.transport.abort();
+		// update the request counter
+		Ajax.activeRequestCount--;
+	}
+});
