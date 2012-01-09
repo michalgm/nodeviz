@@ -346,7 +346,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 			}
 			$svg = preg_replace_callback("/rx=\"([^\"]+)\"([^<]+<text text-anchor=\")[^\"]+(\" x=\")([^\"]+)\"/", "shiftlabels", $svg);
 			#$svg = str_replace("font-size=\"10.00\"", "font-size=\"16.00\"", $svg);
-			$svg = preg_replace("/<!-- ([^ ]+) -->\n/", "", $svg); //remove comments
+			$svg = preg_replace("/^<\!-- .*? -->\n/m", "", $svg); //remove comments
 			$svg = preg_replace("/^.*fill=\"(black|white).*\n/m", "", $svg);
 			$svg = str_replace("G</title>\n<polygon fill=\"#ffffff", "G</title>\n<polygon id='svgscreen' style=\"opacity:0;\" fill=\"#ffffff", $svg); //set id and opacity on svgscreen
 			$svg = preg_replace("/id=\"graph1/", "id=\"graph0", $svg); //rename svg object

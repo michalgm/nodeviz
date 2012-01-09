@@ -427,4 +427,15 @@ class Graph {
 		return $edges;	
 	}
 
+	function ajax_edgeDetails() {
+		global $_REQUEST;
+		$props = $this->data['properties'];
+		$edge = $this->data['edges'][$props['edgeid']];
+		$output = "<ul>";
+		foreach (array_keys($edge) as $key) {
+			$output .= "<li><span style='font-weight: bold;'>".ucwords($key)."</span> - $edge[$key]";
+		}
+		$output .= "</ul>";
+		return $output;
+	}
 }

@@ -18,7 +18,9 @@ if (php_sapi_name() != 'cli') {
 }
 
 //config.php will allow you to override any set globals 
-if(file_exists(getcwd().'/config.php')) { 
+if(file_exists(getcwd().'/../config.php')) { 
+	include_once(getcwd()."/../config.php"); 
+} elseif(file_exists(getcwd().'/config.php')) { 
 	include_once(getcwd()."/config.php"); 
 } elseif(file_exists($nodeViz_config['application_path'].'/config.php')) { 
 	include_once($nodeViz_config['application_path']."/config.php"); 
@@ -66,6 +68,13 @@ function writelog($string, $loglevel = 1) {
 function niceName($name, $lastfirst = 0) { 
 	$titles	= array('dr','miss','mr','mrs','ms','judge', 'rep', 'sen', 'md', 'phd', 'hon', 'honorable', 'senator');
 	$suffices = array('esq','esquire','jr','sr','2', 'ii','iii','iv');
+	if (! strpos($name, ", ")) { 
+		if(! strpos($name, " ")) { 
+			return strtoupper($name);
+		} else {
+			return ucwords(strtolower($name)); 
+		}
+	}
 	list($lastname, $fname) = explode(', ', $name, 2);
 
 	$newname = array();
@@ -369,4 +378,85 @@ function debug($message, $level=1) {
 	}
 }
 
+//From http://www.actionscript.org/forums/showthread.php3?t=50746
+function RGB_TO_HSV ($R, $G=-1, $B=-1)  // RGB Values:Number 0-255
+{                                 // HSV Results:Number 0-1
+	if ($G == -1) {
+		if ($R[0] == '#') { $R = substr($R, 1); }
+		list($R, $G, $B) = array(hexdec($R[0].$R[1]), hexdec($R[2].$R[3]), hexdec($R[4].$R[5]));
+	}
 
+   $HSL = array();
+
+   $var_R = ($R / 255);
+   $var_G = ($G / 255);
+   $var_B = ($B / 255);
+
+   $var_Min = min($var_R, $var_G, $var_B);
+   $var_Max = max($var_R, $var_G, $var_B);
+   $del_Max = $var_Max - $var_Min;
+
+   $V = $var_Max;
+  $H = 0;
+  $S = 0;
+
+   if ($del_Max == 0) {
+      $H = 0;
+      $S = 0;
+   } else {
+      $S = $del_Max / $var_Max;
+
+      $del_R = ( ( ( $var_Max - $var_R ) / 6 ) + ( $del_Max / 2 ) ) / $del_Max;
+      $del_G = ( ( ( $var_Max - $var_G ) / 6 ) + ( $del_Max / 2 ) ) / $del_Max;
+      $del_B = ( ( ( $var_Max - $var_B ) / 6 ) + ( $del_Max / 2 ) ) / $del_Max;
+
+      if      ($var_R == $var_Max) $H = $del_B - $del_G;
+      else if ($var_G == $var_Max) $H = ( 1 / 3 ) + $del_R - $del_B;
+      else if ($var_B == $var_Max) $H = ( 2 / 3 ) + $del_G - $del_R;
+
+      if ($H<0) $H++;
+      if ($H>1) $H--;
+   }
+
+   $HSL['H'] = $H;
+   $HSL['S'] = $S;
+   $HSL['V'] = $V;
+
+   return $HSL;
+}
+
+//From http://www.actionscript.org/forums/showthread.php3?t=50746
+function HSV_TO_RGB ($H, $S=-1, $V=-1)  // HSV Values:Number 0-1
+{                                 // RGB Results:Number 0-255
+    $RGB = array();
+
+    if($S == 0)
+    {
+        $R = $G = $B = $V * 255;
+    }
+    else
+    {
+        $var_H = $H * 6;
+        $var_i = floor( $var_H );
+        $var_1 = $V * ( 1 - $S );
+        $var_2 = $V * ( 1 - $S * ( $var_H - $var_i ) );
+        $var_3 = $V * ( 1 - $S * (1 - ( $var_H - $var_i ) ) );
+
+        if       ($var_i == 0) { $var_R = $V     ; $var_G = $var_3  ; $var_B = $var_1 ; }
+        else if  ($var_i == 1) { $var_R = $var_2 ; $var_G = $V      ; $var_B = $var_1 ; }
+        else if  ($var_i == 2) { $var_R = $var_1 ; $var_G = $V      ; $var_B = $var_3 ; }
+        else if  ($var_i == 3) { $var_R = $var_1 ; $var_G = $var_2  ; $var_B = $V     ; }
+        else if  ($var_i == 4) { $var_R = $var_3 ; $var_G = $var_1  ; $var_B = $V     ; }
+        else                   { $var_R = $V     ; $var_G = $var_1  ; $var_B = $var_2 ; }
+
+        $R = $var_R * 255;
+        $G = $var_G * 255;
+        $B = $var_B * 255;
+    }
+
+    $RGB['R'] = $R;
+    $RGB['G'] = $G;
+    $RGB['B'] = $B;
+
+    return $RGB;
+} 

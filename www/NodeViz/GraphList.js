@@ -30,9 +30,9 @@ GraphList.prototype = {
 		//Build seperate sub lists for each node type
 		$H(data.nodetypes).values().each( function(nodetype) {
 			this.nodeLists[nodetype] = new Hash();
-			$('list_menu').insert({ bottom: new Element('li', {'id': nodetype+'_menu'}).update(nodetype)});
+			$('list_menu').insert({ bottom: new Element('li', {'id': nodetype+'_menu'}).update(nodetype.toWordCase())});
 			$(this.listdiv).insert({ bottom: new Element('div', {'id': nodetype+'_list_container', 'class': 'nodelist_container'}) });
-			$(nodetype+'_list_container').insert({top: new Element('div', {'id': nodetype+'_list_header', 'class': 'nodelist_header'}).update('<span class="node_type_label">'+nodetype+' Nodes</span>')});
+			$(nodetype+'_list_container').insert({top: new Element('div', {'id': nodetype+'_list_header', 'class': 'nodelist_header'}).update('<span class="nodetype_label">'+nodetype+' Nodes</span>')});
 
 			//Create the search field for the top of the lsist
 			var search = ' <label for="'+nodetype+'_search">Search</label> <input class="node_search" id="'+nodetype+'_search" autocomplete="off" size="20" type="text" value="" /> <div class="autocomplete node_search_list" id="'+nodetype+'_search_list" style="display:none"></div>';
@@ -40,6 +40,7 @@ GraphList.prototype = {
 			
 			var nodelist = new Element('ul', {'id': nodetype+'_list', 'class': 'nodelist'});
 			Event.observe($(nodetype+'_menu'), 'click', function(e) { this.displayList(nodetype); }.bind(this));
+			var odd = 'even';
 			$H(data.nodetypesindex[nodetype]).values().each( function(nodeid) {
 				var node = data.nodes[nodeid];
 				var label = '';
@@ -51,7 +52,8 @@ GraphList.prototype = {
 				if (label != '') { 
 					this.nodeLists[nodetype].set(label, nodeid);
 				}
-				var nodelist_entry = new Element('li', {'id': 'list_'+nodeid});
+				odd = odd == 'odd' ? 'even' : 'odd';
+				var nodelist_entry = new Element('li', {'id': 'list_'+nodeid, 'class': odd});
 				nodelist_entry.update(this.listNodeEntry(node));
 				this.NodeViz.addEvents(nodelist_entry, node, 'node', 'list');
 				nodelist.insert({ bottom: nodelist_entry});
@@ -69,6 +71,7 @@ GraphList.prototype = {
 			$(nodetype+'_list_container').insert({ bottom: nodelist });
 			if (this.nodeLists[nodetype].keys()[0]) { 
 				new Autocompleter.Local(nodetype+'_search', nodetype+'_search_list', this.nodeLists[nodetype].keys(), {
+					'partialChars': 1, 
 					'fullSearch': true, 
 					afterUpdateElement: function (t, l) {
 						if (t.value && this.nodeLists[this.NodeViz.current.nodetype].get(t.value)) { 
@@ -106,6 +109,7 @@ GraphList.prototype = {
 				var edge = data.edges[edgeid];
 				if (edge['type'] == edgetype && edge[direction+'Id'] == nodeid) { 
 					var snode = data.nodes[data.edges[edgeid][otherdir+'Id']];
+					snode['edgeid'] = edgeid;
 					nodes.push(snode);
 				}
 			}, this);
@@ -114,9 +118,11 @@ GraphList.prototype = {
 				var classes = edgetype+'_list '+direction+'_list';
 				var elem = new Element('ul', {'id': sublistdiv,'class':classes});
 				
-				elem.insert({ bottom: new Element('span', {'id': sublistdiv+'_header','class': 'node_type_label'}).update(edgetype+' '+direction+' Nodes') });
+				elem.insert({ bottom: new Element('span', {'id': sublistdiv+'_header','class': 'nodetype_label'}).update(edgetype+' '+direction+' Nodes') });
+				var odd='even';
 				nodes.each(function(snode) {
-					var subelem = new Element('li', {'id': sublistdiv+'_'+snode.id});
+					odd = odd == 'odd' ? 'even' : 'odd';
+					var subelem = new Element('li', {'id': 'list_'+direction+'_'+snode['edgeid'], 'class': odd});
 
 					subelem.update(this.listSubNodeEntry(snode, node, edgetype, direction));
 					this.NodeViz.addEvents(subelem, snode, 'node', 'list');
@@ -156,7 +162,8 @@ GraphList.prototype = {
 				var edge = this.NodeViz.data.edges[edgeid];
 				var type = edge.type;
 				var dir = edge.toId == id ? 'from' : 'to';
-				var subnodeid = 'list_'+other_id+'_'+type+'_'+dir+'_'+id;
+				//var subnodeid = 'list_'+other_id+'_'+type+'_'+dir+'_'+id;
+				var subnodeid = 'list_'+dir+'_'+edgeid;
 				$(subnodeid).addClassName('highlight');
 			}, this);
 		} else {
@@ -172,7 +179,8 @@ GraphList.prototype = {
 				var edge = this.NodeViz.data.edges[edgeid];
 				var type = edge.type;
 				var dir = edge.toId == id ? 'from' : 'to';
-				var subnodeid = 'list_'+other_id+'_'+type+'_'+dir+'_'+id;
+				//var subnodeid = 'list_'+other_id+'_'+type+'_'+dir+'_'+id;
+				var subnodeid = 'list_'+dir+'_'+edgeid;
 				$(subnodeid).removeClassName('highlight');
 			}, this);
 		} else { 

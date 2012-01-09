@@ -24,8 +24,10 @@ NodeViz.prototype = {
 		}
 		if (! $(this.options.errordiv)) { 
 			$(document.body).insert({ top: new Element('div', {'id': this.options.errordiv}) });
+			$(this.options.errordiv).hide();
 		}
 		this.renderers = {};
+		this.requests = [];
 		if (this.options.image.graphdiv) { 
 			if ((typeof this.options.useSVG === 'undefined' && document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")) || this.options.useSVG == 1) { 
 				this.options.useSVG = 1;
@@ -69,6 +71,7 @@ NodeViz.prototype = {
 		return 0;	
 	},
 	reportError: function(code, message) {
+		this.hideLightbox();
 		$(this.options.errordiv).update("We're sorry, an error has occured: <span class='errorstring'>"+message+"</span> (<span class='errorcode'>"+code+"</span>)");
 		$(this.options.errordiv).show();
 	},
@@ -95,8 +98,8 @@ NodeViz.prototype = {
 			if (r.transport && r.transport.readyState != 4) { 
 				r.abort();
 			}
-			this.requests.splice(this.requests.indexOf(r), 1);
 		}, this);
+		this.requests.length=0;
 		$$('.loading').each(function (e) { e.remove(); });
 	},
 	getGraphOptions: function() {
@@ -108,7 +111,7 @@ NodeViz.prototype = {
 	resetGraph: function(params) {
 		$H(this.renderers).values().invoke('reset');
 		this.current = {'zoom': 1, 'network': '', 'node': '', 'nodetype': ''};
-		this.requests = [];
+		this.killRequests();
 		this.data = [];
 		this.clearError();
 	},
@@ -117,52 +120,23 @@ NodeViz.prototype = {
 		//console.time('reset');
 		this.resetGraph();
 		//console.timeEnd('reset');
-		
-		/*	
-		var eventcount = 0;
-		$('graphs').descendants().each( function(e) { 
-			if (Element.getStorage(e).get('prototype_event_registry') ) {
-				//eventcount += Element.getStorage(e).get('prototype_event_registry').values().size();
-				Element.getStorage(e).get('prototype_event_registry').values().each(function (v) { 
-					if (v[0]) { 
-						eventcount++;		
-						console.log(e);
-					} 
-				});
-				//console.log(Element.getStorage(e).get('prototype_event_registry'));
-				//console.log(e);
-			}
-		});
-		console.log(eventcount);
-		//if (this.data) { console.log('fuck'); return; }
-		*/	
 
 		var params = this.getGraphOptions();
 		//console.time('fetch');
-		var request = new Ajax.Request(this.options.NodeVizPath+'/request.php', {
-			parameters: params,
-			timeOut: this.options.timeOutLength,
-			onLoading: function() { this.onLoading('images'); }.bind(this),
-			onTimeOut: this.timeOutExceeded.bind(this),
-			evalJS: true,
-			sanitizeJSON: true,
-			onComplete: function(response,json) {
+		this.fetchRemoteData(params, 
+			function(responseData) {
 				//console.timeEnd('fetch');
-				var responseData = this.checkResponse(response);
-				if (responseData) {
-					this.data = responseData.graph.data;
-					//console.time('render');
-					$H(this.renderers).values().invoke('render', responseData);
-					//this.renderers.GraphImage.renderGraph(data.img, data.overlay);
-					if (this.graphLoaded) {
-						this.graphLoaded();
-					}
-					////console.timeEnd('render');
-				//	console.timeEnd('load');
+				this.data = responseData.graph.data;
+				//console.time('render');
+				$H(this.renderers).values().invoke('render', responseData);
+				if (this.graphLoaded) {
+					this.graphLoaded();
 				}
-			}.bind(this)
-		});
-		this.requests[this.requests.length+1] = request;
+				//console.timeEnd('render');
+				//	console.timeEnd('load');
+			}.bind(this),
+			function() { this.onLoading('images'); }.bind(this)
+		);
 	},
 	panToNode: function(id,level) {
 		//zooms graph if in svg mode
@@ -170,14 +144,14 @@ NodeViz.prototype = {
 			this.renderers['GraphImage'].panToNode(id, level);
 		}
 	},
-	highlightNode: function(id, noshowtooltip) {
+	highlightNode: function(id, noshowtooltip, renderer) {
 		id = id.toString();
 		if (! id) { return; }
 		//if(typeof this.data.nodes[id] == 'undefined') { id = this.current['node']; }
 		if (this.data.nodes[id]) {
 			this.unhighlightNode(this.current['node']);
 			this.current['node'] = id;
-			$H(this.renderers).values().invoke('highlightNode', id, noshowtooltip);
+			$H(this.renderers).values().invoke('highlightNode', id, noshowtooltip, renderer);
 		}
 	},
 	unhighlightNode: function(id) {
@@ -207,39 +181,15 @@ NodeViz.prototype = {
 	},
 	selectEdge: function(id) {
 		var params = this.getGraphOptions();
-		params.action = 'displayEdge';
+		params.action = 'edgeDetails';
 		params.edgeid = id;
-		var request = new Ajax.Request(this.options.NodeVizPath+'request.php', {
-			parameters: params,
-			timeOut: this.options.timeOutLength,
-			onLoading: function() { this.onLoading(this.options.lightboxdiv+'contents'); }.bind(this),
-			onTimeOut: this.timeOutExceeded.bind(this),
-			sanitizeJSON: true,
-			onComplete: function(response,json) {
-				data = this.checkResponse(response);
-				if (data) {
-					var edge = this.data.edges[id];
-					var mainhead = "<h2>A Detailed View</h2>";
-					var header = "<h3>From <span class='org_title'>"+this.data.nodes[edge['fromId']].Name+"</span> to <span class='org_title'>"+this.data.nodes[edge['toId']].Name+"</span></h3>";
-					var subhead = "<p class='subhead'>A complete listing of the grants used to construct the edge between the organizations</p>";
-					var tableheader = '<thead><tr><th>'+$H($H(data).values().first()).keys().join('</th><th>')+'</th></tr></thead>';
-					var tablebody = "<tbody>";
-					$H(data).values().each(function (row) { 
-						tablebody += '<tr><td>'+$H(row).values().join('</td><td>')+'</td></tr>';
-					});
-					this.showLightbox(mainhead+subhead+header+'<table id="edge_details_table">'+tableheader+tablebody+'</tbody></table>');
-				} else { 
-					this.hideLightbox();
-				}
-			}.bind(this)
-		});
-		this.requests[this.requests.length+1] = request;
+		this.showLightbox('');
+		this.fetchRemoteData(params, this.showLightbox.bind(this), function() { this.onLoading(this.options.lightboxdiv+'contents'); }.bind(this));
 	},
 	unselectEdge: function() {
 		$(this.options.lightboxdiv+'contents').update();
 		$(this.options.lightboxdiv).hide();
 		$(this.options.lightboxscreen).hide();
-
 	},
 	showLightbox: function(contents) { 
 		this.clearError();
@@ -251,15 +201,33 @@ NodeViz.prototype = {
 		}
 		if (! $(this.options.lightboxscreen)) { 
 			$(document.body).insert({ top: new Element('div', {'id': this.options.lightboxscreen}) });
+			Event.observe($(this.options.lightboxscreen), 'click', this.hideLightbox.bind(this));
 		}
 		$(this.options.lightboxdiv+'contents').update(contents);
 		$(this.options.lightboxdiv).show();
 		$(this.options.lightboxscreen).show();
-
 	},
 	hideLightbox: function() {
 		$(this.options.lightboxdiv).hide();
 		$(this.options.lightboxscreen).hide();
+		$(this.options.lightboxdiv+'contents').update();
+	},
+	fetchRemoteData: function(params, callback, loading) {
+		var request = new Ajax.Request(this.options.NodeVizPath+'/request.php', {
+			parameters: params,
+			timeOut: this.options.timeOutLength,
+			onLoading: loading,
+			onTimeOut: this.timeOutExceeded.bind(this),
+			evalJS: true,
+			sanitizeJSON: true,
+			onComplete: function(response, json) {
+				var responseData = this.checkResponse(response);
+				if (responseData) {
+					callback(responseData);
+				}
+			}.bind(this)
+		});
+		this.requests.push(request);
 	},
 	addEvents: function(dom_element, graph_element, element_type, renderer) {
 		var eventslist = ['mouseover', 'mousemove','mouseout', 'mouseenter', 'mouseleave' , 'mouseup', 'mousedown', 'click', 'dblclick'];
@@ -291,13 +259,14 @@ NodeViz.prototype = {
 	},
 	default_events: { 
 		'node': {
-			'mouseenter': "this.highlightNode(graph_element.id);",
+			'mouseenter': "this.highlightNode(graph_element.id, 0, renderer);",
 			'mouseleave': "if(renderer != 'raster') { this.unhighlightNode(graph_element.id); }",
 			'click': "this.selectNode(graph_element.id);"
 		},
 		'edge': {
 			'mouseenter': "if(renderer != 'list') { this.renderers.GraphImage.showTooltip(graph_element.tooltip); }",
-			'mouseleave': "if(renderer != 'list') { this.renderers.GraphImage.hideTooltip(); }"
+			'mouseleave': "if(renderer != 'list') { this.renderers.GraphImage.hideTooltip(); }",
+			'click': "if(renderer != 'list') { this.selectEdge(graph_element.id); }"
 		}
 	}
 }

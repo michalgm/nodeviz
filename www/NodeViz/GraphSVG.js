@@ -1,17 +1,22 @@
 var GraphSVG = Class.create(GraphImage, {
 	initialize: function($super, NodeViz) {
 		this.zoomlevels = 8;
-		this.zoom_delta = .8;
+		this.zoom_delta = 1.2;
 		this.default_zoom = 1;
 		this.current_zoom = this.default_zoom;
+		this.zoomSliderAxis = 'horizontal';
 		$super(NodeViz);
 		if (this.NodeViz.options.useSVG != 1 ) { return; } 
 
 		Event.observe(window, 'resize', function() {
 			[$('svg_overlay'), $('image')].each(function(e) {
-				e.childNodes[0].setAttribute('height', $(this.graphdiv).getHeight());
-				e.childNodes[0].setAttribute('width', $(this.graphdiv).getWidth());
+				if (e) { 
+					e.childNodes[0].setAttribute('height', $(this.graphdiv).getHeight());
+					e.childNodes[0].setAttribute('width', $(this.graphdiv).getWidth());
+				}
 			}.bind(this));
+			this.stateTf = $('graph0').getCTM().inverse();
+			this.ctm = $('graph0').getCTM();
 		}.bind(this));
 
 		$(this.graphdiv).innerHTML += this.zoomControlsHTML;
@@ -37,7 +42,7 @@ var GraphSVG = Class.create(GraphImage, {
 		//insert the zoom stylesheet into the doc header
 		$$('head')[0].appendChild(new Element('style', {'type': 'text/css'}).update(css_string));
 
-		this.zoomSlider = new Control.Slider('zoomHandle', 'zoomSlider', {values: values, range: $R(this.zoomlevels,0), sliderValue: 1,
+		this.zoomSlider = new Control.Slider('zoomHandle', 'zoomSlider', {values: values, axis: this.zoomSliderAxis, range: $R(this.zoomlevels,0), sliderValue: 1,
 			onChange: function(value) { 
 				if(this.current_zoom != value) { 
 					if (this.zoom_event) { 
@@ -98,16 +103,19 @@ var GraphSVG = Class.create(GraphImage, {
 		//Center the svg images (using the original graph dimensions)
 		this.root = $('svg_overlay').childNodes[0];
 		this.stateTf = $('graph0').getCTM().inverse();
+		this.ctm = $('graph0').getCTM();
 		var delta = this.root.createSVGPoint();
 		delta.x = (this.graphDimensions.width - this.graphWidth)/2;
 		delta.y = (this.graphDimensions.height - this.graphHeight)/2;
 		delta.matrixTransform(this.stateTf);	
-		var matrix = $('graph0').getCTM();
+		var matrix = this.ctm; 
 		matrix.e+= delta.x;
 		matrix.f+= delta.y;
 		var s = "matrix(" + matrix.a + "," + matrix.b + "," + matrix.c + "," + matrix.d + "," + matrix.e + "," + matrix.f + ")";
 		$('graph0').setAttribute('transform', s);
 		$('underlay_graph0').setAttribute('transform', s);
+		this.stateTf = $('graph0').getCTM().inverse();
+		this.ctm = $('graph0').getCTM();
 
 		//Show the Graphs
 		$('svg_overlay').style.setProperty('position','absolute', '');
@@ -122,7 +130,6 @@ var GraphSVG = Class.create(GraphImage, {
 		if (this.default_zoom == 1) { 
 			this.setZoomFilters();
 		}
-
 		//console.timeEnd('renderSVG');
 	},
 	setupListeners: function($super) {
@@ -133,6 +140,8 @@ var GraphSVG = Class.create(GraphImage, {
 		$$('#svg_overlay .node').each( function(n) {
 			var nodeid = n.id;
 			var node = this.NodeViz.data.nodes[n.id]
+			this.addClassName($(nodeid), node['type']);
+			this.addClassName($('underlay_'+nodeid), node['type']);	
 			if (typeof(node['zoom']) != 'undefined') { 
 				this.addClassName($(nodeid), 'zoom_'+node['zoom']);
 				this.addClassName($('underlay_'+nodeid), 'zoom_'+node['zoom']);
@@ -151,6 +160,8 @@ var GraphSVG = Class.create(GraphImage, {
 		$$('#svg_overlay .edge').each( function(e) {
 			var edgeid = e.id;
 			var edge = this.NodeViz.data.edges[edgeid];
+			this.addClassName($(edgeid), edge['type']);
+			this.addClassName($('underlay_'+edgeid), edge['type']);
 			if (edge['zoom']) { 
 				this.addClassName($(edgeid), 'zoom_'+edge['zoom']);
 				this.addClassName($('underlay_'+edgeid), 'zoom_'+edge['zoom']);
@@ -166,12 +177,11 @@ var GraphSVG = Class.create(GraphImage, {
 		}, this);
 		this.setupZoomListeners(this.root);
 	},
-	highlightNode: function($super, id, text, noshowtooltip) {
+	highlightNode: function($super, id, text, noshowtooltip, renderer) {
 		if (this.state != '') { return; }
-		$super(id, text, noshowtooltip);
-		var node;
-		var node = $A($(id).childNodes).reverse().detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; })
-		node.setAttribute('class', 'nhighlight');
+		$super(id, text, noshowtooltip, renderer);
+		$A($(id).childNodes).reverse().detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; }).setAttribute('class', 'nhighlight');
+		$A($('underlay_'+id).childNodes).reverse().detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; }).setAttribute('class', 'nhighlight');
 		if (this.NodeViz.current['network']) { 
 			//$(id).parentNode.appendChild($(id));
 		}
@@ -183,6 +193,7 @@ var GraphSVG = Class.create(GraphImage, {
 		var NodeViz = this.NodeViz;
 		var node = $(id);
 		$A($(id).childNodes).reverse().detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; }).removeAttribute('class');
+		$A($('underlay_'+id).childNodes).reverse().detect(function(e) { return e.tagName == 'polygon' || e.tagName == 'ellipse'; }).removeAttribute('class');
 		if (NodeViz.current['network'] == id || (NodeViz.data.nodes[NodeViz.current['network']] && NodeViz.data.nodes[NodeViz.current['network']]['relatedNodes'][id])) {
 			return;
 		} else {
@@ -232,12 +243,14 @@ var GraphSVG = Class.create(GraphImage, {
 		$super();
 		this.showSVGElement(id);
 		this.addClassName($(id), 'selected');
+		this.addClassName($('underlay_'+id), 'selected');
 		if ($('image').getOpacity() == 1) {
 			new Effect.Opacity('image', { from: 1, to: .3, duration: .5});
 		}
 		$H(this.NodeViz.data.nodes[id].relatedNodes).keys().each(function(e) {
 			this.showSVGElement(e);
 			this.addClassName($(e), 'oselected');
+			this.addClassName($('underlay_'+e), 'oselected');
 			$H(this.NodeViz.data.nodes[id].relatedNodes[e]).values().each( function(edge) { 
 				this.showSVGElement(edge);
 			}, this);
@@ -245,19 +258,27 @@ var GraphSVG = Class.create(GraphImage, {
 	},
 	unselectNode: function($super, id, fade) { 
 		$super();
+		var realunselectNode = function() {	
+			this.removeClassName($(id), 'selected');
+			this.removeClassName($('underlay_'+id), 'selected');
+			$H(this.NodeViz.data.nodes[id].relatedNodes).keys().each(function(e) {
+				this.hideSVGElement(e);
+				this.removeClassName($(e), 'oselected');
+				this.removeClassName($('underlay_'+e), 'oselected');
+				$H(this.NodeViz.data.nodes[id].relatedNodes[e]).values().each( function(edge) { 
+					this.hideSVGElement(edge);
+				}, this);
+			}, this);
+			this.hideSVGElement(id);
+			this.unhighlightNode(id);
+			$('svg_overlay').setStyle({opacity: 1});
+		}.bind(this);
 		if (fade) {
 			new Effect.Opacity('image', { from: .3, to: 1, duration: .3});
+			new Effect.Opacity('svg_overlay', { from: 1, to: 0, duration: .3, afterFinish: realunselectNode});
+		} else {
+			realunselectNode();
 		}
-		this.removeClassName($(id), 'selected');
-		$H(this.NodeViz.data.nodes[id].relatedNodes).keys().each(function(e) {
-			this.hideSVGElement(e);
-			this.removeClassName($(e), 'oselected');
-			$H(this.NodeViz.data.nodes[id].relatedNodes[e]).values().each( function(edge) { 
-				this.hideSVGElement(edge);
-			}, this);
-		}, this);
-		this.hideSVGElement(id);
-		this.unhighlightNode(id);
 	},
 	hasClassName: function(element, className) {
 		var elementClassName = element.getAttribute('class') || '';
@@ -288,7 +309,8 @@ var GraphSVG = Class.create(GraphImage, {
 		if(!$(id)) { return; } //should this throw an error?
 	
   		//get the transform of the svg coords to screen coords
-  		var ctm = $(id).getScreenCTM();
+  		//var ctm = $(id).getScreenCTM();
+		var ctm = this.ctm;
 	
   		//get bounding box for node 
   		var box = $(id).getBBox();
@@ -297,7 +319,7 @@ var GraphSVG = Class.create(GraphImage, {
 		svg_p.y = box.height /2  + box.y;
 
 		//use the transform to move the point to screen coords
-		dom_p = svg_p.matrixTransform(ctm);
+		var dom_p = svg_p.matrixTransform(ctm);
 		//correct for differences in screen coords when page is scrolled
 		var offset = $('svg_overlay').viewportOffset();
 		dom_p.x = dom_p.x -offset[0];
@@ -314,9 +336,10 @@ var GraphSVG = Class.create(GraphImage, {
 		if(!$(id)) { return; } //should this throw an error?
 	
   		//get the transform of the svg coords to screen coords
-  		var ctm = $(id).getScreenCTM();
+  		//var ctm = $(id).getScreenCTM();
+		var ctm = this.ctm;
 		var g = $('graph0');
-		this.stateTf = $('graph0').getCTM().inverse();
+		//this.stateTf = $('graph0').getCTM().inverse();
 
   		//get bounding box for node 
   		var box = $(id).getBBox();
@@ -335,6 +358,8 @@ var GraphSVG = Class.create(GraphImage, {
 		delta.y = (center.y - node_center.y);
 
 		new Effect.Translate($('graph0'), {x: delta.x, y: delta.y, afterFinish: function() {
+				this.stateTf = $('graph0').getCTM().inverse();
+				this.ctm = $('graph0').getCTM();
 				if (typeof(zoom) != 'undefined') {
 					this.zoomToNode(id, zoom);
 				}
@@ -343,7 +368,6 @@ var GraphSVG = Class.create(GraphImage, {
 		//this.setCTM(g, $('graph0').getCTM().translate(delta.x, delta.y));
 	},
 	setupZoomListeners: function(root){
-		this.stateTf = $('graph0').getCTM().inverse();
 		Event.observe($('svgscreen'), 'mousedown', function(e) { this.handleMouseDown(e); }.bind(this));
 		Event.observe($('svgscreen'), 'mousemove', function(e) { this.handleMouseMove(e); }.bind(this));
 		Event.observe($('svgscreen'), 'mouseup', function(e) { this.handleMouseUp(e); }.bind(this));
@@ -386,6 +410,8 @@ var GraphSVG = Class.create(GraphImage, {
 		$('underlay_graph0').setAttribute("transform", s);
 		//this.zoomSlider.setValue(this.current_zoom);
 		this.setZoomFilters();
+		this.stateTf = $('graph0').getCTM().inverse();
+		this.ctm = $('graph0').getCTM();
 	},
 	
 /**
@@ -483,6 +509,7 @@ var GraphSVG = Class.create(GraphImage, {
 		evt.target.style.cursor = 'move';
 		$('svgscreen').style.cursor = 'move';
 		this.stateTf = g.getCTM().inverse();
+		this.ctm = g.getCTM();
 
 		this.stateOrigin = this.getEventPoint(evt).matrixTransform(this.stateTf);
 	},
@@ -531,8 +558,9 @@ var GraphSVG = Class.create(GraphImage, {
 		this.previous_zoom = this.current_zoom;
 		this.current_zoom = d;
 		var zoom_amount = d - this.previous_zoom;
-		var delta = 0.3333333333333333;
-		var z = Math.pow(1 + this.zoom_delta, delta);
+		//var delta = 0.3333333333333333;
+		//var z = Math.pow(1 + this.zoom_delta, delta);
+		var z = this.zoom_delta;
 		var g = $("graph0");
 		var center = '';
 		if (! this.zoom_point) { 
@@ -542,10 +570,16 @@ var GraphSVG = Class.create(GraphImage, {
 		}
 		var p = center.matrixTransform(g.getCTM().inverse());
 		z = Math.pow(z, zoom_amount);
+		//z = z*zoom_amount;
 		//var k = this.root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
 		new Effect.AnimateZoom($('graph0'), {point: p, zoom: z, queue: {'position': 'end', 'scope': 'zoom'}, duration: .5, afterFinish: function() {
 				this.setZoomFilters();
 				$(this.graphdiv).removeClassName('zooming');
+				this.stateTf = $('graph0').getCTM().inverse();
+				this.ctm = $('graph0').getCTM();
+				if(this.NodeViz.afterZoom) {
+					this.NodeViz.afterZoom();
+				}
 			}.bind(this)
 		});
 		//new Effect.AnimateZoom($('underlay_graph0'), {point: p, zoom: z});

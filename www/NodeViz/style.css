@@ -1,5 +1,5 @@
 	html { height: 100%; }	
-	body { height: 99%;font-size:.8em;}	
+	body { height: 99%;font-size:.8em; margin: 0px;}	
 	#debug {position:absolute;}
 	
 	#graphcontent {position:relative; clear:both; margin-bottom:10px; height:700px; background:#fff; border-top:1px solid #ccc; overflow:hidden;}
@@ -20,16 +20,11 @@
 	#warning {float:left; margin-left:10px;margin-top:-10px;color:#999999;}
 
 	#lightbox, .modal {position:fixed; height:80%; width:600px; background:#fff; z-index:1002; top:30px; left:50%; margin-left:-300px; padding:15px; border-radius:10px; -webkit-border-radius:10px; -moz-border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.75); -webkit-box-shadow:0 3px 10px rgba(0,0,0,0.75); -moz-box-shadow:0 3px 10px rgba(0,0,0,0.75); max-height: 80%; }
-	#lightboxscreen {width:100%; height:100%; position:absolute; z-index:1001; top:0; left:0; background:#000; opacity:0.5; -moz-opacity:0.5; filter:alpha(opacity=50); overflow:hidden;}
+	#lightboxscreen {width:100%; height:100%; position:absolute; z-index:1001; top:0; left:0; background:#000; opacity:0.5; -moz-opacity:0.5; filter:alpha(opacity=50); overflow:hidden; cursor: pointer;}
 	#lightboxcontents { width: 100%; height: 100%; }
-	#lightboxcontents table { margin: auto; max-height: 85%; height: 85%; overflow: auto; display: block; font-size: 75%; }
 	#lightboxcontents h3 { text-align: center; margin-top: 0px;}
 	#lightbox .close {position:absolute; top:5px; right:5px; display:block; cursor: pointer;}
 	
-	#tables, #cotables {position:relative; z-index:99; width:319px; background:#fff; border-left:1px solid #ccc;}
-	#tables ul, #cotables ul {list-style:none; padding:0; width:319px;}
-	#tables ul ul, #cotables ul ul {width:285px; overflow: hidden; }
-
 	.nodeselector { display: none; }
 
 
@@ -50,9 +45,7 @@
 	.norelationships {background-color:#EEEEEE;padding:5px;color:#999999;}
 	
 	
-	#images {text-align:left;}
-
-
+	#images {text-align:center;}
 
 
 	#lists {float: right; height:90%; width:30%; background:#B2B7A1; border-radius:0 0 10px 0;}
@@ -108,11 +101,12 @@
 	.to_node_item {color:green;}
 	.from_node_item {color:orange;}
 
+	#list_menu { text-align: center; }
 	#list_menu li { display: inline;  padding: 5px; cursor: pointer;}
 	#list_menu li.selected {font-weight: bold; } 
 
 	#edgeview { position: absolute; z-index: 20; width: 80%; background-color: #fff; margin: auto; padding: 20px;}
-	#error { z-index: 1000; color: #f00; background: #ddd; border: 1px solid black; width: 60%; margin: auto; padding: 10px; }
+	#error { z-index: 1000; color: #f00; background: #ddd; border: 1px solid black; width: 500px; margin: auto; padding: 10px; position: absolute; left: 50%; top: 15px; margin-left: -250px; }
 	#error .errorstring { display:block; max-height: 200px; overflow: auto; background: #fee; padding: 3px; }
 	#error .code { font-family: monospace; white-space: pre-wrap; }
 
