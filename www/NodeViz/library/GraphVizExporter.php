@@ -63,7 +63,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		@returns $dot a string in .dot format ready to be written out
 	
 	*/
-	function renderDot(){ //add more arguments to control dot file creation
+	protected function renderDot(){ //add more arguments to control dot file creation
 		$graph = $this->graph;
 
 		//Set the size if it was passed in
@@ -186,7 +186,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		$this->dotString = $dot;
 	}
 	
-	function processDot() {
+	protected function processDot() {
 		global $nodeViz_config;
 		if ($nodeViz_config['debug']) { 
 			$nicegraphfile = fopen($this->graphFileName.".nicegraph", "w");
@@ -205,7 +205,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 
 	}
 	//if no value is set, returns 1
-	//have to use funny names 'cause we can't declare as private
+	//have to use funny names 'cause we can't declare as protected
 	static function getWeightGV($value){
 	  if ($value==null){
 		 return 1;
@@ -250,7 +250,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		}
 	}
 
-	function setPermissions($file) {
+	protected function setPermissions($file) {
 		if (is_file($file) || is_dir($file)) {
 			$perms = fileperms($file);
 			if (decoct(fileperms($file)) != '100777') { 
@@ -292,7 +292,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		return array('image'=>$image, 'graph'=>$this->graph, 'overlay'=>$overlay, 'dot'=>$dot);
 	}
 
-	function processImap() {
+	protected function processImap() {
 		$imap = file_get_contents($this->graphFileName.".imap");
 		$imap = str_replace('<map id="G" name="G">', "", $imap);
 		$imap = str_replace("</map>", "", $imap);
@@ -318,7 +318,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		@param $graph the Graph object corresponding to the SVG image.
 		@returns $svg string with modified SVG content
 	*/
-	function processSVG() {
+	protected function processSVG() {
 		global $old_graphviz;
 		global $nodeViz_config;
 	
@@ -357,7 +357,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		$this->svgString = $svg;
 	}
 
-	function processGraphData() {
+	protected function processGraphData() {
 		$data = &$this->graph->data;
 		unset($data['properties']['graphvizProperties']);
 		unset($data['queries']);
@@ -373,7 +373,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		}
 	}
 
-	function renderGraphViz() {
+	protected function renderGraphViz() {
 		require('libgv-php5/gv.php'); //load the graphviz php bindings
 		global $nodeViz_config;
 		$filename = $nodeViz_config['nodeViz_path'].$this->graphFileName; //Need to use absolute paths cuz we change to web dir
@@ -400,7 +400,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 
 	}
 
-	function renderSVG() {
+	protected function renderSVG() {
 		$svg = &$this->svgString;
 		
 		$width = $this->graph->width;
@@ -415,7 +415,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		fclose($svgout);
 	}
 
-	function renderImap() {
+	protected function renderImap() {
 		$imap = &$this->imapString;
 
 		$width = $this->graph->width;
@@ -445,7 +445,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		fclose($imapout);
 	}
 
-	function renderRaster() {
+	protected function renderRaster() {
 		#Generate the raster version
 		$im = new Imagick();
 		$im->setFormat('svg');
@@ -458,7 +458,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		$im->destroy();
 	}
 
-function checkPaths() {
+	protected function checkPaths() {
 		//check if cache directory is readable
 		if (! is_dir($this->cachePath) || ! is_readable($this->cachePath)) {
 			trigger_error("Unable to read cache directory '".$this->cachePath."'", E_USER_ERROR);
