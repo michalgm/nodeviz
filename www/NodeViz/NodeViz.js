@@ -208,6 +208,7 @@ NodeViz.prototype = {
 		$(this.options.lightboxscreen).show();
 	},
 	hideLightbox: function() {
+		if (! $(this.options.lightboxdiv)) {  return; }
 		$(this.options.lightboxdiv).hide();
 		$(this.options.lightboxscreen).hide();
 		$(this.options.lightboxdiv+'contents').update();
