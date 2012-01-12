@@ -71,6 +71,7 @@ var GraphSVG = Class.create(GraphImage, {
 	render: function($super, responseData) { 
 		//console.time('renderSVG');
 		$super();
+		$('imagescreen').show();
 		var image = responseData.image;
 		var overlay = responseData.overlay;
 		overlay = overlay.replace("<div id='svg_overlay' style='display: none'>", '');
@@ -130,6 +131,7 @@ var GraphSVG = Class.create(GraphImage, {
 		if (this.default_zoom == 1) { 
 			this.setZoomFilters();
 		}
+		$('imagescreen').fade();
 		//console.timeEnd('renderSVG');
 	},
 	setupListeners: function($super) {

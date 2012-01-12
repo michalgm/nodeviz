@@ -32,6 +32,7 @@ GraphImage.prototype = {
 			this.tooltipOffsetX = -5;
 			this.tooltipOffsetY = 5;
 		}
+		$('imagescreen').clonePosition($('images'));
 	},
 	
 	//Catches mousemove events
