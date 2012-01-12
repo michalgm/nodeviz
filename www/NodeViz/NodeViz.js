@@ -6,6 +6,7 @@ NodeViz.prototype = {
 		this.options = {
 			timeOutLength : 100,
 			errordiv : 'error',
+			loadingdiv: 'loading',
 			lightboxdiv : 'lightbox',
 			lightboxscreen : 'lightboxscreen',
 			optionsform : 'graphoptions',
@@ -25,6 +26,10 @@ NodeViz.prototype = {
 		if (! $(this.options.errordiv)) { 
 			$(document.body).insert({ top: new Element('div', {'id': this.options.errordiv}) });
 			$(this.options.errordiv).hide();
+		}
+		if (! $(this.options.loadingdiv)) { 
+			$(document.body).insert({ top: new Element('div', {'id': this.options.loadingdiv}) });
+			$(this.options.loadingdiv).hide();
 		}
 		this.renderers = {};
 		this.requests = [];
@@ -132,10 +137,11 @@ NodeViz.prototype = {
 				if (this.graphLoaded) {
 					this.graphLoaded();
 				}
+				Effect.Fade.defer($(this.options.loadingdiv));
 				//console.timeEnd('render');
 				//	console.timeEnd('load');
 			}.bind(this),
-			function() { this.onLoading('images'); }.bind(this)
+			function() { this.onLoading(this.options.loadingdiv); }.bind(this)
 		);
 	},
 	panToNode: function(id,level) {

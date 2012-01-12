@@ -26,6 +26,7 @@ GraphList.prototype = {
 		//console.time('renderList');
 		var data = this.NodeViz.data;
 		this.nodeLists = new Hash();
+		$(this.listdiv).hide();
 		$(this.listdiv).insert({ top: new Element('ul', {'id': 'list_menu'}) });
 		//Build seperate sub lists for each node type
 		$H(data.nodetypes).values().each( function(nodetype) {
@@ -83,6 +84,7 @@ GraphList.prototype = {
 			}
 		}, this);
 		this.displayList(data.nodetypes[0]);
+		$(this.listdiv).show();
 		//console.timeEnd('renderList');
 	},
 	displayList: function(nodetype) { 
