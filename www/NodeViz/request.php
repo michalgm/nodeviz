@@ -27,8 +27,6 @@ if (isset($nodeViz_config['setupfiles']["$setupfile.php"])) {
 	} else { trigger_error("Setup file '$setupfile' does not exist", E_USER_ERROR); }
 } else { print_r($nodeViz_config);trigger_error("Invalid setup file: $setupfile", E_USER_ERROR); }
 
-$datapath = $nodeViz_config['nodeViz_path'].'/'.$nodeViz_config['cache_path'];
-
 $graph = new $setupfile();
 
 //either build or load the cached graph
@@ -49,9 +47,10 @@ if(isset($_REQUEST['action'])) {
 		trigger_error('"'.$_REQUEST['action'].'" is an invalid method.', E_USER_ERROR);
 	}
 } else {
-	$returnSVG = isset($_REQUEST['useSVG']) ? 1 : 0;
+	$returnSVG = isset($_REQUEST['useSVG']) && $_REQUEST['useSVG'] ? 1 : 0;
 	include_once('GraphVizExporter.php');
-	$data = GraphVizExporter::generateGraphvizOutput($graph, $datapath, 'jpg', $returnSVG);
+	$exporter = new GraphVizExporter($graph, $returnSVG);
+	$data = $exporter->export();
 }
 
 writelog('done');

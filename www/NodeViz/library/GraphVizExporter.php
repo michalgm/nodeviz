@@ -11,42 +11,60 @@ class GraphVizExporter {
 neato will run when it reads the file.  See http://www.graphviz.org/doc/info/attrs.html
 for list of params and dfns. Used as default values but can be overridden in Graph setup files. 
 */
- 	static $GV_PARAMS = array(
-		'graph' => array(
-			'outputorder' => 'edgesfirst',  /*! draw edges before drawing nodes !*/
-			'truecolor' => 'true',
-			//'maxiter' => '10000', //turning this off speeds things up, but does it mean that some might not converge?
-			'size' => '9,9!',
-			'dpi' => '96',
-			//'sep=' => '0.2',
-			'bgcolor' => 'transparent',
-			'splines' => '1',
-			'epsilon'=>'0.0',
-			'layoutEngine'=>'neato',
-			#'ratio'=>'fill'
-		),
-		'node' => array(
-			'style' => 'setlinewidth(16), filled',
-			'fontsize' => '10',
-			'fixedsize' => 'true', 
-			'label'=>' ',
-			'imagescale'=>'true'
-		),
-		'edge' => array(
-			'len' => '8',
-			'style'=>'setlinewidth(2)',
-			'labelfloat' => 'true'
-		)
-	);
+	function __construct($graph, $returnSVG=1, $rasterFormat='jpg') {
+		global $nodeViz_config;
+		$GV_PARAMS = array(
+			'graph' => array(
+				'outputorder' => 'edgesfirst',  /*! draw edges before drawing nodes !*/
+				'truecolor' => 'true',
+				//'maxiter' => '10000', //turning this off speeds things up, but does it mean that some might not converge?
+				'size' => '9,9!',
+				'dpi' => '96',
+				//'sep=' => '0.2',
+				'bgcolor' => 'transparent',
+				'splines' => '1',
+				'epsilon'=>'0.0',
+				'layoutEngine'=>'neato',
+				#'ratio'=>'fill'
+			),
+			'node' => array(
+				'style' => 'setlinewidth(16), filled',
+				'fontsize' => '10',
+				'fixedsize' => 'true', 
+				'label'=>' ',
+				'imagescale'=>'true'
+			),
+			'edge' => array(
+				'len' => '8',
+				'style'=>'setlinewidth(2)',
+				'labelfloat' => 'true'
+			)
+		);
 
+		$this->GV_PARAMS = $GV_PARAMS;
+		$this->graph = $graph;
+		$this->rasterFormat = $rasterFormat;
+		$this->returnSVG = $returnSVG;
+		$this->cachePath = $nodeViz_config['cache_path'];
+		$this->graphPath = $this->cachePath."/".$this->graph->graphname().'/';
+		$this->renderPath = $this->graphPath."/".$this->graph->width."_".$this->graph->height.'/';
+		$this->graphFileName = $this->graphPath."/".$this->graph->graphname();
+		$this->renderFileName = $this->renderPath."/".$this->graph->graphname();
+		$this->cacheLevel = $nodeViz_config['cache'];
+		$this->dotString = null;
+		$this->svgString = null;
+		$this->imapString = null;
+
+		return $this;
+	}
 
 	/**  Loops through the passed graph structure and writes it to a text string in the .dot file format. All graph data will be written, even if it is not a valid GraphViz paramters.  When some important GraphViz params are not included, it uses the default values in $GV_PARAMS.
 		@param $graph  the graph to be converted
 		@returns $dot a string in .dot format ready to be written out
 	
 	*/
-	static function createDot($graph){ //add more arguments to control dot file creation
-		$GV_PARAMS = GraphVizExporter::$GV_PARAMS;
+	function renderDot(){ //add more arguments to control dot file creation
+		$graph = $this->graph;
 
 		//Set the size if it was passed in
 		if (isset($graph->width)) { 
@@ -54,16 +72,18 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 			$graph->data['graphvizProperties']['graph']['size'] = $size;
 		}
 
+		$graph->data['graphvizProperties']['graph']['size'] = "1000,1000!";
+
 		//Merge any properties set in graphSetup into GV_PARAMS
 		if (isset($graph->data['graphvizProperties'])) {
-			$GV_PARAMS = array_merge_recursive_unique($GV_PARAMS, $graph->data['graphvizProperties']);
+			$this->GV_PARAMS = array_merge_recursive_unique($this->GV_PARAMS, $graph->data['graphvizProperties']);
 		} 
 
 		$dot = "digraph G {\ngraph ["; 
 		//get the graph-level params from the params object
-		foreach (array_keys($GV_PARAMS['graph']) as $key) {
-			if ($GV_PARAMS['graph'][$key] != null){
-				$dot .= $key.'="'.$GV_PARAMS['graph'][$key].'" ';
+		foreach (array_keys($this->GV_PARAMS['graph']) as $key) {
+			if ($this->GV_PARAMS['graph'][$key] != null){
+				$dot .= $key.'="'.$this->GV_PARAMS['graph'][$key].'" ';
 			}
 		}
 		$dot .="];\n";
@@ -73,9 +93,9 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		//default formatting for nodes
 		$dot .= "node [";
 		//get the node-level params from the params object
-		foreach (array_keys($GV_PARAMS['node']) as $key) {
-			if ($GV_PARAMS['node'][$key] != null){
-				$dot .= $key.'="'.$GV_PARAMS['node'][$key].'" ';
+		foreach (array_keys($this->GV_PARAMS['node']) as $key) {
+			if ($this->GV_PARAMS['node'][$key] != null){
+				$dot .= $key.'="'.$this->GV_PARAMS['node'][$key].'" ';
 			}
 		}
 		$dot .= "];\n";
@@ -107,9 +127,9 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		//default properties for edges
 		$dot .= "edge [";
 		//get the edge-level params from the params object
-		foreach (array_keys($GV_PARAMS['edge']) as $key) {
-			if ($GV_PARAMS['edge'][$key] != null){
-				$dot .= $key.'="'.$GV_PARAMS['edge'][$key].'" ';
+		foreach (array_keys($this->GV_PARAMS['edge']) as $key) {
+			if ($this->GV_PARAMS['edge'][$key] != null){
+				$dot .= $key.'="'.$this->GV_PARAMS['edge'][$key].'" ';
 			}
 		}
 		$dot .="];\n";
@@ -124,7 +144,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 			}
 			if(isset($edge['size'])) {
 				$dot .= 'style="setlinewidth('.$edge['size'].')" ';
-				if (isset($edge['arrowhead']) && $edge['arrowhead'] != 'none' && $GV_PARAMS['edge']['arrowhead'] != 'none') { 
+				if (isset($edge['arrowhead']) && $edge['arrowhead'] != 'none' && $this->GV_PARAMS['edge']['arrowhead'] != 'none') { 
 					$dot .= 'arrowsize="'. ($edge['size']*5).'" ';
 				}
 			}
@@ -163,10 +183,27 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 
 		//remove all newlines from dot, so GV doesn't choke
 		$dot = str_replace("\n", " ", $dot);
-		return $dot;
+		$this->dotString = $dot;
+	}
+	
+	function processDot() {
+		global $nodeViz_config;
+		if ($nodeViz_config['debug']) { 
+			$nicegraphfile = fopen($this->graphFileName.".nicegraph", "w");
+			fwrite($nicegraphfile, print_r($this->graph, 1));
+			fclose($nicegraphfile);
+			$origdot = fopen($this->graphFileName."_orig.dot", "w");
+			fwrite($origdot, $this->dotString);
+			fclose($origdot);
+		}
+		$data = &$this->graph->data;
+		if ($this->cacheLevel == 0 || ! file_exists($this->graphFileName.".graph")) {
+			$graphfile = fopen($this->graphFileName.".graph", "w");
+			fwrite($graphfile, serialize($data));
+			fclose($graphfile);
+		}
 
 	}
-
 	//if no value is set, returns 1
 	//have to use funny names 'cause we can't declare as private
 	static function getWeightGV($value){
@@ -183,79 +220,43 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 	@param $format  string giving suffix for other image format to save graph images as. (i.e. ".jpg")
 	@returns an array with $imap and $svg elements
 	*/
-	public static function generateGraphFiles($graph, $datapath, $format) {
-		global $nodeViz_config;
+	public function generateGraphFiles() {
 
-		$graphname = $graph->graphname();
-		$dotString = GraphVizExporter::createDot($graph);
-
-		$GV_PARAMS = GraphVizExporter::$GV_PARAMS;
-		if (isset($graph->data['graphvizProperties'])) {
-			$GV_PARAMS = array_merge_recursive_unique($GV_PARAMS, $graph->data['graphvizProperties']);
+		if ($this->cacheLevel < 2 || ! file_exists($this->graphFileName.".svg")) {
+			$this->renderDot();
+			$this->processDot();
+			$this->renderGraphViz();
+			$this->processImap();
+			$this->processSVG();
+			#chmod all our files
+			foreach (array('.svg', '.svg.raw', '.dot', '.graph', '.nicegraph', '_orig.dot', '.imap') as $ext) {
+				$this->setPermissions($this->graphFileName.$ext);
+			}	
+			$this->setPermissions($this->graphPath);
+		} else {
+			$this->svgString = file_get_contents($this->graphFileName.".svg");
+			$this->imapString = file_get_contents($this->graphFileName.".imap");
 		}
 
-		$layoutEngine = $GV_PARAMS['graph']['layoutEngine'];
+		if ($this->cacheLevel < 3) { 
+			$this->processGraphData();
+			$this->renderSVG();
+			$this->renderImap();
+			$this->renderRaster();
+			foreach (array('.svg', '.imap', ".".$this->rasterFormat) as $ext) {
+				$this->setPermissions($this->renderFileName.$ext);
+			}	
+			$this->setPermissions($this->renderPath);
+		}
+	}
 
-		$imageFile = "$datapath/$graphname.png";
-		$dotFile = "$datapath/$graphname.dot";
-		$svgFile = "$datapath/$graphname.svg.raw";
-		$imapFile = "$datapath/$graphname.imap";
-		if ($nodeViz_config['debug']) { 
-			$nicegraphfile = fopen("$datapath/$graphname.nicegraph", "w");
-			fwrite($nicegraphfile, print_r($graph, 1));
-			fclose($nicegraphfile);
-			$origdot = fopen("$datapath/$graphname"."_orig.dot", "w");
-			fwrite($origdot, $dotString);
-			fclose($origdot);
-		}
-	
-		//use gv.php to process dot string, apply layout, and generate outputs
-		chdir($nodeViz_config['web_path']);
-		ob_start();
-		$gv = gv::readstring($dotString);
-		gv::layout($gv, $layoutEngine);		
-		gv::render($gv, 'svg', $svgFile);
-		//FIXME - we should be able to use 'renderresult' to write to string, but it breaks - why?
-		gv::render($gv, 'cmapx', $imapFile);
-		if($nodeViz_config['debug']) {
-			gv::render($gv, 'dot', $dotFile);
-		}
-		gv::rm($gv);
-		if(ob_get_contents()) {
-			ob_end_clean();
-			trigger_error("GraphViz interpreter failed", E_USER_ERROR);
-		}
-		ob_end_clean();
-		chdir($nodeViz_config['nodeViz_path']);
-		
-		$imap = GraphVizExporter::processImap($imapFile, $datapath, $graphname);
-		
-		$svg = GraphVizExporter::processSVG($svgFile, $datapath, $graph);
-
-		$graphData = GraphVizExporter::processGraphData($graph->data, $datapath, $graphname);
-		
-		#Generate the raster version
-		$im = new Imagick();
-		$im->setFormat('svg');
-		#remove labels from the raster version
-		$raster_svg = preg_replace('/<text.+\/text>/m', "", $svg);;
-		$im->readImageBlob($raster_svg);
-		$im->setImageFormat($format);
-		$im->setImageCompressionQuality(90);
-		$im->writeImage("$datapath$graphname.$format");
-		$im->clear();
-		$im->destroy();
-		
-		#chmod all our files
-		foreach (array('.svg', '.svg.raw', '.dot', '.graph', '.nicegraph', '_orig.dot', '.imap', ".$format") as $ext) {
-			if (is_file("$datapath$graphname$ext")) {
-				$perms = fileperms("$datapath$graphname$ext");
-				if (decoct(fileperms("$datapath$graphname$ext")) != '100666') { 
-					chmod("$datapath$graphname$ext", 0666) || print "can't chmod file: $datapath/$graphname$ext : ".decoct(fileperms("$datapath$graphname$ext"));
-				}
+	function setPermissions($file) {
+		if (is_file($file) || is_dir($file)) {
+			$perms = fileperms($file);
+			if (decoct(fileperms($file)) != '100777') { 
+				chmod($file, 0777) || trigger_error("can't chmod file: $file: ".decoct(fileperms($file)), E_USER_ERROR);
 			}
-		}	   
-		return array($imap, $svg);
+		}
 	}
 
 	/**
@@ -266,54 +267,41 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 	@param $returnsvg NOT USED?  seems to read request param instead.
 	@returns an array with elements for the 'image', 'graph', 'overlay', and 'dot' data.
 	*/
-	public static function generateGraphvizOutput($graph, $datapath, $format, $returnsvg = 0) {
+	public function export() {
 		global $nodeViz_config;
-		$graphname = $graph->graphname();
-		$imageFile = "$datapath$graphname.$format";
-		$dotFile = "$datapath$graphname.dot";
-		$svgFile = "$datapath$graphname.svg";
- 
-		$cache = $nodeViz_config['cache'];
-		
-		//check if cache directory is writable
-		if (! is_dir($nodeViz_config['cache_path']) || ! is_readable($nodeViz_config['cache_path'])) {
-			trigger_error("Unable to read cache to cache directory '".$nodeViz_config['cache_path']."'", E_USER_ERROR);
-		}
-		$output = "";
+		$graphname = $this->graph->graphname();
+		$datapath = $this->cachePath;
+		$this->checkPaths();
 		
 		//either write files to the cache, or load in the cached files
-		if ($cache != 1) {
-			require('libgv-php5/gv.php'); //load the graphviz php bindings
-			if (! is_writable($nodeViz_config['cache_path'])) {
-				trigger_error("Unable to write cache to cache directory '".$nodeViz_config['cache_path']."'", E_USER_ERROR);
-			}
-			list($imap, $svg) = GraphVizExporter::generateGraphFiles($graph, $datapath, $format);
+		$this->generateGraphFiles();
+
+		if ($this->returnSVG) { 
+			$overlay = "<div id='svg_overlay' style='display: none'>".$this->svgString."</div>";
+			$format = 'svg';
 		} else {
-			$imap = file_get_contents("$datapath/$graphname.imap");
-			$svg = file_get_contents("$datapath/$graphname.svg");
+			$overlay = $this->imapString;
+			$format = $this->rasterFormat;
 		}
-		if (! $cache) { $imageFile .= "?".(rand()%1000); } //append random # to image name to prevent browser caching
-		if (isset($_REQUEST['useSVG']) && $_REQUEST['useSVG'] == 1) { 
-			$overlay = "<div id='svg_overlay' style='display: none'>$svg</div>";
-		} else {
-			$overlay = $imap;
-		}
-		$path = preg_replace("|^".$nodeViz_config['web_path']."|", "", $nodeViz_config['cache_path']);
-		$image = "$path$graphname.$format";
-		$dot = "$path$graphname.dot";
-		return array('image'=>$image, 'graph'=>$graph, 'overlay'=>$overlay, 'dot'=>$dot);
+
+		$imagepath = preg_replace("|^".$nodeViz_config['web_path']."|", "", $this->renderFileName);
+		$dotpath = preg_replace("|^".$nodeViz_config['web_path']."|", "", $this->graphFileName);
+		$image = "$imagepath.$format";
+		if ($nodeViz_config['debug']) { srand(); $image .= "?".(rand()%1000); } //append random # to image name to prevent browser caching
+		$dot = "$dotpath.dot";
+		return array('image'=>$image, 'graph'=>$this->graph, 'overlay'=>$overlay, 'dot'=>$dot);
 	}
 
-	public static function processImap($imapFile, $datapath, $graphname) {
-		$imap = file_get_contents($imapFile);
+	function processImap() {
+		$imap = file_get_contents($this->graphFileName.".imap");
 		$imap = str_replace('<map id="G" name="G">', "", $imap);
 		$imap = str_replace("</map>", "", $imap);
 		$imap = preg_replace("/ (target|title|href|alt)=\"[^\"]*\"/", "", $imap);
 		$imap = "<map id='G' name='G'>".join("\n", array_reverse(explode("\n", $imap)))."</map>";
-		$imapfile = fopen ($imapFile, 'w');
+		$imapfile = fopen ($this->graphFileName.".imap", 'w');
 		fwrite($imapfile, $imap);
 		fclose($imapfile);
-		return $imap;
+		$this->imapString = $imap;
 	}
 
 
@@ -330,12 +318,12 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		@param $graph the Graph object corresponding to the SVG image.
 		@returns $svg string with modified SVG content
 	*/
-	public static function processSVG($svgFile, $datapath, $graph) {
+	function processSVG() {
 		global $old_graphviz;
 		global $nodeViz_config;
-		$graphname = $graph->graphname();
+	
 		#clean up the raw svg
-		$svg = file_get_contents($svgFile);
+		$svg = file_get_contents($this->graphFileName.".svg.raw");
 		if ($old_graphviz) {
 			$svg = preg_replace("/<!-- ([^ ]+) -->\n<g id=\"(node|edge)\d+\"/", "<g id=\"$1\"", $svg);
 			$svg = preg_replace("/^.*fill:(black|white).*\n/m", "", $svg);
@@ -360,16 +348,17 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 		$svg = preg_replace("/\.\.\/www\//", "", $svg); //FIXME change the local web path to be relative to http web path
 
 		#write out the new svg
-		$svgout = fopen("$datapath/$graphname.svg", 'w');
+		$svgout = fopen($this->graphFileName.".svg", 'w');
 		fwrite($svgout, $svg);
 		fclose($svgout);
 	
 		#delete the raw svg
-		if (! $nodeViz_config['debug']) { unlink($svgFile); }
-		return $svg;
+		if (! $nodeViz_config['debug']) { unlink($this->graphFileName.".svg.raw"); }
+		$this->svgString = $svg;
 	}
 
-	public static function processGraphData($data, $datapath, $graphname) {
+	function processGraphData() {
+		$data = &$this->graph->data;
 		unset($data['properties']['graphvizProperties']);
 		unset($data['queries']);
 		foreach (array_keys($data['nodes']) as $node) {
@@ -382,10 +371,122 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 				unset($data['edges'][$edge][$key]); 
 			}
 		}
-		$graphfile = fopen("$datapath/$graphname.graph", "w");
-		fwrite($graphfile, serialize($data));
-		fclose($graphfile);
-		return $data;
+	}
+
+	function renderGraphViz() {
+		require('libgv-php5/gv.php'); //load the graphviz php bindings
+		global $nodeViz_config;
+		$filename = $nodeViz_config['nodeViz_path'].$this->graphFileName; //Need to use absolute paths cuz we change to web dir
+
+		//use gv.php to process dot string, apply layout, and generate outputs
+		chdir($nodeViz_config['web_path']);
+		ob_start();
+		$gv = gv::readstring($this->dotString);
+		gv::layout($gv, $this->GV_PARAMS['graph']['layoutEngine']);		
+		gv::render($gv, 'svg', $filename.".svg.raw");
+		//FIXME - we should be able to use 'renderresult' to write to string, but it breaks - why?
+		gv::render($gv, 'cmapx', $filename.".imap");
+		if($nodeViz_config['debug']) {
+			gv::render($gv, 'dot', $filename.".dot");
+		}
+		gv::rm($gv);
+		if(ob_get_contents()) {
+			ob_end_clean();
+			trigger_error("GraphViz interpreter failed", E_USER_ERROR);
+		}
+		ob_end_clean();
+		chdir($nodeViz_config['nodeViz_path']);
+		
+
+	}
+
+	function renderSVG() {
+		$svg = &$this->svgString;
+		
+		$width = $this->graph->width;
+		$height = $this->graph->height;
+		$size = $width > $height ? $height : $width;
+		$ratio = $size / (1000*96);
+		$svg = preg_replace('/<svg width="(\d+)px" height="(\d+)px"/em', "'<svg width=\"'.($1*$ratio).'px\" height=\"'.($2*$ratio).'px\"'", $svg);
+		$svg = preg_replace("/transform=\"scale\(([\d\.]+) ([\d\.]+)\) /me", "'transform=\"scale('.($1* $ratio).' '.($2*$ratio).') '", $svg);
+
+		$svgout = fopen($this->renderFileName.".svg", 'w');
+		fwrite($svgout, $svg);
+		fclose($svgout);
+	}
+
+	function renderImap() {
+		$imap = &$this->imapString;
+
+		$width = $this->graph->width;
+		$height = $this->graph->height;
+		$size = $width > $height ? $height : $width;
+		$ratio = $size / (1000*96);
+		$newimap = "";
+		foreach (explode("\n", $imap) as $line) {
+			if (preg_match("/coords=\"([\d, \.]+)\"/", $line, $coords)) {
+				$sets = array();
+				foreach(explode(' ', $coords[1]) as $set) {
+					$nums = array();
+					foreach(explode(',', $set) as $num) {
+						$nums[] = $num * $ratio;
+					}
+					$sets[] = implode(',', $nums);
+				}
+				$newcoords = implode(' ', $sets);
+				$newimap .= str_replace($coords[0], "coords=\"$newcoords\"", $line)."\n";
+			} else {
+				$newimap .= $line."\n";
+			}
+		}
+		$imap = $newimap;
+		$imapout = fopen($this->renderFileName.".imap", 'w');
+		fwrite($imapout, $imap);
+		fclose($imapout);
+	}
+
+	function renderRaster() {
+		#Generate the raster version
+		$im = new Imagick();
+		$im->setFormat('svg');
+		#remove labels from the raster version
+		$im->readImageBlob(preg_replace('/<text.+\/text>/m', "", $this->svgString));
+		$im->setImageFormat($this->rasterFormat);
+		$im->setImageCompressionQuality(90);
+		$im->writeImage($this->renderFileName.".".$this->rasterFormat);
+		$im->clear();
+		$im->destroy();
+	}
+
+function checkPaths() {
+		//check if cache directory is readable
+		if (! is_dir($this->cachePath) || ! is_readable($this->cachePath)) {
+			trigger_error("Unable to read cache directory '".$this->cachePath."'", E_USER_ERROR);
+		}
+		if ($this->cacheLevel < 3) {
+			if ($this->cacheLevel < 2) {
+				if (! is_writable($this->cachePath)) {
+					trigger_error("Unable to write to cache directory '".$this->cachePath."'", E_USER_ERROR);
+				}
+			}
+				if (! is_dir($this->graphPath)) {
+					mkdir($this->graphPath) || trigger_error("Unable to create graph directory '".$this->graphPath."'", E_USER_ERROR);
+				} elseif (! is_writeable($this->graphPath)) {
+					trigger_error("Unable to write to graph directory '".$this->graphPath."'", E_USER_ERROR);
+				}
+			if (! is_dir($this->renderPath)) {
+				mkdir($this->renderPath) || trigger_error("Unable to create render directory '".$this->renderPath."'", E_USER_ERROR);
+			} elseif (! is_writeable($this->renderPath)) {
+				trigger_error("Unable to write to render directory '".$this->renderPath."'", E_USER_ERROR);
+			}
+		} else {
+			if (! is_readable($this->graphPath)) {
+				trigger_error("Unable to read graph directory '".$this->graphPath."'", E_USER_ERROR);
+			}
+			if (! is_readable($this->renderPath)) {
+				trigger_error("Unable to read render directory '".$this->renderPath."'", E_USER_ERROR);
+			}
+		}		
 	}
 }
 ?>

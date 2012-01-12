@@ -70,9 +70,9 @@ class Graph {
 		@returns $this, a reference to the graph object
 	*/
 	function setupGraph($request_parameters=array(), $blank=0) {
-		global $datapath;
 		global $nodeViz_config;
 		$cache = $nodeViz_config['cache'];
+		$datapath = $nodeViz_config['nodeViz_path'].'/'.$nodeViz_config['cache_path'];
 		
 		$this->input_parameters = $request_parameters;
 		//Override defaults with input values if they exist
@@ -101,11 +101,11 @@ class Graph {
 
 		if ($blank == 0 ) {
 			//Either load graph data from cache, or use loadGraphData to load it
-			if ($cache != 1) { 
+			if ($cache == 0 || ! is_readable("$datapath/$graphname/$graphname.graph")) { 
 				$this->loadGraphData();
 			} else { 
-				if (is_readable("$datapath/$graphname.graph")) {
-					$data = unserialize(file_get_contents("$datapath/$graphname.graph")); 
+				if (is_readable("$datapath/$graphname/$graphname.graph")) {
+					$data = unserialize(file_get_contents("$datapath/$graphname/$graphname.graph")); 
 					$this->data = $data;
 				} else {
 					$this->data = "";
@@ -231,7 +231,7 @@ class Graph {
 	#-------------------------------------------------
 
 	/**Utility function to scale the 'size' property of graph elements to a data value. Takes graph object, entity type, and key of entity to use for scaled values. Size parameters of nodes are set so that the area of the node will be proportional to the value. The maximum and minimum sizes that the elements will be scaled to are controlled by the graph's maxSize and minSize properties for each type. Scales slightly differently if it is a square or circle shape. 
-		@param $array HEY GREG, WHAT IS THIS ARRAY FOR?
+		@param $array an indexed array of either nodes or edges which will be scaled relative to one another
 		@param $type a string giving the type of the nodes that should be scaled
 		@param $key a string giving the name of the property with the value to be scaled to
 		@returns an array ... of node properties?
