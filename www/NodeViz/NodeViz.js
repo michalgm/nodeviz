@@ -76,6 +76,7 @@ NodeViz.prototype = {
 		return 0;	
 	},
 	reportError: function(code, message) {
+		$$('.loading').each(function(l) { $(l.parentNode).hide(); });
 		this.hideLightbox();
 		$(this.options.errordiv).update("We're sorry, an error has occured: <span class='errorstring'>"+message+"</span> (<span class='errorcode'>"+code+"</span>)");
 		$(this.options.errordiv).show();
