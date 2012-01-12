@@ -11,6 +11,7 @@ GraphImage.prototype = {
 		$(this.graphdiv).innerHTML += "<div id='images'></div>";
 		$(this.graphdiv).innerHTML += "<div id='imagescreen' style='display:none;'></div>";
 		this.graphDimensions = $(this.graphdiv).getDimensions();
+		$('imagescreen').clonePosition($(this.graphdiv));
 	},
 	reset: function() {
 		Event.stopObserving($('image'));
@@ -32,7 +33,7 @@ GraphImage.prototype = {
 			this.tooltipOffsetX = -5;
 			this.tooltipOffsetY = 5;
 		}
-		$('imagescreen').clonePosition($('images'));
+		$('imagescreen').clonePosition($(this.graphdiv));
 	},
 	
 	//Catches mousemove events
