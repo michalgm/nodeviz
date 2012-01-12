@@ -174,8 +174,8 @@ class Graph {
 					$this->data['nodes'][$node['id']]['type'] = $nodetype;
 					$this->data['nodes'][$node['id']]['relatedNodes'] = array();
 				}
+				$this->data['nodetypesindex'][$nodetype] = array_keys($nodes);
 			}
-			$this->data['nodetypesindex'][$nodetype] = array_keys($nodes);
 		}
 
 		$this->checkIsolates();
@@ -248,28 +248,9 @@ class Graph {
 
 		$vals = array();
 		
-		//if (isset($graph['nodetypesindex'][$type])) {	
 		reset($array);
 		if (key($array)) { 
-			if(isset($graph['nodetypesindex'][$type])) {
-				$shape = $array[key($array)]['shape'];
-			} else {
-				$shape = 'edge';
-			}
-			if ($shape == 'edge') {
-				$scale = $maxSize - $minSize;  //the range we actually want
-			} else if ($shape == 'circle' || $shape == 'octagon' || $shape == 'polygon') { 
-				//we need to comvert sizes from diameter to radius
-				$maxSize = $maxSize/2;
-				$minSize = $minSize/2;
-				$scale = pow($maxSize,2)*pi() - pow($minSize,2)*pi();  //the range we actually want
-			} else if ($shape == 'triangle') { 
-				$scale = sqrt(3)/4*pow($maxSize,2) - sqrt(3)/4*pow($minSize,2);  //adjust to value we want
-			} else if ($shape == 'diamond') { 
-				$scale = sqrt(pow($maxSize,2)/2) - sqrt(pow($minSize,2)/2);
-			} else {
-				$scale = pow($maxSize,2) - pow($minSize,2);  //the range we actually want
-			}
+			$scale = $maxSize - $minSize;  //the range we actually want
 			//load all the cash into an array
 			foreach($array as $node) { $vals[] =  $node[$key]; }
 			//This code was for reseting values < 0 to zero
@@ -289,6 +270,11 @@ class Graph {
 				$diff = $max - $min;  //figure out the data range
 			}
 			foreach(array_keys($array) as $id) {
+				if(isset($array[$id]['fromId'])) {
+					$shape = 'edge';
+				} else {
+					$shape = $array[$id]['shape'];
+				}
 				if ($diff == 0) {  // if all nodes are the same size, use max
 					$array[$id]['size']	= $maxSize;
 				} else {
@@ -300,24 +286,28 @@ class Graph {
 					} else {
 						$normed = ($value - $min) / $diff; //normalize it to the range 0-1
 					}
-					 //now calculate appropriate with from area depending on shape
+					//print "$value $min $diff $normed $scale\n";
+					$area = $normed*$scale + $minSize;
+					//now calculate appropriate with from area depending on shape
 					if ($shape == 'edge') { 
-						$size = ($normed * $scale) + $minSize;  //adjust to value we want
+						$size = $area;  //adjust to value we want
 					} else if ($shape == 'circle' || $shape == 'octagon' || $shape == 'polygon') { 
-						$area = ($normed * $scale) + pow($minSize,2)*pi();  //adjust to value we want
+						//$area = ($normed * $scale) + pow($minSize,2)*pi();  //adjust to value we want
 						$size = sqrt(abs($area)/pi())*2;  //get radius and multiple by 2 for diameter
 					} else if ($shape == 'triangle') { 
-						$area = ($normed * $scale) + (sqrt(3)/4*pow($minSize,2));  //adjust to value we want
-						$size = sqrt(abs($area)) / (sqrt(3)/4);
+						//$area = ($normed * $scale) + (sqrt(3)*pow($minSize,2))/4;  //adjust to value we want
+						//$size = sqrt(abs($area)) / (sqrt(3)/4);
+						$size = sqrt((4*abs($area)) / (sqrt(3)));
 					} else if ($shape == 'diamond') { 
-						$area = ($normed * $scale) + pow($minSize,2)/2;
+						//$area = ($normed * $scale) + pow($minSize,2)/2;
 						$size = sqrt(pow(sqrt(abs($area)),2)*2);
 						#$scale = sqrt(pow($maxSize,2)/2) - sqrt(pow($minSize,2)/2);
 					} else {
-						$area = ($normed * $scale) + pow($minSize,2);  //adjust to value we want
+						//$area = ($normed * $scale) + pow($minSize,2);  //adjust to value we want
 						$size = sqrt(abs($area));
 					}
-					$array[$id]['size']	= $size ;
+					$array[$id]['area']	= $area;
+					$array[$id]['size']	= $size;
 				}
 			}
 		}
