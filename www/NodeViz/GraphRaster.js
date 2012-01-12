@@ -15,6 +15,7 @@ var GraphRaster = Class.create(GraphImage, {
 					$(a).stopObserving();
 				}
 			});
+			$('G').remove();
 		}
 		$('highlight').stopObserving();
 		$('highlightimg').stopObserving();
@@ -86,7 +87,7 @@ var GraphRaster = Class.create(GraphImage, {
 		$('highlight').style.top = parseFloat(node['posy']) -1 + this.offsetY + 'px';
 		$('highlight').style.left = parseFloat(node['posx']) -1 + this.offsetX + 'px';
 		$('highlight').style.visibility = 'visible';
-		if (node['shape'] != 'circle') { 
+		if (node['shape'] != 'circle' && ! (node['shape'] == 'polygon' && node['sides'] > 5)) { 
 			$('highlight').addClassName('selected');
 			$('highlightimg').style.visibility = 'hidden';
 		} else {
