@@ -115,7 +115,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 			if (isset($node['label'])) { $dot .= 'label="'.$node['label'].'" '; }
 			//Write out all other node properties (color, shape, onClick)
 			foreach(array_keys($node) as $key) { 
-				if (! in_array($key, array('size', 'label'))) { //skip keys that we have to convert
+				if (! in_array($key, array('size', 'label', 'relatedNodes'))) { //skip keys that we have to convert
 					$dot .= "$key=\"".$node[$key].'" ';
 				}
 			}	
@@ -358,6 +358,7 @@ for list of params and dfns. Used as default values but can be overridden in Gra
 	}
 
 	protected function processGraphData() {
+		$this->graph->data['name'] = $this->graph->graphname();
 		$data = &$this->graph->data;
 		unset($data['properties']['graphvizProperties']);
 		unset($data['queries']);
