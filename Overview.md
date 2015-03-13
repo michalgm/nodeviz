@@ -1,0 +1,52 @@
+# Introduction #
+
+NodeViz was created because we wanted to be able to embed interactive network diagrams on a web page.  Projects like GraphViz offer partial solutions for rendering networks in web-friendly formats, but don't do much to help with the interaction. After writing a few sites with custom code to build networks from a database display them, we've tried to bundle some of the functionality.
+
+We are also usually dealing with situations where the network we are displaying is a subset of huge pile of relations stored in multiple tables in a database. This project is structured to simplify the process of converting the SQL queries into a network.
+
+
+# Details #
+
+NodeViz has two main parts:
+  * Server-side code in PHP which can handle requests, assemble an appropriate network based on parameters, and render it using GraphViz
+
+  * Client-side code in JavaScript which can request a graph from the server, insert an SVG (or JPEG) image of the graph into the DOM, render the graph data as a list, and handle selecting and zooming events.
+
+
+
+# Features #
+
+  * The network is embedded in the page as SVG, and is part of the web page DOM. This means that it can be styled using CSS!
+
+  * Graceful degradation to non-SVG browsers. When you view with IE 7 or 8 (which cannot display inline SVG, the network image is displayed as an image with an imagemap and events should still work.
+
+  * Networks can be rendered as both graphs and lists, with synchronized interaction between them.
+
+  * Networks can be cached on the server to avoid repeating the expensive network layout process, an for cases where GraphViz can't be installed on the production server..
+
+  * A structured template for assembling a network from an arbitrary data source (usually a database).
+
+  * AJAX callbacks for sending the client additional data associated with nodes or edges.
+
+  * Supports multiple node types (i.e 'classes') and edge types for constructing multi-partite graphs and handling interaction and list construction appropriately.
+
+  * Zooming and panning the network in the browser, including zoomToNode methods. Can also apply zoomLevel classes to elements to selectively hide and reveal as zoom levels change.
+
+# Dependencies #
+
+  * PHP 5.3 +
+  * GraphViz open source graph drawing package http://graphviz.org
+  * GraphViz php bindings (libgv-php5)
+  * Scriptaculous JS library http://script.aculo.us/
+  * Prototype JS library http://www.prototypejs.org/
+  * ImageMagick http://www.imagemagick.org/
+
+Note that it is possible to deploy on a server that doesn't have GraphViz by generating pre-cached data files..
+
+# What NodeViz does not do #
+  * Network analysis (try Gephi, the R network library, Pajek, etc)
+  * Its not the simplest way to throw up a basic network image on the web. Depending on your use case, you might want to checkout some of these alternatives:
+    * [Javascript Infoviz Toolkit](http://thejit.org/demos/)
+    * [Google Charts GraphViz](http://code.google.com/apis/chart/image/docs/gallery/graphviz.html)
+    * [d3](http://mbostock.github.com/d3/ex/force.html)
+    * or some of the alternatives listed on this [example page](http://skyeome.net/projects/networkChart/comparison.html)

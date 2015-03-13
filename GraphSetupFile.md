@@ -1,0 +1,153 @@
+#explanation of how the networks are defined
+
+# Loading data into a graph #
+
+NodeViz uses a custom Graph object to store and manipulate the network data which will be passed to the client. Usually the best way to create a new type of network is to create a new class which extends the Graph.php class and sets all the network properties appropriately.  When NodeViz attempts to build the specific type of graph, it will expect to find a certain set of functions which will return necessary data about the graph.
+
+Note: we've structured the order of the graph construction in this way to facilitate our most common use case: pulling the data for the graph out of a set of tables in a database.
+
+The basic idea is:
+  1. Define a graph object with some meta properties, includeing the types of nodes and edges
+  1. Repeat for each node type:
+    * Call a function to get a list of the ids so that we know what they are and how many, add to graph array
+    * Call a function that, given the list of ids, fills in sets of properties for each id on the graph array. Also do any processing to scale or format values, etc.
+  1. Repeat for each edge type:
+    * Call a function to get a list of edge ids and add them to the graph array.
+    * Call a function that, given a list of edge ids, fills in sets of properties for each edge.
+  1. Do some state checking, index construction, etc.
+  1. Pass the graph on to the rest of the framework to do what is needed with it.
+
+
+
+
+## Functions in the GraphSetupFile ##
+
+Generally the best way to create a new GraphSetupFile is to copy a [demo file](http://code.google.com/p/nodeviz/source/browse/www/framework/application/DemoGraph.php) and modify it.  Below is an outline of the main functions and what they do. All of the properties are defined as a nested set of associative arrays.
+
+```
+__construct()
+```
+This method is called at the beginning of graph construction and should define any graph-level properties and "meta" information about the network being constructed -- such as the parameters that define the graph.  Essential elements include"
+  * **nodetypes**  defines the names of the various "classes" of nodes that will be included in the network. (i.e. a [bi-partite](http://http://en.wikipedia.org/wiki/Bipartite_graph) network will have more than one node type)
+  * **edgetypes**  names the 'classes' of edges, and which types of nodes they will connect
+  * **properties** defines the graph-level properties. The arrays of values stored  'minSize' and 'maxSize' will control the relative sizes of nodes in the rendered network.
+  * **graphvizProperties** An array of GraphViz graph-level properties that will impact how GraphViz renders the network.  The properties and their acceptable values are defined in the GraphViz attribute [documentation](http://http://www.graphviz.org/content/attrs).
+
+The **nodetypes** and **edgetypes** arrays actually define the names of the sets of methods that will be used to construct the nodes and edges. NodeViz expects to find a `<nodetype>_fetchNodes()` and `<nodetype>_fetchNodeProperties` function for each node typeFor example, if your graph defines:
+```
+$this->data['nodetypes'] = array('animals', 'foods');
+```
+then it expects to find functions named:
+```
+function animals_fetchNodes(){
+  //return an array of node ids
+}
+
+function foods_fetchNodes(){
+  //return an array of node ids
+}
+```
+
+These methods must return an array of unique node id values.  When there are multiple node types, it is important that the sets of ids don't overlap between the types.
+
+Not surprisingly NodeViz will also look for a `<edgetype>_fetchEdges()` function to define the relations in the network. For example if an edgetype was defined to link animal and food nodes by:
+```
+$this->data['edgetypes'] = array( 'animal_to_food' => array('animals', 'foods'));
+```
+
+Then there should be a function:
+```
+function animal_to_food_fetchEdges(){
+}
+```
+
+The array returned by the `_fetchEdges()` function is a bit more complicated than the nodes case. Each element of the array needs to include an **id** for referencing the edge, as well as a **fromId** and **toId** values giving the ids of the nodes that will be linked by the edge.
+
+QUESTION: DOES THE ID HAVE TO BE IN 'A\_B' FORMAT FOR THE JS TO WORK?
+
+So for example
+```
+$edges['edge327'] = array('id'=>'edge327','fromId'=>'horse','toId'=>'hay');
+```
+
+## Adding Properties to Graph Elements ##
+
+Although a graph with just nodes and edges defined should work, it won't be very interesting.  Probably you want to add properties to your graph to control the color and shape of nodes and edges, as well as adding some JavaScript methods to trigger interaction events.
+
+Just like for the fetch methods, you can define `<node_type>_fetchNodeProperties()`functions for each node type to add properties.
+
+```
+
+//define a method to add properties to the 'foods' node type
+function foods_fetchNodeProperties($nodes){
+  //loop over the list of nodes to add properties
+  foreach ($nodes as &$node) {
+    $node['tooltip'] = $foods[$fid];
+    $node['label'] = $foods[$fid];
+    $node['shape'] = 'box';
+    $node['color'] = 'black';
+    $node['fillcolor'] = "#CCCCFF";
+
+    //add some javascript interaction using framework methods
+    $node['onClick'] = "this.Framework.selectNode('".$node['id']."'); this.Framework.panToNode('".$node['id']."');";
+    $node['onMouseover'] = "this.Framework.highlightNode('".$node['id']."');";
+  }
+}
+
+function animals_fetchNodeProperties(){
+  //do a similar thing for another node tip
+}
+
+```
+
+All of the GraphViz properties to control node rendering should work.
+
+Edge properties are added in a similar way.
+
+> and a `<edgetype>_fedgeEdges()` and `<edgetype>_fetchEdgeProperties()` function for each edge type.
+
+## Useful Utility Methods ##
+
+`scaleSizes()`
+
+
+
+## More Optional Methods ##
+
+`graphName()`
+
+AJAX callback methods?
+
+Graph Pre-processing
+
+Graph Post-processing
+
+
+## The Method to This Madness ##
+
+The main reason for going through this seeming convoluted construction process is to make it easy to deal with the case where we want to pull sets of relation from a database using SQL commands.  So we can do things along the lines of
+
+```
+function myNode_fetchNodes(){
+  //a query to get node ids
+  $query = "SELECT node_id as id FROM myNodes;";
+
+  //code to execute query and convert results to an array
+}
+
+function myNode_fetchNodeProperties($nodes){
+  //a query to get properties for our set of nodes
+  
+  //we use a handy function to convert the array of nodes into a string for an SQL in statement..
+  $node_ids = arrayToInString($nodes);
+  $query = "SELECT name AS label, age, cash AS size FROM myNodes WHERE node_id IN $node_ids";
+  //code to execute query and convert results to an array
+}
+
+function myEdge_fetchEdges($nodes){
+  //a query to find only the set of edges between the selected nodes
+  $node_ids = arrayToInString($nodes);
+  $query = "SELECT FROM relationships WHERE partner_a IN $node_ids AND partner_b IN $node_ids";
+}
+
+```

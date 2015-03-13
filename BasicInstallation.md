@@ -1,0 +1,28 @@
+#how to get a 'hello world' graph working
+
+# Basic Installation #
+
+## Requirements ##
+
+To get NodeViz to work, you'll shell access to a web server.
+The server needs to be running PHP 5 or greater.
+
+## Install Graphviz ##
+We have been using GraphViz version 2.26.23 .
+Most linux distributions can install the "graphviz" package by running the package manager. Otherwise follow instructions at http://www.graphviz.org/Download.php  If you will be using a version of GraphViz earlier that 2.24, you will need to set the 'old\_graphviz' flag in config.php.
+
+## Checkout or download the Framework code ##
+
+Follow the instructions on the [Source](http://code.google.com/p/nodeviz/source/checkout) or [Downloads](http://code.google.com/p/nodeviz/downloads/list) page of the NodeViz google code site. The framework should be installed in a web-accessible directory on your web server (i.e. 'public\_html' on Ubuntu).
+
+## Set permissions ##
+
+In some situations, it may be necessary to set the permissions of the "log" and "cache" directories to 777 so that the web service can write to them.  Maybe this has been fixed?
+
+## Load index page! ##
+
+Go to the NodeViz directory in your web browser. The address is probably something like: http://yourServerAddress/~yourUser/nodeViz/
+
+# More detailed installation #
+## Determine a location for your application directory ##
+## Edit config.php ##
